@@ -1,0 +1,41 @@
+// JeumalaCup 26 — Jersey Order System
+//
+// Note: The local dev database is SQLite (does not support Prisma enums),
+// so enum-like fields are stored as String and validated at the application
+// layer (see src/lib/validations.ts). The exact same schema works on
+// PostgreSQL (Railway) — when migrating to Postgres you may optionally
+// convert these String fields to native enums.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+/// Gender of the registrant. Allowed values: "PRIA" | "WANITA"
+model JerseyOrder {
+  id         String   @id @default(cuid())
+  gender     String
+  fullName   String
+  backName   String   @unique
+  backNumber Int      @unique
+  size       String
+  sleeve     String
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@index([gender])
+  @@index([backNumber])
+}
+
+model AdminLoginAttempt {
+  id        String   @id @default(cuid())
+  ip        String
+  success   Boolean
+  createdAt DateTime @default(now())
+
+  @@index([ip, createdAt])
+}

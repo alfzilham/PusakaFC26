@@ -1,0 +1,464 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+/* ============================================================
+   JeumalaCup 26 — Design Tokens
+   Clean minimalism · neutral palette + emerald brand accent
+   ============================================================ */
+@theme inline {
+  --font-sans: var(--font-jakarta), ui-sans-serif, system-ui, sans-serif;
+
+  --color-app-bg: var(--jc-bg);
+  --color-app-fg: var(--jc-fg);
+  --color-app-surface: var(--jc-surface);
+  --color-app-muted: var(--jc-muted);
+  --color-app-border: var(--jc-border);
+  --color-app-accent: var(--jc-accent);
+  --color-app-accent-strong: var(--jc-accent-strong);
+  --color-app-accent-fg: var(--jc-accent-fg);
+  --color-app-danger: var(--jc-danger);
+  --color-app-success: var(--jc-success);
+  --color-app-pria: var(--jc-pria);
+  --color-app-wanita: var(--jc-wanita);
+}
+
+:root {
+  --radius: 0.75rem;
+
+  /* Neutral warm-gray palette */
+  --jc-bg: #f7f6f4;
+  --jc-surface: #ffffff;
+  --jc-surface-2: #fbfaf9;
+  --jc-fg: #1c1917;
+  --jc-fg-soft: #44403c;
+  --jc-muted: #78716c;
+  --jc-border: #e7e5e4;
+  --jc-border-strong: #d6d3d1;
+
+  /* Brand accent — emerald (sporty, pitch-green) */
+  --jc-accent: #0d9488;
+  --jc-accent-strong: #0f766e;
+  --jc-accent-soft: #ccfbf1;
+  --jc-accent-fg: #ffffff;
+
+  /* Status */
+  --jc-danger: #dc2626;
+  --jc-danger-soft: #fee2e2;
+  --jc-success: #059669;
+  --jc-success-soft: #d1fae5;
+
+  /* Gender badges */
+  --jc-pria: #0d9488;
+  --jc-pria-soft: #ccfbf1;
+  --jc-pria-fg: #134e4a;
+  --jc-wanita: #e11d6e;
+  --jc-wanita-soft: #fce7f3;
+  --jc-wanita-fg: #831843;
+
+  --shadow-sm: 0 1px 2px 0 rgb(28 25 23 / 0.05);
+  --shadow-md: 0 4px 12px -2px rgb(28 25 23 / 0.08), 0 2px 4px -2px rgb(28 25 23 / 0.05);
+  --shadow-lg: 0 12px 32px -4px rgb(28 25 23 / 0.12), 0 4px 12px -2px rgb(28 25 23 / 0.08);
+}
+
+.dark {
+  --jc-bg: #1c1917;
+  --jc-surface: #292524;
+  --jc-surface-2: #232020;
+  --jc-fg: #f5f5f4;
+  --jc-fg-soft: #d6d3d1;
+  --jc-muted: #a8a29e;
+  --jc-border: #44403c;
+  --jc-border-strong: #57534e;
+
+  --jc-accent: #2dd4bf;
+  --jc-accent-strong: #14b8a6;
+  --jc-accent-soft: #134e4a;
+  --jc-accent-fg: #042f2e;
+
+  --jc-danger: #f87171;
+  --jc-danger-soft: #450a0a;
+  --jc-success: #34d399;
+  --jc-success-soft: #022c22;
+
+  --jc-pria: #2dd4bf;
+  --jc-pria-soft: #134e4a;
+  --jc-pria-fg: #99f6e4;
+  --jc-wanita: #f472b6;
+  --jc-wanita-soft: #500724;
+  --jc-wanita-fg: #fbcfe8;
+}
+
+@layer base {
+  * {
+    border-color: var(--jc-border);
+  }
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
+  body {
+    background-color: var(--jc-bg);
+    color: var(--jc-fg);
+    font-family: var(--font-jakarta), ui-sans-serif, system-ui, sans-serif;
+    min-height: 100dvh;
+  }
+  ::selection {
+    background: var(--jc-accent-soft);
+    color: var(--jc-accent-strong);
+  }
+}
+
+/* ============================================================
+   Custom Scrollbar — WebKit + Firefox fallback
+   ============================================================ */
+.jc-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: var(--jc-border-strong) transparent;
+}
+.jc-scroll::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+.jc-scroll::-webkit-scrollbar-track {
+  background: transparent;
+  border-radius: 999px;
+}
+.jc-scroll::-webkit-scrollbar-thumb {
+  background: var(--jc-border-strong);
+  border-radius: 999px;
+  border: 2px solid var(--jc-surface);
+  transition: background 0.15s ease;
+}
+.jc-scroll::-webkit-scrollbar-thumb:hover {
+  background: var(--jc-muted);
+}
+.jc-scroll::-webkit-scrollbar-corner {
+  background: transparent;
+}
+
+/* Global thin scrollbar for the whole page */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--jc-border-strong) transparent;
+}
+*::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
+*::-webkit-scrollbar-thumb {
+  background: var(--jc-border-strong);
+  border-radius: 999px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+*::-webkit-scrollbar-thumb:hover {
+  background: var(--jc-muted);
+  background-clip: padding-box;
+}
+
+/* ============================================================
+   Splash Screen
+   ============================================================ */
+.jc-splash {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 1.25rem;
+  background: linear-gradient(160deg, #0f766e 0%, #0d9488 45%, #134e4a 100%);
+}
+.jc-splash-logo {
+  transform: scale(0.3);
+  opacity: 0;
+  animation: jc-splash-in 800ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+.jc-splash.fade-out {
+  animation: jc-splash-out 450ms ease forwards;
+}
+.jc-splash-word {
+  opacity: 0;
+  animation: jc-fade-up 600ms ease 500ms forwards;
+}
+@keyframes jc-splash-in {
+  0% {
+    transform: scale(0.3);
+    opacity: 0;
+  }
+  60% {
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+@keyframes jc-splash-out {
+  to {
+    opacity: 0;
+    transform: scale(1.04);
+    visibility: hidden;
+  }
+}
+@keyframes jc-fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ============================================================
+   Skeleton shimmer
+   ============================================================ */
+.jc-shimmer {
+  position: relative;
+  overflow: hidden;
+  background: var(--jc-surface-2);
+  border: 1px solid var(--jc-border);
+}
+.jc-shimmer::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  transform: translateX(-100%);
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgb(255 255 255 / 0.55),
+    transparent
+  );
+  animation: jc-shimmer-move 1.4s infinite;
+}
+.dark .jc-shimmer::after {
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgb(255 255 255 / 0.06),
+    transparent
+  );
+}
+@keyframes jc-shimmer-move {
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+/* ============================================================
+   Toast — slide in from top
+   ============================================================ */
+.jc-toast {
+  animation: jc-toast-in 320ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+.jc-toast.leaving {
+  animation: jc-toast-out 280ms ease forwards;
+}
+@keyframes jc-toast-in {
+  from {
+    opacity: 0;
+    transform: translateY(-120%);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@keyframes jc-toast-out {
+  to {
+    opacity: 0;
+    transform: translateY(-120%);
+  }
+}
+
+/* ============================================================
+   Custom Dropdown — fade + scale
+   ============================================================ */
+.jc-dropdown-panel {
+  transform-origin: top center;
+  animation: jc-dd-in 170ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+.jc-dropdown-panel.closing {
+  animation: jc-dd-out 120ms ease forwards;
+}
+@keyframes jc-dd-in {
+  from {
+    opacity: 0;
+    transform: scale(0.96) translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+@keyframes jc-dd-out {
+  to {
+    opacity: 0;
+    transform: scale(0.97) translateY(-2px);
+  }
+}
+
+/* ============================================================
+   Custom Checkbox — smooth check
+   ============================================================ */
+.jc-check-tick {
+  stroke-dasharray: 22;
+  stroke-dashoffset: 22;
+  transition: stroke-dashoffset 0.15s ease;
+}
+.jc-checkbox.checked .jc-check-tick {
+  stroke-dashoffset: 0;
+}
+.jc-checkbox-box {
+  transition: background-color 0.15s ease, border-color 0.15s ease;
+}
+
+/* ============================================================
+   Sidebar slide
+   ============================================================ */
+.jc-sidebar {
+  animation: jc-slide-in-right 260ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+.jc-sidebar.closing {
+  animation: jc-slide-out-right 220ms ease forwards;
+}
+@keyframes jc-slide-in-right {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+@keyframes jc-slide-out-right {
+  to {
+    transform: translateX(100%);
+  }
+}
+.jc-overlay {
+  animation: jc-fade-in 220ms ease forwards;
+}
+.jc-overlay.closing {
+  animation: jc-fade-out 180ms ease forwards;
+}
+@keyframes jc-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@keyframes jc-fade-out {
+  to {
+    opacity: 0;
+  }
+}
+
+/* ============================================================
+   Generic helpers
+   ============================================================ */
+.jc-fade-in {
+  animation: jc-view-in 300ms ease forwards;
+}
+@keyframes jc-view-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.jc-pop-in {
+  animation: jc-pop-in 200ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+@keyframes jc-pop-in {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Focus-visible ring (shared) */
+.jc-focus:focus-visible {
+  outline: 2px solid var(--jc-accent);
+  outline-offset: 2px;
+}
+
+/* Shared text input style (used in admin edit modal) */
+.jc-input {
+  width: 100%;
+  border-radius: 0.75rem;
+  border: 1px solid var(--jc-border);
+  background: var(--jc-surface);
+  padding: 0.75rem 0.875rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--jc-fg);
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+.jc-input::placeholder {
+  color: var(--jc-muted);
+  font-weight: 400;
+}
+.jc-input:hover {
+  border-color: var(--jc-border-strong);
+}
+.jc-input:focus {
+  outline: none;
+  border-color: var(--jc-accent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--jc-accent) 18%, transparent);
+}
+
+/* Spinner */
+.jc-spinner {
+  width: 1.1em;
+  height: 1.1em;
+  border-radius: 999px;
+  border: 2px solid currentColor;
+  border-top-color: transparent;
+  animation: jc-spin 0.6s linear infinite;
+  display: inline-block;
+}
+@keyframes jc-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Hide number input spinners */
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+input[type="number"] {
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
+
+/* Respect reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
