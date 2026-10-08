@@ -4,13 +4,15 @@ import { useEffect, useState } from "react";
 import {
   X,
   ClipboardList,
-  Hash,
+  ListOrdered,
   Lock,
   Info,
+  ShieldAlert,
   ChevronDown,
   type LucideIcon,
 } from "lucide-react";
 import { Logo } from "./Logo";
+import { Modal } from "./Modal";
 import { APP_NAME } from "@/lib/constants";
 import { cn } from "@/lib/utils";
 
@@ -34,6 +36,7 @@ export function Sidebar({
 }: SidebarProps) {
   const [closing, setClosing] = useState(false);
   const [infoOpen, setInfoOpen] = useState(false);
+  const [accessNoticeOpen, setAccessNoticeOpen] = useState(false);
 
   function handleClose() {
     setClosing(true);
@@ -98,7 +101,7 @@ export function Sidebar({
             onClick={() => navigate("form")}
           />
           <NavItem
-            icon={Hash}
+            icon={ListOrdered}
             label="Nomor Punggung Terpakai"
             active={current === "numbers"}
             onClick={() => navigate("numbers")}
@@ -106,8 +109,7 @@ export function Sidebar({
           <NavItem
             icon={Lock}
             label="Lihat Detail Data"
-            disabled
-            disabledHint="Khusus admin (via /admin)"
+            onClick={() => setAccessNoticeOpen(true)}
           />
 
           {/* Information — sticky bottom */}
@@ -147,6 +149,24 @@ export function Sidebar({
           </div>
         </nav>
       </aside>
+      <Modal
+        open={accessNoticeOpen}
+        onClose={() => setAccessNoticeOpen(false)}
+        title="Akses terbatas"
+        icon={<ShieldAlert className="h-5 w-5 text-app-danger" />}
+        footer={
+          <button
+            type="button"
+            onClick={() => setAccessNoticeOpen(false)}
+            className="jc-focus w-full rounded-xl bg-app-accent px-4 py-2.5 text-sm font-bold text-app-accent-fg transition-colors hover:bg-app-accent-strong"
+          >
+            Mengerti
+          </button>
+        }
+      >
+        Fitur detail data hanya dapat diakses oleh admin dan developer. Silakan
+        gunakan halaman admin untuk melanjutkan.
+      </Modal>
     </div>
   );
 }

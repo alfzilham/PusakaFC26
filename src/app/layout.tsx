@@ -15,6 +15,11 @@ export const metadata: Metadata = {
     "Sistem pendaftaran nama dan nomor punggung jersey untuk event JeumalaCup 26.",
   keywords: ["JeumalaCup", "Jersey", "Pendaftaran", "Sepak Bola"],
   authors: [{ name: "Alfiz Ilham" }],
+  icons: {
+    icon: "/favicon.ico",
+    shortcut: "/favicon.ico",
+    apple: "/favicon.ico",
+  },
 };
 
 export const viewport: Viewport = {

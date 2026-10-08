@@ -25,16 +25,16 @@ export function Splash({ onDone }: { onDone: () => void }) {
       aria-label={`${APP_NAME} sedang dimuat`}
     >
       <div className="jc-splash-logo">
-        <Logo size={96} variant="light" />
+        <Logo size={164} variant="light" />
       </div>
       <div className="jc-splash-word text-center">
         <p
-          className="text-2xl font-extrabold tracking-tight text-white"
+          className="text-2xl font-extrabold tracking-tight text-app-accent-strong"
           style={{ letterSpacing: "-0.01em" }}
         >
           {APP_NAME}
         </p>
-        <p className="mt-1 text-sm font-medium text-white/70">
+        <p className="mt-1 text-sm font-medium text-app-muted">
           Pendaftaran Jersey
         </p>
       </div>
