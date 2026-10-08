@@ -24,7 +24,7 @@ export function Logo({
       aria-hidden="true"
     >
       <Image
-        src="/logo.svg"
+        src="/logo.webp"
         alt=""
         width={size}
         height={size}

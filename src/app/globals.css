@@ -172,9 +172,12 @@
   justify-content: center;
   flex-direction: column;
   gap: 1.25rem;
-  background: linear-gradient(160deg, #0f766e 0%, #0d9488 45%, #134e4a 100%);
+  background: #ffffff;
 }
 .jc-splash-logo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
   transform: scale(0.3);
   opacity: 0;
   animation: jc-splash-in 800ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
