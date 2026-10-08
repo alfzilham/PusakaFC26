@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "next dev -p 3000 2>&1 | tee dev.log",
     "build": "prisma generate && next build && node -e \"const fs=require('fs'); fs.cpSync('.next/static','.next/standalone/.next/static',{recursive:true}); fs.cpSync('public','.next/standalone/public',{recursive:true})\"",
-    "start": "NODE_ENV=production bun .next/standalone/server.js 2>&1 | tee server.log",
+    "start": "HOSTNAME=0.0.0.0 NODE_ENV=production bun .next/standalone/server.js",
     "lint": "eslint .",
     "db:push": "prisma db push --accept-data-loss",
     "db:generate": "prisma generate",
