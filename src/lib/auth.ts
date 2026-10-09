@@ -78,8 +78,21 @@ export async function isAdminAuthenticated(): Promise<boolean> {
   return verifySessionToken(token);
 }
 
+function normalizeEnvironmentSecret(value: string): string {
+  const normalized = value.trim();
+  if (
+    normalized.length >= 2 &&
+    ((normalized.startsWith('"') && normalized.endsWith('"')) ||
+      (normalized.startsWith("'") && normalized.endsWith("'")))
+  ) {
+    return normalized.slice(1, -1);
+  }
+  return normalized;
+}
+
 export function getAdminPassword(): string {
-  return process.env[ADMIN_PASSWORD_ENV] || DEFAULT_ADMIN_PASSWORD;
+  const configured = process.env[ADMIN_PASSWORD_ENV];
+  return configured ? normalizeEnvironmentSecret(configured) : DEFAULT_ADMIN_PASSWORD;
 }
 
 // ---- Rate limiting (per IP) ----
