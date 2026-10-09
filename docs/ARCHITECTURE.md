@@ -22,7 +22,7 @@
   /api
     /orders
       route.ts              → GET (list terpakai) POST (submit order)
-      /[id]/route.ts        → PATCH (edit) DELETE (hapus) — admin only
+      /[id]/route.ts        → PATCH (edit) DELETE (hapus) — developer only
     /admin
       /login/route.ts       → POST login + rate limit check
       /export/route.ts      → GET export .xlsx / .json
@@ -43,11 +43,11 @@
     SummaryCards.tsx
     EditModal.tsx
     DeleteConfirmModal.tsx
-/lib
+  /lib
   prisma.ts                 → Prisma client singleton
   validation.ts             → Zod schema validasi field
   rateLimit.ts               → logic rate limiting login admin
-  auth.ts                    → session/cookie admin
+  auth.ts                    → session/cookie admin + developer
 /prisma
   schema.prisma
 ```
@@ -79,7 +79,7 @@ model JerseyOrder {
   gender     Gender
   fullName   String
   backName   String     @unique
-  backNumber Int        @unique
+  backNumber Int
   size       Size
   sleeve     SleeveType
   createdAt  DateTime   @default(now())
@@ -102,16 +102,16 @@ model AdminLoginAttempt {
 |---|---|---|---|
 | `/api/orders` | GET | Ambil semua `backName` + `backNumber` + `gender` terpakai (untuk cache client-side) | Public |
 | `/api/orders` | POST | Submit order baru, validasi server-side ulang (unik global) | Public |
-| `/api/orders/[id]` | PATCH | Edit entri | Admin |
-| `/api/orders/[id]` | DELETE | Hapus entri | Admin |
+| `/api/orders/[id]` | PATCH | Edit entri | Developer |
+| `/api/orders/[id]` | DELETE | Hapus entri | Developer |
 | `/api/admin/login` | POST | Login admin, cek rate limit | Public (gated) |
-| `/api/admin/export?format=xlsx\|json` | GET | Export data | Admin |
+| `/api/admin/export?format=xlsx\|json` | GET | Export data | Developer |
 
 ## 5. Validasi Duplikat — Alur Teknis
 
 1. Saat Halaman 1 di-load: fetch `GET /api/orders` → simpan di state client (`usedNames: Set<string>`, `usedNumbers: Set<number>`).
 2. Saat user mengetik di field Nama Belakang / No. Belakang: cek langsung terhadap Set di client → tampilkan error instan jika duplikat.
-3. Saat submit: server re-validasi terhadap DB (via Prisma `@unique` constraint + explicit check) untuk mencegah race condition.
+3. Saat submit: server re-validasi terhadap DB dengan explicit check untuk mencegah race condition. User dan admin biasa tetap wajib unik; developer dapat memakai nomor duplikat melalui endpoint terproteksi.
 4. Jika submit sukses: refetch `GET /api/orders` untuk update cache client.
 5. Jika submit gagal karena duplikat (race condition): tampilkan error, minta user ganti nama/nomor.
 
@@ -128,6 +128,12 @@ model AdminLoginAttempt {
 
 - **`.xlsx`**: generate dengan library seperti `exceljs` atau `xlsx` (SheetJS) di server (API route), 2 sheet: "Pria" dan "Wanita", masing-masing filter dari tabel `JerseyOrder`.
 - **`.json`**: `JSON.stringify` seluruh data `JerseyOrder`, didownload sebagai file.
+
+## 8. Role Admin dan Developer
+
+- Admin dapat melihat statistik dan data secara read-only.
+- Export, edit, hapus, dan nomor punggung duplikat membutuhkan verifikasi developer.
+- Password developer disimpan pada environment variable `DEVELOPER_PASSWORD`.
 
 ## 8. Deployment (Railway)
 
