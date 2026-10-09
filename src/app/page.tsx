@@ -9,6 +9,7 @@ import { UsedNumbersList } from "@/components/jeumala/UsedNumbersList";
 import { FormSkeleton, NumbersSkeleton } from "@/components/jeumala/Skeleton";
 import { InformationPanel } from "@/components/jeumala/InformationPanel";
 import { ToastProvider } from "@/components/jeumala/Toast";
+import { UpdateNotification } from "@/components/jeumala/UpdateNotification";
 import type { UsedEntry } from "@/lib/validations";
 
 export default function Page() {
@@ -83,6 +84,7 @@ function AppShell() {
   return (
     <div className="flex min-h-screen flex-col">
       <TopBar onMenu={() => setSidebarOpen(true)} />
+      <UpdateNotification audience="public" />
       <Sidebar
         open={sidebarOpen}
         onClose={() => setSidebarOpen(false)}

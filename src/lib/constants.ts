@@ -2,6 +2,17 @@
 
 export const APP_NAME = "JeumalaCup 26";
 export const APP_TAGLINE = "Sistem Pendaftaran Jersey";
+export const APP_VERSION = "v1.1.0";
+
+export const UPDATE_NOTIFICATION = {
+  title: "Pembaruan JeumalaCup 26",
+  summary: "Versi terbaru sudah tersedia dengan peningkatan keamanan dan pengalaman penggunaan.",
+  items: [
+    "Login admin diperbaiki agar lebih stabil di production.",
+    "Warna identitas diperbarui menjadi hijau JeumalaCup.",
+    "Notifikasi pembaruan kini tersedia di halaman utama dan admin.",
+  ],
+};
 
 export const DEVELOPER = {
   name: "Alfiz Ilham",
