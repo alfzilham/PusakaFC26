@@ -19,6 +19,7 @@ export function InformationPanel({
     about: { title: "About", icon: <Info className="h-5 w-5 text-app-accent" /> },
     privacy: { title: "Privacy Policy", icon: <Shield className="h-5 w-5 text-app-accent" /> },
     terms: { title: "Terms of Services", icon: <FileText className="h-5 w-5 text-app-accent" /> },
+    "admin-contact": { title: "Admin Contact", icon: <Phone className="h-5 w-5 text-app-accent" /> },
     contact: { title: "Developer Contact", icon: <Phone className="h-5 w-5 text-app-accent" /> },
   };
 
@@ -29,6 +30,7 @@ export function InformationPanel({
       {info === "about" && <AboutContent />}
       {info === "privacy" && <PrivacyContent />}
       {info === "terms" && <TermsContent />}
+      {info === "admin-contact" && <AdminContactContent />}
       {info === "contact" && <ContactContent />}
     </Modal>
   );
@@ -46,7 +48,7 @@ function AboutContent() {
         <h3 className="mb-2 font-semibold text-app-fg">Fitur Utama</h3>
         <ul className="list-disc space-y-1.5 pl-5 text-app-fg-soft">
           <li>Pendaftaran jersey dengan validasi real-time.</li>
-          <li>Pencegahan duplikat nama & nomor punggung (unik global).</li>
+          <li>Pencegahan duplikat nama & nomor punggung untuk user dan admin.</li>
           <li>Daftar nomor punggung terpakai yang dapat dilihat publik.</li>
           <li>Panel admin terproteksi untuk mengelola data.</li>
         </ul>
@@ -82,12 +84,13 @@ function PrivacyContent() {
         <p className="text-app-fg-soft">
           Data disimpan pada basis data terproteksi. Akses pengelolaan hanya
           melalui panel admin yang dilindungi password dengan pembatasan
-          percobaan login.
+          percobaan login. Aksi perubahan dan export hanya tersedia untuk
+          developer setelah verifikasi tambahan.
         </p>
       </div>
       <p className="text-xs text-app-muted">
-        Jika ada pertanyaan terkait privasi, hubungi developer melalui menu
-        Developer Contact.
+        Jika ada pertanyaan terkait privasi, hubungi admin atau developer
+        melalui menu kontak yang tersedia.
       </p>
     </div>
   );
@@ -103,13 +106,13 @@ function TermsContent() {
           diedit atau dibatalkan oleh peserta.
         </li>
         <li>
-          <strong>Keunikan:</strong> Nama belakang dan nomor punggung bersifat
-          unik secara global. Jika sudah dipakai, peserta harus memilih yang
-          lain.
+          <strong>Keunikan:</strong> Nama belakang dan nomor punggung user dan
+          admin bersifat unik secara global. Jika sudah dipakai, peserta harus
+          memilih yang lain.
         </li>
         <li>
           <strong>Koreksi Data:</strong> Untuk koreksi data setelah submit,
-          peserta wajib menghubungi admin via WhatsApp.
+          peserta wajib menghubungi admin atau developer via WhatsApp.
         </li>
         <li>
           <strong>Penggunaan Wajar:</strong> Pesenta dilarang melakukan upaya
@@ -122,6 +125,25 @@ function TermsContent() {
       </ol>
       <p className="text-xs text-app-muted">
         Dengan mendaftar, peserta dianggap menyetujui ketentuan di atas.
+      </p>
+    </div>
+  );
+}
+
+function AdminContactContent() {
+  return (
+    <div className="space-y-4">
+      <div className="rounded-xl border border-app-border bg-app-surface-2 p-4">
+        <p className="font-semibold text-app-fg">Admin {APP_NAME}</p>
+        <p className="mt-1 text-sm text-app-muted">Tim admin event · akses read-only</p>
+      </div>
+      <p>
+        Hubungi admin untuk pertanyaan pendaftaran, konfirmasi data, atau
+        koreksi informasi jersey. Aksi perubahan data dilakukan oleh admin
+        dengan otorisasi developer.
+      </p>
+      <p className="text-xs text-app-muted">
+        Untuk bantuan teknis dan akses developer, buka menu Developer Contact.
       </p>
     </div>
   );
