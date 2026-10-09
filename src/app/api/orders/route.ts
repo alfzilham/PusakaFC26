@@ -57,7 +57,7 @@ export async function POST(req: Request) {
         where: { backName: { equals: normalizedBackName } },
         select: { id: true },
       }),
-      db.jerseyOrder.findUnique({
+      db.jerseyOrder.findFirst({
         where: { backNumber },
         select: { id: true },
       }),
