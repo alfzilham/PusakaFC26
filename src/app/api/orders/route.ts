@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { databaseUnavailableResponse } from "@/lib/database-error";
-import { createOrderSchema, isGender } from "@/lib/validations";
+import { createOrderSchema, isGender, normalizeFullName } from "@/lib/validations";
 
 // GET /api/orders — public: returns used entries (for Page 2 + client cache)
 export async function GET() {
@@ -43,6 +43,7 @@ export async function POST(req: Request) {
     );
   }
   const { gender, fullName, backName, backNumber, size, sleeve } = parsed.data;
+  const normalizedFullName = normalizeFullName(fullName);
 
   // Normalize backName for uniqueness (trim + collapse spaces)
   const normalizedBackName = backName.trim().replace(/\s+/g, " ");
@@ -89,7 +90,7 @@ export async function POST(req: Request) {
     const created = await db.jerseyOrder.create({
       data: {
         gender,
-        fullName: fullName.trim(),
+        fullName: normalizedFullName,
         backName: normalizedBackName,
         backNumber,
         size,
