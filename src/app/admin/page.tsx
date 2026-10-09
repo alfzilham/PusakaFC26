@@ -4,10 +4,12 @@ import { useEffect, useState } from "react";
 import { AdminLogin } from "@/components/jeumala/admin/AdminLogin";
 import { AdminDashboard } from "@/components/jeumala/admin/AdminDashboard";
 import { ToastProvider } from "@/components/jeumala/Toast";
+import { UpdateNotification } from "@/components/jeumala/UpdateNotification";
 
 export default function AdminPage() {
   return (
     <ToastProvider>
+      <UpdateNotification audience="admin" />
       <AdminGate />
     </ToastProvider>
   );
