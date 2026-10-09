@@ -96,6 +96,8 @@ export type UpdateOrderInput = z.infer<typeof updateOrderSchema>;
 
 export type OrderRow = {
   id: string;
+  /** Stable position based on the earliest submission time. */
+  sequenceNumber?: number;
   gender: Gender;
   fullName: string;
   backName: string;
