@@ -12,6 +12,7 @@ Repository: https://github.com/alfzilham/PusakaFC26
 - Pemeriksaan duplikasi nama belakang dan nomor punggung di sisi client serta server.
 - Daftar nomor punggung terpakai yang dapat dilihat publik.
 - Panel admin dengan login berbasis password, rate limiting, statistik, edit/hapus data, dan ekspor.
+- Panel admin menampilkan nomor urut berdasarkan waktu submit dan nomor punggung sebagai field terpisah.
 - API Next.js untuk orders dan operasi admin.
 - Prisma ORM dengan SQLite untuk pengembangan lokal.
 - UI mobile-first menggunakan Tailwind CSS, Radix UI, Lucide React, dan Framer Motion.
@@ -72,6 +73,7 @@ Repository: https://github.com/alfzilham/PusakaFC26
 | `bun run lint` | Menjalankan ESLint |
 | `bun run db:generate` | Generate Prisma Client |
 | `bun run db:push` | Sinkronisasi schema ke database |
+| `bun run db:normalize:names` | Menormalkan nama lengkap lama tanpa menghapus data |
 | `bun run db:migrate` | Membuat dan menjalankan migration Prisma |
 | `bun run db:reset` | Reset database lokal |
 

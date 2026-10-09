@@ -248,6 +248,9 @@ export function AdminDashboard({ onLogout }: { onLogout: () => void }) {
           <p className="basis-full text-xs text-app-muted">
             Admin dapat melihat data. Export, edit, dan hapus hanya tersedia untuk developer.
           </p>
+          <p className="basis-full text-xs text-app-muted">
+            No. Urut mengikuti waktu submit dan tidak dapat diedit. No. Punggung adalah nomor jersey.
+          </p>
           <button
             type="button"
             onClick={refreshAll}
@@ -318,13 +321,14 @@ export function AdminDashboard({ onLogout }: { onLogout: () => void }) {
         {/* Table */}
         <section className="overflow-hidden rounded-2xl border border-app-border bg-app-surface shadow-sm">
           <div className="jc-scroll overflow-x-auto">
-            <table className="w-full min-w-[680px] text-left text-sm">
+            <table className="w-full min-w-[820px] text-left text-sm">
               <thead>
                 <tr className="border-b border-app-border bg-app-surface-2 text-xs uppercase tracking-wide text-app-muted">
-                  <th className="px-4 py-3 font-semibold">No.</th>
+                  <th className="px-4 py-3 font-semibold">No. Urut</th>
                   <th className="px-4 py-3 font-semibold">Gender</th>
                   <th className="px-4 py-3 font-semibold">Nama Lengkap</th>
                   <th className="px-4 py-3 font-semibold">Nama Belakang</th>
+                  <th className="px-4 py-3 font-semibold">No. Punggung</th>
                   <th className="px-4 py-3 font-semibold">Ukuran</th>
                   <th className="px-4 py-3 font-semibold">Lengan</th>
                   <th className="px-4 py-3 text-right font-semibold">Aksi</th>
@@ -333,14 +337,14 @@ export function AdminDashboard({ onLogout }: { onLogout: () => void }) {
               <tbody>
                 {loading && rows.length === 0 ? (
                   <tr>
-                    <td colSpan={7} className="px-4 py-16 text-center text-app-muted">
+                    <td colSpan={8} className="px-4 py-16 text-center text-app-muted">
                       <span className="jc-spinner" />
                       <p className="mt-3">Memuat data…</p>
                     </td>
                   </tr>
                 ) : rows.length === 0 ? (
                   <tr>
-                    <td colSpan={7} className="px-4 py-16">
+                    <td colSpan={8} className="px-4 py-16">
                       <div className="flex flex-col items-center gap-2 text-center">
                         <Inbox className="h-8 w-8 text-app-muted" />
                         <p className="font-semibold text-app-fg">Tidak ada data</p>
@@ -357,7 +361,7 @@ export function AdminDashboard({ onLogout }: { onLogout: () => void }) {
                       className="border-b border-app-border/70 transition-colors last:border-0 hover:bg-app-surface-2"
                     >
                       <td className="px-4 py-3 font-bold tabular-nums text-app-fg">
-                        {r.backNumber}
+                        {r.sequenceNumber ?? "—"}
                       </td>
                       <td className="px-4 py-3">
                         <GenderBadge gender={r.gender} />
@@ -367,6 +371,9 @@ export function AdminDashboard({ onLogout }: { onLogout: () => void }) {
                       </td>
                       <td className="px-4 py-3 font-medium text-app-fg-soft">
                         {r.backName}
+                      </td>
+                      <td className="px-4 py-3 font-bold tabular-nums text-app-fg">
+                        {r.backNumber}
                       </td>
                       <td className="px-4 py-3 text-app-fg-soft">
                         {SIZE_LABEL[r.size]}
@@ -474,7 +481,7 @@ export function AdminDashboard({ onLogout }: { onLogout: () => void }) {
       >
         {deleting && (
           <p>
-            Yakin ingin menghapus data <strong>{deleting.fullName}</strong> (No.{" "}
+            Yakin ingin menghapus data <strong>{deleting.fullName}</strong> (No. Punggung{" "}
             <strong>{deleting.backNumber}</strong> — {deleting.backName})? Tindakan
             ini tidak dapat dibatalkan.
           </p>
