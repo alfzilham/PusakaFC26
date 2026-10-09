@@ -328,7 +328,7 @@ export function RegistrationForm({ used, onAfterSubmit }: Props) {
           <MessageCircle className="mt-0.5 h-4 w-4 shrink-0 text-app-accent" />
           <p>
             Data yang sudah disimpan <strong className="font-semibold text-app-fg-soft">tidak dapat diedit/dibatalkan</strong> sendiri.
-            Untuk koreksi, hubungi developer via WhatsApp:{" "}
+            Untuk koreksi, hubungi admin atau developer via WhatsApp:{" "}
             <a
               href={DEVELOPER.whatsappHref}
               target="_blank"
