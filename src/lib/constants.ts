@@ -1,6 +1,6 @@
-// App-wide constants for JeumalaCup 26
+// App-wide constants for PusakaFC26
 
-export const APP_NAME = "JeumalaCup 26";
+export const APP_NAME = "PusakaFC26";
 export const APP_TAGLINE = "Sistem Pendaftaran Jersey";
 export const APP_VERSION = "v1.1.1";
 
