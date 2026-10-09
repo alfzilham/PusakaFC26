@@ -1,4 +1,4 @@
-# ARCHITECTURE.md — JeumalaCup 26
+# ARCHITECTURE.md — PusakaFC26
 
 ## 1. Stack
 
