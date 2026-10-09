@@ -7,6 +7,7 @@ import {
   isSize,
   isSleeve,
   GENDER_VALUES,
+  normalizeFullName,
   type OrderRow,
 } from "@/lib/validations";
 
@@ -32,6 +33,7 @@ async function ensureDeveloperAuth() {
 
 function toRow(r: {
   id: string;
+  sequenceNumber?: number;
   gender: string;
   fullName: string;
   backName: string;
@@ -43,6 +45,7 @@ function toRow(r: {
 }): OrderRow {
   return {
     id: r.id,
+    sequenceNumber: r.sequenceNumber,
     gender: isGender(r.gender) ? r.gender : "PRIA",
     fullName: r.fullName,
     backName: r.backName,
@@ -89,7 +92,7 @@ export async function GET(req: Request) {
     where.gender = gender;
   }
 
-  const [total, rows] = await Promise.all([
+  const [total, rows, sequenceRows] = await Promise.all([
     db.jerseyOrder.count({ where }),
     db.jerseyOrder.findMany({
       where,
@@ -97,10 +100,20 @@ export async function GET(req: Request) {
       skip: (page - 1) * pageSize,
       take: pageSize,
     }),
+    db.jerseyOrder.findMany({
+      orderBy: [{ createdAt: "asc" }, { id: "asc" }],
+      select: { id: true },
+    }),
   ]);
 
+  const sequenceById = new Map(
+    sequenceRows.map((row, index) => [row.id, index + 1])
+  );
+
   return NextResponse.json({
-    data: rows.map(toRow),
+    data: rows.map((row) =>
+      toRow({ ...row, sequenceNumber: sequenceById.get(row.id) })
+    ),
     total,
     page,
     pageSize,
@@ -144,7 +157,7 @@ export async function PUT(req: Request) {
   // Build update payload + duplicate checks
   const update: Record<string, unknown> = {};
   if (data.gender) update.gender = data.gender;
-  if (data.fullName) update.fullName = data.fullName.trim();
+  if (data.fullName) update.fullName = normalizeFullName(data.fullName);
   if (data.sleeve) update.sleeve = data.sleeve;
   if (data.size) update.size = data.size;
 
