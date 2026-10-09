@@ -9,7 +9,7 @@ import { UpdateNotification } from "@/components/jeumala/UpdateNotification";
 export default function AdminPage() {
   return (
     <ToastProvider>
-      <UpdateNotification audience="admin" />
+      <UpdateNotification />
       <AdminGate />
     </ToastProvider>
   );
