@@ -2,6 +2,8 @@
 
 Aplikasi web pendaftaran jersey JeumalaCup 26. Aplikasi ini menyediakan formulir pendaftaran publik, daftar nomor punggung yang sudah digunakan, dan panel admin untuk mengelola data pendaftaran.
 
+Repository: https://github.com/alfzilham/PusakaFC26
+
 ## Fitur
 
 - Form pendaftaran jersey dengan validasi nama, nomor, ukuran, jenis kelamin, dan panjang lengan.
