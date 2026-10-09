@@ -4,6 +4,8 @@ Aplikasi web pendaftaran jersey PusakaFC26. Aplikasi ini menyediakan formulir pe
 
 Repository: https://github.com/alfzilham/PusakaFC26
 
+![PusakaFC26 banner](public/assets/banner/pusakafc26-banner.jpg)
+
 ## Fitur
 
 - Form pendaftaran jersey dengan validasi nama, nomor, ukuran, jenis kelamin, dan panjang lengan.
