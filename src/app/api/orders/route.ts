@@ -1,20 +1,25 @@
 import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
+import { databaseUnavailableResponse } from "@/lib/database-error";
 import { createOrderSchema, isGender } from "@/lib/validations";
 
 // GET /api/orders — public: returns used entries (for Page 2 + client cache)
 export async function GET() {
-  const rows = await db.jerseyOrder.findMany({
-    orderBy: [{ backNumber: "asc" }],
-    select: { id: true, gender: true, backName: true, backNumber: true },
-  });
+  try {
+    const rows = await db.jerseyOrder.findMany({
+      orderBy: [{ backNumber: "asc" }],
+      select: { id: true, gender: true, backName: true, backNumber: true },
+    });
 
-  const data = rows.map((r) => ({
-    ...r,
-    gender: isGender(r.gender) ? r.gender : "PRIA",
-  }));
+    const data = rows.map((r) => ({
+      ...r,
+      gender: isGender(r.gender) ? r.gender : "PRIA",
+    }));
 
-  return NextResponse.json({ data });
+    return NextResponse.json({ data });
+  } catch (error) {
+    return databaseUnavailableResponse("orders GET", error);
+  }
 }
 
 // POST /api/orders — public: create a new jersey order
@@ -44,16 +49,22 @@ export async function POST(req: Request) {
 
   // Explicit duplicate checks (race-condition aware) before relying on
   // the Prisma unique constraints below.
-  const [byName, byNumber] = await Promise.all([
-    db.jerseyOrder.findFirst({
-      where: { backName: { equals: normalizedBackName } },
-      select: { id: true },
-    }),
-    db.jerseyOrder.findUnique({
-      where: { backNumber },
-      select: { id: true },
-    }),
-  ]);
+  let byName;
+  let byNumber;
+  try {
+    [byName, byNumber] = await Promise.all([
+      db.jerseyOrder.findFirst({
+        where: { backName: { equals: normalizedBackName } },
+        select: { id: true },
+      }),
+      db.jerseyOrder.findUnique({
+        where: { backNumber },
+        select: { id: true },
+      }),
+    ]);
+  } catch (error) {
+    return databaseUnavailableResponse("orders duplicate check", error);
+  }
 
   if (byName) {
     return NextResponse.json(

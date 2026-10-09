@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
+import { databaseUnavailableResponse } from "@/lib/database-error";
 import {
   checkRateLimit,
   recordLoginAttempt,
@@ -13,7 +14,12 @@ import { LOGIN_LOCK_MINUTES, LOGIN_MAX_ATTEMPTS } from "@/lib/constants";
 export async function POST(req: Request) {
   const ip = getClientIP(req);
 
-  const rl = await checkRateLimit(ip);
+  let rl;
+  try {
+    rl = await checkRateLimit(ip);
+  } catch (error) {
+    return databaseUnavailableResponse("admin login rate limit", error);
+  }
   if (rl.locked) {
     const minutes = Math.ceil(rl.retryAfterMs / 60000);
     return NextResponse.json(
@@ -42,10 +48,19 @@ export async function POST(req: Request) {
   }
 
   const ok = password === getAdminPassword();
-  await recordLoginAttempt(ip, ok);
+  try {
+    await recordLoginAttempt(ip, ok);
+  } catch (error) {
+    return databaseUnavailableResponse("admin login record", error);
+  }
 
   if (!ok) {
-    const rl2 = await checkRateLimit(ip);
+    let rl2;
+    try {
+      rl2 = await checkRateLimit(ip);
+    } catch (error) {
+      return databaseUnavailableResponse("admin login rate limit", error);
+    }
     const remaining = rl2.remainingAttempts;
     return NextResponse.json(
       {
