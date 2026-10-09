@@ -70,7 +70,7 @@ export function AdminLogin({ onSuccess, onBack }: Props) {
               Admin {APP_NAME}
             </h1>
             <p className="mt-1 text-sm text-app-muted">
-              Masukkan password untuk mengakses panel.
+              Admin dapat melihat data. Aksi terbatas memerlukan verifikasi developer.
             </p>
           </div>
 

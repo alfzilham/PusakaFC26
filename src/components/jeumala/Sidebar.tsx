@@ -17,7 +17,7 @@ import { APP_NAME } from "@/lib/constants";
 import { cn } from "@/lib/utils";
 
 export type ViewKey = "form" | "numbers";
-export type InfoKey = "about" | "privacy" | "terms" | "contact";
+export type InfoKey = "about" | "privacy" | "terms" | "admin-contact" | "contact";
 
 type SidebarProps = {
   open: boolean;
@@ -143,6 +143,7 @@ export function Sidebar({
                 <InfoSubItem label="About" onClick={() => { onOpenInfo("about"); handleClose(); }} />
                 <InfoSubItem label="Privacy Policy" onClick={() => { onOpenInfo("privacy"); handleClose(); }} />
                 <InfoSubItem label="Terms of Services" onClick={() => { onOpenInfo("terms"); handleClose(); }} />
+                <InfoSubItem label="Admin Contact" onClick={() => { onOpenInfo("admin-contact"); handleClose(); }} />
                 <InfoSubItem label="Developer Contact" onClick={() => { onOpenInfo("contact"); handleClose(); }} />
               </div>
             )}

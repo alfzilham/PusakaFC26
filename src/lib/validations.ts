@@ -20,6 +20,15 @@ export function isSize(v: string): v is Size {
   return (SIZE_VALUES as readonly string[]).includes(v);
 }
 
+/** Normalize public submissions to a consistent title-case full name. */
+export function normalizeFullName(value: string): string {
+  return value
+    .trim()
+    .replace(/\s+/g, " ")
+    .toLocaleLowerCase("id-ID")
+    .replace(/(^|[\s'-])\p{L}/gu, (letter) => letter.toLocaleUpperCase("id-ID"));
+}
+
 // ---- Public-facing labels ----
 export const GENDER_LABEL: Record<Gender, string> = {
   PRIA: "Pria",

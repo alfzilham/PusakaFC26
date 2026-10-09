@@ -59,6 +59,7 @@ Sistem input pemesanan nama/nomor punggung jersey untuk event "PusakaFC26". Tida
   - About (deskripsi software).
   - Privacy Policy.
   - Terms of Services.
+  - Admin Contact: kanal komunikasi admin event.
   - Developer Contact: Nama "Alfiz Ilham", No. WA "0852-1389-6460".
 
 ## 5. Admin Panel (`/admin`)
@@ -70,6 +71,9 @@ Sistem input pemesanan nama/nomor punggung jersey untuk event "PusakaFC26". Tida
 
 ### 5.2 Fitur Admin
 - **Dashboard summary cards**: total entri, total Pria, total Wanita.
+- **Akses admin dan developer**:
+  - Admin hanya dapat melihat data dan statistik.
+  - Export, edit, hapus, dan nomor punggung duplikat membutuhkan verifikasi developer.
 - **Export data**:
   - `.xlsx` — 2 sheet terpisah: "Pria" dan "Wanita".
   - `.json` — seluruh data.

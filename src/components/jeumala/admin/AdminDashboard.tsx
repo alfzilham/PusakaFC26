@@ -205,7 +205,7 @@ export function AdminDashboard({ onLogout }: { onLogout: () => void }) {
               <p className="text-sm font-extrabold tracking-tight text-app-fg">
                 {APP_NAME}
               </p>
-              <p className="text-[11px] text-app-muted">Panel Admin</p>
+              <p className="text-[11px] text-app-muted">Panel Admin · Read-only</p>
             </div>
           </div>
           <button
@@ -245,6 +245,9 @@ export function AdminDashboard({ onLogout }: { onLogout: () => void }) {
         {/* Export + refresh */}
         <section className="mb-6 flex flex-wrap items-center gap-3">
           <h2 className="mr-auto text-lg font-bold text-app-fg">Data Pendaftar</h2>
+          <p className="basis-full text-xs text-app-muted">
+            Admin dapat melihat data. Export, edit, dan hapus hanya tersedia untuk developer.
+          </p>
           <button
             type="button"
             onClick={refreshAll}
