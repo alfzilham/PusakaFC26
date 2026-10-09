@@ -17,12 +17,6 @@ export const DEVELOPER = {
   whatsappHref: "https://wa.me/6285213896460",
 };
 
-export const ADMIN_CONTACT = {
-  name: "Ata Sidqi",
-  whatsapp: "0813-6173-909",
-  whatsappHref: "https://wa.me/628136173909",
-};
-
 export const ADMIN_PASSWORD_ENV = "ADMIN_PASSWORD";
 export const DEVELOPER_PASSWORD_ENV = "DEVELOPER_PASSWORD";
 export const ADMIN_SESSION_COOKIE = "jc26_admin";
