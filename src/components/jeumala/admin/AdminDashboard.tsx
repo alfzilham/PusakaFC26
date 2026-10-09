@@ -129,7 +129,7 @@ export function AdminDashboard({ onLogout }: { onLogout: () => void }) {
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
-      a.download = `jeumalacup26-${Date.now()}.${fmt}`;
+      a.download = `pusakafc26-${Date.now()}.${fmt}`;
       document.body.appendChild(a);
       a.click();
       a.remove();
