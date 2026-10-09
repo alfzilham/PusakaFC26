@@ -135,7 +135,7 @@ model AdminLoginAttempt {
 - Environment variables: `DATABASE_URL`, `ADMIN_PASSWORD_HASH`, `SESSION_SECRET`.
 - Build command: `prisma generate && next build`.
 - Start command: `next start`.
-- Migrasi: `prisma migrate deploy` dijalankan saat deploy (release command di Railway).
+- Sinkronisasi schema: `prisma db push --skip-generate` dijalankan sebelum server dimulai untuk mendukung database Railway existing tanpa baseline migration.
 
 ## 9. Animasi & Performance
 
