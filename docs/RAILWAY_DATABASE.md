@@ -2,7 +2,7 @@
 
 Service aplikasi harus memakai URL dari service PostgreSQL Railway.
 
-Pada Railway, buka service aplikasi `jeumalacup26` → **Variables**, lalu set:
+Pada Railway, buka service aplikasi PusakaFC26 → **Variables**, lalu set:
 
 ```text
 DATABASE_URL=${{Postgres.DATABASE_URL}}
