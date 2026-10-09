@@ -1,4 +1,4 @@
-# DESIGN.md — JeumalaCup 26
+# DESIGN.md — PusakaFC26
 
 ## 1. Design Principles
 
@@ -51,7 +51,7 @@
 - Animasi: `scale(0.3)→scale(1)` + `opacity 0→1`, durasi ~800ms, easing `ease-out`.
 - Lanjut: fade-out splash → fade-in halaman utama.
 
-## 5. Warna (disarankan, dapat disesuaikan brand JeumalaCup)
+## 5. Warna (disarankan, dapat disesuaikan brand PusakaFC26)
 
 - Base: netral (putih/abu sangat terang untuk background, abu gelap untuk teks) agar clean minimalism tetap dominan.
 - Primary accent: satu warna brand (misal biru atau warna tim) dipakai konsisten untuk tombol utama, link aktif, badge gender.
@@ -62,14 +62,14 @@
 
 ### 6.1 Top Bar (sticky, semua halaman)
 ```
-[ Logo ] [ JeumalaCup 26 ]                    [ Hamburger menu ]
+[ Logo ] [ PusakaFC26 ]                    [ Hamburger menu ]
 ```
 - Logo + nama brand rata kiri.
 - Hamburger menu rata kanan, membuka Sidebar (drawer dari kanan atau kiri, mobile-first → full/partial overlay).
 
 ### 6.2 Sidebar (drawer/overlay)
 Urutan dari atas ke bawah:
-1. Logo + "JeumalaCup 26" (header sidebar).
+1. Logo + "PusakaFC26" (header sidebar).
 2. Link: Halaman 1 — "Form Pendaftaran Jersey".
 3. Link: Halaman 2 — "Nomor Punggung Terpakai".
 4. Link: "Lihat Detail Data" — tampil dengan ikon `Lock`, style disabled (opacity rendah, cursor not-allowed, tidak clickable untuk publik).
