@@ -2,13 +2,11 @@
 
 import { Info, Shield, FileText, Phone } from "lucide-react";
 import { Modal } from "./Modal";
-import { ADMIN_CONTACT, APP_NAME, DEVELOPER } from "@/lib/constants";
+import { APP_NAME, DEVELOPER } from "@/lib/constants";
 import type { InfoKey } from "./Sidebar";
 
 const WA_DISPLAY = DEVELOPER.whatsapp;
 const WA_HREF = DEVELOPER.whatsappHref;
-const ADMIN_WA_DISPLAY = ADMIN_CONTACT.whatsapp;
-const ADMIN_WA_HREF = ADMIN_CONTACT.whatsappHref;
 
 export function InformationPanel({
   info,
@@ -136,26 +134,9 @@ function AdminContactContent() {
   return (
     <div className="space-y-4">
       <div className="rounded-xl border border-app-border bg-app-surface-2 p-4">
-        <p className="font-semibold text-app-fg">{ADMIN_CONTACT.name}</p>
-        <p className="mt-1 text-sm text-app-muted">Admin · {APP_NAME}</p>
+        <p className="font-semibold text-app-fg">Admin {APP_NAME}</p>
+        <p className="mt-1 text-sm text-app-muted">Tim admin event · akses read-only</p>
       </div>
-      <a
-        href={ADMIN_WA_HREF}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="jc-focus flex items-center justify-between gap-3 rounded-xl border border-app-border bg-app-surface-2 p-4 transition-colors hover:border-app-accent/40 hover:bg-app-accent/5"
-      >
-        <div className="flex items-center gap-3">
-          <Phone className="h-5 w-5 text-app-accent" />
-          <div>
-            <p className="text-xs text-app-muted">WhatsApp Admin</p>
-            <p className="font-semibold text-app-fg">{ADMIN_WA_DISPLAY}</p>
-          </div>
-        </div>
-        <span className="rounded-lg bg-app-accent px-3 py-1.5 text-xs font-semibold text-app-accent-fg">
-          Chat
-        </span>
-      </a>
       <p>
         Hubungi admin untuk pertanyaan pendaftaran, konfirmasi data, atau
         koreksi informasi jersey. Aksi perubahan data dilakukan oleh admin
