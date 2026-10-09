@@ -37,10 +37,10 @@
   --jc-border: #e7e5e4;
   --jc-border-strong: #d6d3d1;
 
-  /* Brand accent — emerald (sporty, pitch-green) */
-  --jc-accent: #0d9488;
-  --jc-accent-strong: #0f766e;
-  --jc-accent-soft: #ccfbf1;
+  /* Brand accent — Jeumala green */
+  --jc-accent: #004e15;
+  --jc-accent-strong: #003a0f;
+  --jc-accent-soft: #e5f1e7;
   --jc-accent-fg: #ffffff;
 
   /* Status */
@@ -50,9 +50,9 @@
   --jc-success-soft: #d1fae5;
 
   /* Gender badges */
-  --jc-pria: #0d9488;
-  --jc-pria-soft: #ccfbf1;
-  --jc-pria-fg: #134e4a;
+  --jc-pria: #004e15;
+  --jc-pria-soft: #e5f1e7;
+  --jc-pria-fg: #003a0f;
   --jc-wanita: #e11d6e;
   --jc-wanita-soft: #fce7f3;
   --jc-wanita-fg: #831843;
@@ -72,19 +72,19 @@
   --jc-border: #44403c;
   --jc-border-strong: #57534e;
 
-  --jc-accent: #2dd4bf;
-  --jc-accent-strong: #14b8a6;
-  --jc-accent-soft: #134e4a;
-  --jc-accent-fg: #042f2e;
+  --jc-accent: #004e15;
+  --jc-accent-strong: #003a0f;
+  --jc-accent-soft: #173d22;
+  --jc-accent-fg: #ffffff;
 
   --jc-danger: #f87171;
   --jc-danger-soft: #450a0a;
   --jc-success: #34d399;
   --jc-success-soft: #022c22;
 
-  --jc-pria: #2dd4bf;
-  --jc-pria-soft: #134e4a;
-  --jc-pria-fg: #99f6e4;
+  --jc-pria: #004e15;
+  --jc-pria-soft: #173d22;
+  --jc-pria-fg: #b7e4c2;
   --jc-wanita: #f472b6;
   --jc-wanita-soft: #500724;
   --jc-wanita-fg: #fbcfe8;
