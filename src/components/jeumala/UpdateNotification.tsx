@@ -24,7 +24,7 @@ export function UpdateNotification() {
       href={UPDATE_NOTIFICATION.href}
       target="_blank"
       rel="noreferrer"
-      aria-label="Lihat changelog JeumalaCup di GitHub"
+      aria-label="Lihat changelog PusakaFC26 di GitHub"
       className={`jc-update-card jc-focus fixed left-4 top-4 z-[80] flex w-[min(290px,calc(100vw-2rem))] items-center gap-3 rounded-xl border border-app-accent/20 bg-app-surface px-4 py-3 shadow-lg transition-shadow hover:shadow-xl${
         leaving ? " jc-update-card-leaving" : ""
       }`}
