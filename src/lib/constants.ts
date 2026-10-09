@@ -2,10 +2,10 @@
 
 export const APP_NAME = "JeumalaCup 26";
 export const APP_TAGLINE = "Sistem Pendaftaran Jersey";
-export const APP_VERSION = "v1.1.0";
+export const APP_VERSION = "v1.1.1";
 
 export const UPDATE_NOTIFICATION = {
-  label: "Update v1.0.0",
+  label: "Update v1.1.1",
   summary: "View changelog or see more update here",
   href: "https://github.com/alfzilham/jeumalacup26",
 };
