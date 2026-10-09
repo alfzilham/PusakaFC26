@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import {
   Users,
   UserCheck,
@@ -35,6 +35,7 @@ import {
   type OrderRow,
 } from "@/lib/validations";
 import { cn } from "@/lib/utils";
+import { DeveloperVerificationModal } from "@/components/jeumala/admin/DeveloperVerificationModal";
 
 type Stats = { total: number; pria: number; wanita: number };
 
@@ -53,6 +54,9 @@ export function AdminDashboard({ onLogout }: { onLogout: () => void }) {
 
   const [editing, setEditing] = useState<OrderRow | null>(null);
   const [deleting, setDeleting] = useState<OrderRow | null>(null);
+  const [developerPrompt, setDeveloperPrompt] = useState<string | null>(null);
+  const [developerVerified, setDeveloperVerified] = useState(false);
+  const pendingDeveloperAction = useRef<(() => void | Promise<void>) | null>(null);
 
   // Derived gender filter for API
   const genderParam = (() => {
@@ -118,6 +122,23 @@ export function AdminDashboard({ onLogout }: { onLogout: () => void }) {
   function refreshAll() {
     fetchTable();
     fetchStats();
+  }
+
+  function requireDeveloper(actionLabel: string, action: () => void | Promise<void>) {
+    if (developerVerified) {
+      void action();
+      return;
+    }
+    pendingDeveloperAction.current = action;
+    setDeveloperPrompt(actionLabel);
+  }
+
+  function handleDeveloperVerified() {
+    setDeveloperVerified(true);
+    setDeveloperPrompt(null);
+    const action = pendingDeveloperAction.current;
+    pendingDeveloperAction.current = null;
+    if (action) void action();
   }
 
   async function handleExport(fmt: "xlsx" | "json") {
@@ -235,7 +256,7 @@ export function AdminDashboard({ onLogout }: { onLogout: () => void }) {
           </button>
           <button
             type="button"
-            onClick={() => handleExport("xlsx")}
+            onClick={() => requireDeveloper("export Excel", () => handleExport("xlsx"))}
             disabled={!!exporting}
             className="jc-focus inline-flex items-center gap-1.5 rounded-xl bg-app-accent px-3.5 py-2 text-sm font-semibold text-app-accent-fg transition-colors hover:bg-app-accent-strong disabled:opacity-60"
           >
@@ -248,7 +269,7 @@ export function AdminDashboard({ onLogout }: { onLogout: () => void }) {
           </button>
           <button
             type="button"
-            onClick={() => handleExport("json")}
+            onClick={() => requireDeveloper("export JSON", () => handleExport("json"))}
             disabled={!!exporting}
             className="jc-focus inline-flex items-center gap-1.5 rounded-xl border border-app-border bg-app-surface px-3.5 py-2 text-sm font-semibold text-app-fg transition-colors hover:border-app-border-strong disabled:opacity-60"
           >
@@ -354,7 +375,7 @@ export function AdminDashboard({ onLogout }: { onLogout: () => void }) {
                         <div className="flex items-center justify-end gap-1">
                           <button
                             type="button"
-                            onClick={() => setEditing(r)}
+                            onClick={() => requireDeveloper("mengedit data", () => setEditing(r))}
                             aria-label={`Edit ${r.fullName}`}
                             className="jc-focus inline-flex h-8 w-8 items-center justify-center rounded-lg text-app-muted transition-colors hover:bg-app-accent/10 hover:text-app-accent"
                           >
@@ -362,7 +383,7 @@ export function AdminDashboard({ onLogout }: { onLogout: () => void }) {
                           </button>
                           <button
                             type="button"
-                            onClick={() => setDeleting(r)}
+                            onClick={() => requireDeveloper("menghapus data", () => setDeleting(r))}
                             aria-label={`Hapus ${r.fullName}`}
                             className="jc-focus inline-flex h-8 w-8 items-center justify-center rounded-lg text-app-muted transition-colors hover:bg-app-danger/10 hover:text-app-danger"
                           >
@@ -456,6 +477,16 @@ export function AdminDashboard({ onLogout }: { onLogout: () => void }) {
           </p>
         )}
       </Modal>
+
+      <DeveloperVerificationModal
+        open={!!developerPrompt}
+        actionLabel={developerPrompt || "fitur terbatas"}
+        onClose={() => {
+          pendingDeveloperAction.current = null;
+          setDeveloperPrompt(null);
+        }}
+        onVerified={handleDeveloperVerified}
+      />
     </div>
   );
 }
@@ -591,7 +622,7 @@ function EditOrderModal({
           label="Gender"
           required
           value={gender}
-          onChange={setGender}
+          onChange={(value) => setGender(value as typeof gender)}
           options={GENDER_VALUES.map((g) => ({ value: g, label: GENDER_LABEL[g] }))}
         />
         <Field label="Nama Lengkap">
@@ -626,14 +657,14 @@ function EditOrderModal({
             label="Ukuran"
             required
             value={size}
-            onChange={setSize}
+            onChange={(value) => setSize(value as typeof size)}
             options={SIZE_VALUES.map((s) => ({ value: s, label: SIZE_LABEL[s] }))}
           />
           <CustomDropdown
             label="Lengan"
             required
             value={sleeve}
-            onChange={setSleeve}
+            onChange={(value) => setSleeve(value as typeof sleeve)}
             options={SLEEVE_VALUES.map((s) => ({ value: s, label: SLEEVE_LABEL[s] }))}
           />
         </div>

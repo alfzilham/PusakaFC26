@@ -3,6 +3,9 @@ import crypto from "crypto";
 import {
   ADMIN_SESSION_COOKIE,
   ADMIN_SESSION_MAX_AGE,
+  DEVELOPER_PASSWORD_ENV,
+  DEVELOPER_SESSION_COOKIE,
+  DEVELOPER_SESSION_MAX_AGE,
   DEFAULT_ADMIN_PASSWORD,
   ADMIN_PASSWORD_ENV,
 } from "@/lib/constants";
@@ -24,7 +27,11 @@ function sign(data: string): string {
 }
 
 export function createSessionToken(): string {
-  const exp = Date.now() + ADMIN_SESSION_MAX_AGE * 1000;
+  return createToken(ADMIN_SESSION_MAX_AGE);
+}
+
+function createToken(maxAge: number): string {
+  const exp = Date.now() + maxAge * 1000;
   const payload = Buffer.from(JSON.stringify({ exp })).toString("base64url");
   const sig = sign(payload);
   return `${payload}.${sig}`;
@@ -63,6 +70,26 @@ export async function setSessionCookie(token: string) {
   });
 }
 
+export function createDeveloperSessionToken(): string {
+  return createToken(DEVELOPER_SESSION_MAX_AGE);
+}
+
+export async function setDeveloperSessionCookie(token: string) {
+  const store = await cookies();
+  store.set(DEVELOPER_SESSION_COOKIE, token, {
+    httpOnly: true,
+    sameSite: "lax",
+    secure: process.env.NODE_ENV === "production",
+    path: "/",
+    maxAge: DEVELOPER_SESSION_MAX_AGE,
+  });
+}
+
+export async function clearDeveloperSessionCookie() {
+  const store = await cookies();
+  store.delete(DEVELOPER_SESSION_COOKIE);
+}
+
 export async function clearSessionCookie() {
   const store = await cookies();
   store.delete(ADMIN_SESSION_COOKIE);
@@ -76,6 +103,12 @@ export async function getSessionToken(): Promise<string | undefined> {
 export async function isAdminAuthenticated(): Promise<boolean> {
   const token = await getSessionToken();
   return verifySessionToken(token);
+}
+
+export async function isDeveloperAuthenticated(): Promise<boolean> {
+  if (!(await isAdminAuthenticated())) return false;
+  const store = await cookies();
+  return verifySessionToken(store.get(DEVELOPER_SESSION_COOKIE)?.value);
 }
 
 function normalizeEnvironmentSecret(value: string): string {
@@ -93,6 +126,19 @@ function normalizeEnvironmentSecret(value: string): string {
 export function getAdminPassword(): string {
   const configured = process.env[ADMIN_PASSWORD_ENV];
   return configured ? normalizeEnvironmentSecret(configured) : DEFAULT_ADMIN_PASSWORD;
+}
+
+export function getDeveloperPassword(): string {
+  return normalizeEnvironmentSecret(process.env[DEVELOPER_PASSWORD_ENV] || "");
+}
+
+export function secretsMatch(input: string, expected: string): boolean {
+  const inputBuffer = Buffer.from(input);
+  const expectedBuffer = Buffer.from(expected);
+  if (!expectedBuffer.length || inputBuffer.length !== expectedBuffer.length) {
+    return false;
+  }
+  return crypto.timingSafeEqual(inputBuffer, expectedBuffer);
 }
 
 // ---- Rate limiting (per IP) ----

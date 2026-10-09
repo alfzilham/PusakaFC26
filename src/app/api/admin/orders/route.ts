@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
-import { isAdminAuthenticated } from "@/lib/auth";
+import { isAdminAuthenticated, isDeveloperAuthenticated } from "@/lib/auth";
 import {
   updateOrderSchema,
   isGender,
@@ -10,11 +10,21 @@ import {
   type OrderRow,
 } from "@/lib/validations";
 
-async function ensureAuth() {
+async function ensureAdminAuth() {
   if (!(await isAdminAuthenticated())) {
     return NextResponse.json(
       { error: "Tidak terautentikasi." },
       { status: 401 }
+    );
+  }
+  return null;
+}
+
+async function ensureDeveloperAuth() {
+  if (!(await isDeveloperAuthenticated())) {
+    return NextResponse.json(
+      { error: "Verifikasi developer diperlukan.", code: "DEVELOPER_REQUIRED" },
+      { status: 403 }
     );
   }
   return null;
@@ -46,7 +56,7 @@ function toRow(r: {
 
 // GET /api/admin/orders — search + filter + pagination
 export async function GET(req: Request) {
-  const auth = await ensureAuth();
+  const auth = await ensureAdminAuth();
   if (auth) return auth;
 
   const url = new URL(req.url);
@@ -100,7 +110,7 @@ export async function GET(req: Request) {
 
 // PUT /api/admin/orders?id=... — update inline (no extra confirmation)
 export async function PUT(req: Request) {
-  const auth = await ensureAuth();
+  const auth = await ensureDeveloperAuth();
   if (auth) return auth;
 
   const url = new URL(req.url);
@@ -152,7 +162,7 @@ export async function PUT(req: Request) {
     }
     update.backName = normalized;
   }
-  if (typeof data.backNumber === "number") {
+  if (typeof data.backNumber === "number" && !(await isDeveloperAuthenticated())) {
     const clash = await db.jerseyOrder.findFirst({
       where: { backNumber: data.backNumber, NOT: { id } },
       select: { id: true },
@@ -191,7 +201,7 @@ export async function PUT(req: Request) {
 
 // DELETE /api/admin/orders?id=...
 export async function DELETE(req: Request) {
-  const auth = await ensureAuth();
+  const auth = await ensureDeveloperAuth();
   if (auth) return auth;
 
   const url = new URL(req.url);

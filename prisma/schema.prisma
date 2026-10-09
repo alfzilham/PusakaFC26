@@ -21,7 +21,7 @@ model JerseyOrder {
   gender     String
   fullName   String
   backName   String   @unique
-  backNumber Int      @unique
+  backNumber Int
   size       String
   sleeve     String
   createdAt  DateTime @default(now())

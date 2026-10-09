@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import * as XLSX from "xlsx";
 import { db } from "@/lib/db";
-import { isAdminAuthenticated } from "@/lib/auth";
+import { isDeveloperAuthenticated } from "@/lib/auth";
 import {
   GENDER_LABEL,
   SLEEVE_LABEL,
@@ -16,10 +16,10 @@ import {
 export const dynamic = "force-dynamic";
 
 async function ensureAuth() {
-  if (!(await isAdminAuthenticated())) {
+  if (!(await isDeveloperAuthenticated())) {
     return NextResponse.json(
-      { error: "Tidak terautentikasi." },
-      { status: 401 }
+      { error: "Verifikasi developer diperlukan.", code: "DEVELOPER_REQUIRED" },
+      { status: 403 }
     );
   }
   return null;
