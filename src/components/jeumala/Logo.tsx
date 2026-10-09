@@ -9,7 +9,7 @@ type LogoProps = {
   withWordmark?: boolean;
 };
 
-/** JeumalaCup 26 brand logo using the supplied official brand asset. */
+/** PusakaFC26 brand logo using the supplied official brand asset. */
 export function Logo({
   size = 40,
   className,
@@ -36,7 +36,7 @@ export function Logo({
           className="font-extrabold tracking-tight"
           style={{ color: text, fontSize: size * 0.42 }}
         >
-          JeumalaCup <span style={{ opacity: 0.85 }}>26</span>
+          PusakaFC26
         </span>
       )}
     </span>

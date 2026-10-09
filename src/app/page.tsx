@@ -106,7 +106,7 @@ function AppShell() {
       <footer className="mt-auto border-t border-app-border bg-app-surface">
         <div className="mx-auto max-w-3xl px-4 py-5 text-center sm:px-6">
           <p className="text-xs text-app-muted">
-            JeumalaCup 26 · Pendaftaran Jersey
+            PusakaFC26 · Pendaftaran Jersey
           </p>
         </div>
       </footer>

@@ -1,10 +1,10 @@
-# JeumalaCup 26 — Project Worklog
+# PusakaFC26 — Project Worklog
 
 ## Project Status Assessment
 
 **Status: ✅ Core feature-complete and verified via agent-browser.**
 
-JeumalaCup 26 is a full-stack jersey registration system built with Next.js 16
+PusakaFC26 is a full-stack jersey registration system built with Next.js 16
 (App Router), Prisma (SQLite locally / PostgreSQL-ready for Railway), Plus
 Jakarta Sans, and Lucide React icons. All specified public and admin flows are
 implemented, lint-clean, and browser-verified.

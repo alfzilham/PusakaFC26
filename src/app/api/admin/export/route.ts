@@ -77,7 +77,7 @@ export async function GET(req: Request) {
     const json = JSON.stringify(
       {
         exportedAt: new Date().toISOString(),
-        event: "JeumalaCup 26",
+        event: "PusakaFC26",
         total: data.length,
         data,
       },
@@ -88,7 +88,7 @@ export async function GET(req: Request) {
       status: 200,
       headers: {
         "Content-Type": "application/json; charset=utf-8",
-        "Content-Disposition": `attachment; filename="jeumalacup26-${Date.now()}.json"`,
+        "Content-Disposition": `attachment; filename="pusakafc26-${Date.now()}.json"`,
       },
     });
   }
@@ -122,7 +122,7 @@ export async function GET(req: Request) {
     status: 200,
     headers: {
       "Content-Type": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-      "Content-Disposition": `attachment; filename="jeumalacup26-${Date.now()}.xlsx"`,
+      "Content-Disposition": `attachment; filename="pusakafc26-${Date.now()}.xlsx"`,
     },
   });
 }

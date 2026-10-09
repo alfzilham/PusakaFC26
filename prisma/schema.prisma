@@ -1,4 +1,4 @@
-// JeumalaCup 26 — Jersey Order System
+// PusakaFC26 — Jersey Order System
 //
 // Note: The local dev database is SQLite (does not support Prisma enums),
 // so enum-like fields are stored as String and validated at the application

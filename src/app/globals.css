@@ -4,7 +4,7 @@
 @custom-variant dark (&:is(.dark *));
 
 /* ============================================================
-   JeumalaCup 26 — Design Tokens
+   PusakaFC26 — Design Tokens
    Clean minimalism · neutral palette + emerald brand accent
    ============================================================ */
 @theme inline {
@@ -37,7 +37,7 @@
   --jc-border: #e7e5e4;
   --jc-border-strong: #d6d3d1;
 
-  /* Brand accent — Jeumala green */
+  /* Brand accent — Pusaka green */
   --jc-accent: #004e15;
   --jc-accent-strong: #003a0f;
   --jc-accent-soft: #e5f1e7;

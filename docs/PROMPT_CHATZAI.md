@@ -1,4 +1,4 @@
-Buatkan saya aplikasi web full-stack bernama "JeumalaCup 26" — sistem pendaftaran nama/nomor punggung jersey bola, tanpa login page untuk user publik, dengan panel admin terproteksi.
+Buatkan saya aplikasi web full-stack bernama "PusakaFC26" — sistem pendaftaran nama/nomor punggung jersey bola, tanpa login page untuk user publik, dengan panel admin terproteksi.
 
 STACK:
 - Next.js (App Router) full-stack
@@ -34,10 +34,10 @@ HALAMAN 2 — "Nomor Punggung Terpakai":
 - Read-only untuk publik.
 
 TOP BAR (semua halaman, sticky):
-[ Logo ] [ JeumalaCup 26 ]                    [ Hamburger menu ]
+[ Logo ] [ PusakaFC26 ]                    [ Hamburger menu ]
 
 SIDEBAR (dibuka via hamburger):
-1. Logo + "JeumalaCup 26" di bagian atas
+1. Logo + "PusakaFC26" di bagian atas
 2. Link ke Halaman 1
 3. Link ke Halaman 2
 4. "Lihat Detail Data" — tampil dengan ikon lock, DISABLED/tidak bisa diklik untuk publik (hanya admin, diakses via path /admin terpisah)

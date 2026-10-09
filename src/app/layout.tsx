@@ -10,10 +10,10 @@ const plusJakarta = Plus_Jakarta_Sans({
 });
 
 export const metadata: Metadata = {
-  title: "JeumalaCup 26 — Pendaftaran Jersey",
+  title: "PusakaFC26 — Pendaftaran Jersey",
   description:
-    "Sistem pendaftaran nama dan nomor punggung jersey untuk event JeumalaCup 26.",
-  keywords: ["JeumalaCup", "Jersey", "Pendaftaran", "Sepak Bola"],
+    "Sistem pendaftaran nama dan nomor punggung jersey untuk event PusakaFC26.",
+  keywords: ["PusakaFC26", "Jersey", "Pendaftaran", "Sepak Bola"],
   authors: [{ name: "Alfiz Ilham" }],
   icons: {
     icon: "/favicon.ico",

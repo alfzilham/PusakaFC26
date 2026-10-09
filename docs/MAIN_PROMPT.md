@@ -12,7 +12,7 @@ Halaman kedua:
 Halaman kedua menampilkan jumlah no. yang sudah digunakan.
 Kedua halaman tersebut dapat di akses juga melalui sidebar. untuk sidebar, ada:
 
-* Nama Brand (JeumalaCup 26) dengan logo - Terletak bagian atas
+* Nama Brand (PusakaFC26) dengan logo - Terletak bagian atas
 * halaman pertama (Tolong rekomendasikan title untuk halaman pertama)
 * halaman kedua (Tolong rekomendasikan title untuk halaman kedua)
 * Lihat Detail Data (Diblokir dan tidak dapat di klik, hanya dapat diakses oleh admin. oleh karena itu, buat halaman admin)
@@ -25,7 +25,7 @@ Kedua halaman tersebut dapat di akses juga melalui sidebar. untuk sidebar, ada:
 selain halaman, ada Top bar. betuknya:
 
 ```
- [ Logo ] [ JeumalaCup 26 ]                    [ Humburger menu ]
+ [ Logo ] [ PusakaFC26 ]                    [ Humburger menu ]
 ```
 
 selain itu, gunakan Style clean minimalism yang mudah digunakan saja. Fokus pada Mobile-first dan berikut kriteria yang akan saya gunakan:
@@ -67,7 +67,7 @@ Q: Bentuk tampilan halaman kedua?
 A: Daftar No. yang sudah dipakai saja
 
 Q: Proteksi untuk Admin Page?
-A: Perlu proteksi akses (password/PIN sederhana) meski tidak ada login page untuk user umum dan diakses melalui path lainnya seperti `https://jeumalacup.railway.app/admin/` 
+A: Perlu proteksi akses (password/PIN sederhana) meski tidak ada login page untuk user umum dan diakses melalui path lainnya seperti `https://DOMAIN-RAILWAY-BARU/admin/` 
 
 Q: Fitur admin ada apa saja?
 A: tambah fitur edit dan hapus entri

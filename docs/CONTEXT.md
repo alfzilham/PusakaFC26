@@ -1,8 +1,8 @@
-# CONTEXT.md — JeumalaCup 26
+# CONTEXT.md — PusakaFC26
 
 ## 1. Latar Belakang Project
 
-Sistem input nama/nomor jersey untuk event "JeumalaCup 26". Dibuat untuk memudahkan peserta mendaftarkan nama belakang dan nomor punggung baju bola mereka tanpa perlu membuat akun/login, sekaligus memberi panitia (admin) kontrol penuh atas data melalui panel terpisah dan terproteksi.
+Sistem input nama/nomor jersey untuk event "PusakaFC26". Dibuat untuk memudahkan peserta mendaftarkan nama belakang dan nomor punggung baju bola mereka tanpa perlu membuat akun/login, sekaligus memberi panitia (admin) kontrol penuh atas data melalui panel terpisah dan terproteksi.
 
 Project ini akan dieksekusi/dibangun melalui [chat.z.ai](https://chat.z.ai), menggunakan dokumen SPEC.md, ARCHITECTURE.md, dan DESIGN.md sebagai acuan.
 

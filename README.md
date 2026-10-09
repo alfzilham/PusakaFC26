@@ -1,6 +1,6 @@
-# JeumalaCup 26
+# PusakaFC26
 
-Aplikasi web pendaftaran jersey JeumalaCup 26. Aplikasi ini menyediakan formulir pendaftaran publik, daftar nomor punggung yang sudah digunakan, dan panel admin untuk mengelola data pendaftaran.
+Aplikasi web pendaftaran jersey PusakaFC26. Aplikasi ini menyediakan formulir pendaftaran publik, daftar nomor punggung yang sudah digunakan, dan panel admin untuk mengelola data pendaftaran.
 
 Repository: https://github.com/alfzilham/PusakaFC26
 
@@ -77,7 +77,7 @@ Repository: https://github.com/alfzilham/PusakaFC26
 
 ```text
 src/app/                 Halaman, layout, dan API routes Next.js
-src/components/          Komponen UI dan komponen domain JeumalaCup
+src/components/          Komponen UI dan komponen domain PusakaFC26
 src/lib/                 Database, autentikasi, konstanta, dan validasi
 prisma/schema.prisma     Schema database
 public/                  Asset publik
