@@ -265,6 +265,20 @@
 .jc-toast.leaving {
   animation: jc-toast-out 280ms ease forwards;
 }
+
+.jc-update-card {
+  animation: jc-update-in 520ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+@keyframes jc-update-in {
+  from {
+    opacity: 0;
+    transform: translateX(-120%);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
 @keyframes jc-toast-in {
   from {
     opacity: 0;
