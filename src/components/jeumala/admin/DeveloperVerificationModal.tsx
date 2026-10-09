@@ -60,7 +60,7 @@ export function DeveloperVerificationModal({
     >
       <form onSubmit={handleSubmit} className="space-y-4">
         <div className="rounded-xl border border-app-accent/20 bg-app-accent/5 p-3.5 text-sm text-app-fg-soft">
-          Tunjukkan bahwa diri anda developer untuk mengakses fitur <strong>{actionLabel}</strong>.
+          Tunjukkan bahwa diri anda developer untuk mengakses fitur admin terbatas: <strong>{actionLabel}</strong>.
         </div>
         <div>
           <label htmlFor="developer-password" className="mb-1.5 block text-sm font-semibold text-app-fg">
@@ -76,7 +76,8 @@ export function DeveloperVerificationModal({
               autoComplete="current-password"
               autoFocus
               required
-              className="jc-input w-full pl-10"
+              className="jc-input w-full"
+              style={{ paddingLeft: "2.75rem" }}
               placeholder="Masukkan password developer"
             />
           </div>
