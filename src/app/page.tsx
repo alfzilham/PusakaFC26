@@ -84,7 +84,7 @@ function AppShell() {
   return (
     <div className="flex min-h-screen flex-col">
       <TopBar onMenu={() => setSidebarOpen(true)} />
-      <UpdateNotification audience="public" />
+      <UpdateNotification />
       <Sidebar
         open={sidebarOpen}
         onClose={() => setSidebarOpen(false)}
