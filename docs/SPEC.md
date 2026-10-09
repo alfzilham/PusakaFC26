@@ -1,8 +1,8 @@
-# SPEC.md — JeumalaCup 26 Jersey Order System
+# SPEC.md — PusakaFC26 Jersey Order System
 
 ## 1. Overview
 
-Sistem input pemesanan nama/nomor punggung jersey untuk event "JeumalaCup 26". Tidak ada login page untuk pengguna umum. Terdapat halaman admin terproteksi password untuk melihat, mengelola, dan mengekspor data.
+Sistem input pemesanan nama/nomor punggung jersey untuk event "PusakaFC26". Tidak ada login page untuk pengguna umum. Terdapat halaman admin terproteksi password untuk melihat, mengelola, dan mengekspor data.
 
 ## 2. User Flow
 
@@ -47,11 +47,11 @@ Sistem input pemesanan nama/nomor punggung jersey untuk event "JeumalaCup 26". T
 
 ### 4.1 Top Bar
 ```
-[ Logo ] [ JeumalaCup 26 ]                    [ Hamburger menu ]
+[ Logo ] [ PusakaFC26 ]                    [ Hamburger menu ]
 ```
 
 ### 4.2 Sidebar (dibuka via hamburger menu)
-- Nama Brand "JeumalaCup 26" + logo — bagian atas.
+- Nama Brand "PusakaFC26" + logo — bagian atas.
 - Link ke Halaman 1 (Form Pendaftaran Jersey).
 - Link ke Halaman 2 (Nomor Punggung Terpakai).
 - "Lihat Detail Data" — terlihat tapi **disabled/tidak dapat diklik** untuk user publik (khusus admin, diakses lewat path terpisah `/admin`).
