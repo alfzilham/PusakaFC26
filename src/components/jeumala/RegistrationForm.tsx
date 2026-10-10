@@ -10,6 +10,7 @@ import {
   Send,
   AlertCircle,
   MessageCircle,
+  ShieldCheck,
   Clock3,
 } from "lucide-react";
 import { CustomDropdown } from "./CustomDropdown";
@@ -63,6 +64,8 @@ export function RegistrationForm({ used, onAfterSubmit }: Props) {
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [touched, setTouched] = useState<Record<string, boolean>>({});
   const [developerMode, setDeveloperMode] = useState(false);
+  const [developerModeUntil, setDeveloperModeUntil] = useState<number | null>(null);
+  const [developerModeRemaining, setDeveloperModeRemaining] = useState(0);
   const [developerPromptOpen, setDeveloperPromptOpen] = useState(false);
   const [developerLockUntil, setDeveloperLockUntil] = useState<number | null>(null);
   const [lockModalOpen, setLockModalOpen] = useState(false);
@@ -147,6 +150,25 @@ export function RegistrationForm({ used, onAfterSubmit }: Props) {
     const timer = setInterval(updateTimer, 1000);
     return () => clearInterval(timer);
   }, [developerLockUntil]);
+
+  useEffect(() => {
+    const sessionUntil = developerModeUntil ?? 0;
+    if (sessionUntil <= 0) return;
+
+    function updateDeveloperTimer() {
+      const remaining = Math.max(0, sessionUntil - Date.now());
+      setDeveloperModeRemaining(remaining);
+      if (remaining === 0) {
+        setDeveloperMode(false);
+        setDeveloperModeUntil(null);
+        void fetch("/api/developer/logout", { method: "POST" });
+      }
+    }
+
+    updateDeveloperTimer();
+    const timer = setInterval(updateDeveloperTimer, 1000);
+    return () => clearInterval(timer);
+  }, [developerModeUntil]);
 
   function setField<K extends keyof Fields>(key: K, value: string) {
     setFields((prev) => ({ ...prev, [key]: value }));
@@ -277,6 +299,23 @@ export function RegistrationForm({ used, onAfterSubmit }: Props) {
         noValidate
         className="space-y-5 rounded-2xl border border-app-border bg-app-surface p-5 shadow-sm sm:p-6"
       >
+        {developerMode && (
+          <button
+            type="button"
+            onClick={() => {
+              setDeveloperMode(false);
+              setDeveloperModeUntil(null);
+              setDeveloperModeRemaining(0);
+              void fetch("/api/developer/logout", { method: "POST" });
+            }}
+            className="jc-focus inline-flex items-center gap-2 rounded-lg border border-app-accent bg-app-accent/10 px-3 py-2 text-xs font-semibold text-app-accent transition-colors hover:bg-app-accent/15"
+          >
+            <ShieldCheck className="h-4 w-4" />
+            Developer Mode aktif · {String(Math.floor(developerModeRemaining / 60000)).padStart(2, "0")}:
+            {String(Math.floor((developerModeRemaining % 60000) / 1000)).padStart(2, "0")}
+            <span className="ml-1 underline underline-offset-2">Nonaktifkan</span>
+          </button>
+        )}
         {/* Gender */}
         <CustomDropdown
           label="Gender"
@@ -430,7 +469,10 @@ export function RegistrationForm({ used, onAfterSubmit }: Props) {
         }}
         onClose={() => setDeveloperPromptOpen(false)}
         onVerified={() => {
+          const expiresAt = Date.now() + 5 * 60 * 1000;
           setDeveloperMode(true);
+          setDeveloperModeUntil(expiresAt);
+          setDeveloperModeRemaining(expiresAt - Date.now());
           setDeveloperPromptOpen(false);
         }}
       />
