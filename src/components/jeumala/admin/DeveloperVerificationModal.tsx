@@ -12,7 +12,7 @@ type Props = {
   endpoint?: string;
   title?: string;
   closeOnError?: boolean;
-  onVerificationFailed?: () => void;
+  onVerificationFailed?: (result: { locked: boolean; retryAfter: number }) => void;
 };
 
 export function DeveloperVerificationModal({
@@ -48,7 +48,10 @@ export function DeveloperVerificationModal({
       const data = await res.json().catch(() => ({}));
       if (!res.ok) {
         setError(data.error || "Verifikasi developer gagal.");
-        onVerificationFailed?.();
+        onVerificationFailed?.({
+          locked: data.code === "DEVELOPER_LOCKED" || res.status === 429,
+          retryAfter: Number(data.retryAfter) || 0,
+        });
         if (closeOnError) close();
         return;
       }
