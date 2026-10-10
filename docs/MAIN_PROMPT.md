@@ -20,7 +20,7 @@ Kedua halaman tersebut dapat di akses juga melalui sidebar. untuk sidebar, ada:
   * About (Informasi tentang software ini)
   * Privacy Policy
   * Terms of Services
-  * Developer Contact: `Nama: Alfiz Ilham`, `No. Wa: 0852-1389-6460` 
+  * Super Admin Contact: `Nama: Alfiz Ilham`, `No. Wa: 0852-1389-6460`
 
 selain halaman, ada Top bar. betuknya:
 
@@ -228,7 +228,7 @@ Pertanyaan 8 — Apakah user bisa mengedit/membatalkan inputnya sendiri setelah 
 
 Apakah user bisa edit/batalkan input sendiri setelah submit?
 
-Tidak bisa — user harus hubungi admin (WA developer) untuk koreksi
+Tidak bisa — user harus hubungi admin (WA super admin) untuk koreksi
 
 
 
