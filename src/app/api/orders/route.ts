@@ -1,7 +1,13 @@
 import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { databaseUnavailableResponse } from "@/lib/database-error";
-import { createOrderSchema, isGender, normalizeFullName } from "@/lib/validations";
+import {
+  createOrderSchema,
+  isGender,
+  normalizeBackName,
+  normalizeFullName,
+} from "@/lib/validations";
+import { isPublicDeveloperAuthenticated } from "@/lib/auth";
 
 // GET /api/orders — public: returns used entries (for Page 2 + client cache)
 export async function GET() {
@@ -45,8 +51,8 @@ export async function POST(req: Request) {
   const { gender, fullName, backName, backNumber, size, sleeve } = parsed.data;
   const normalizedFullName = normalizeFullName(fullName);
 
-  // Normalize backName for uniqueness (trim + collapse spaces)
-  const normalizedBackName = backName.trim().replace(/\s+/g, " ");
+  const normalizedBackName = normalizeBackName(backName);
+  const developerMode = await isPublicDeveloperAuthenticated();
 
   // Explicit duplicate checks (race-condition aware) before relying on
   // the Prisma unique constraints below.
@@ -58,10 +64,12 @@ export async function POST(req: Request) {
         where: { backName: { equals: normalizedBackName } },
         select: { id: true },
       }),
-      db.jerseyOrder.findFirst({
-        where: { backNumber },
-        select: { id: true },
-      }),
+      developerMode
+        ? Promise.resolve(null)
+        : db.jerseyOrder.findFirst({
+            where: { backNumber },
+            select: { id: true },
+          }),
     ]);
   } catch (error) {
     return databaseUnavailableResponse("orders duplicate check", error);
