@@ -29,6 +29,11 @@ export function normalizeFullName(value: string): string {
     .replace(/(^|[\s'-])\p{L}/gu, (letter) => letter.toLocaleUpperCase("id-ID"));
 }
 
+/** Normalize jersey back names to the print-ready uppercase format. */
+export function normalizeBackName(value: string): string {
+  return value.trim().replace(/\s+/g, " ").toLocaleUpperCase("id-ID");
+}
+
 // ---- Public-facing labels ----
 export const GENDER_LABEL: Record<Gender, string> = {
   PRIA: "Pria",
