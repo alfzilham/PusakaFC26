@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState, type FormEvent } from "react";
+import { useEffect, useMemo, useRef, useState, type FormEvent } from "react";
 import {
   User,
   Shirt,
@@ -11,6 +11,7 @@ import {
   AlertCircle,
   MessageCircle,
   ShieldCheck,
+  Clock3,
 } from "lucide-react";
 import { CustomDropdown } from "./CustomDropdown";
 import { useToast } from "./Toast";
@@ -27,6 +28,7 @@ import {
 import { DEVELOPER } from "@/lib/constants";
 import { cn } from "@/lib/utils";
 import { DeveloperVerificationModal } from "./admin/DeveloperVerificationModal";
+import { Modal } from "./Modal";
 
 type Props = {
   used: UsedEntry[];
@@ -63,6 +65,12 @@ export function RegistrationForm({ used, onAfterSubmit }: Props) {
   const [touched, setTouched] = useState<Record<string, boolean>>({});
   const [developerMode, setDeveloperMode] = useState(false);
   const [developerPromptOpen, setDeveloperPromptOpen] = useState(false);
+  const [developerFailedAttempts, setDeveloperFailedAttempts] = useState(0);
+  const [developerLockUntil, setDeveloperLockUntil] = useState<number | null>(null);
+  const [lockModalOpen, setLockModalOpen] = useState(false);
+  const [lockRemaining, setLockRemaining] = useState(0);
+  const developerTapCount = useRef(0);
+  const developerTapResetTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Indexes for O(1) duplicate lookup against the client cache
   const { nameSet, numberSet } = useMemo(() => {
@@ -116,6 +124,26 @@ export function RegistrationForm({ used, onAfterSubmit }: Props) {
 
   const errors = validate(fields);
   const isValid = Object.keys(errors).length === 0;
+  const duplicateNumberOnly =
+    errors.backNumber === "Nomor sudah dipakai" && Object.keys(errors).length === 1;
+
+  useEffect(() => {
+    if (!developerLockUntil) return;
+
+    function updateTimer() {
+      const remaining = Math.max(0, developerLockUntil - Date.now());
+      setLockRemaining(remaining);
+      if (remaining === 0) {
+        setDeveloperLockUntil(null);
+        setDeveloperFailedAttempts(0);
+        setLockModalOpen(false);
+      }
+    }
+
+    updateTimer();
+    const timer = setInterval(updateTimer, 1000);
+    return () => clearInterval(timer);
+  }, [developerLockUntil]);
 
   function setField<K extends keyof Fields>(key: K, value: string) {
     setFields((prev) => ({ ...prev, [key]: value }));
@@ -130,9 +158,39 @@ export function RegistrationForm({ used, onAfterSubmit }: Props) {
     return touched[key] && errors[key];
   }
 
+  function handleDeveloperTap() {
+    setTouched((t) => ({ ...t, backNumber: true }));
+    setSubmitError(null);
+
+    if (developerLockUntil && Date.now() < developerLockUntil) {
+      developerTapCount.current += 1;
+      if (developerTapCount.current >= 7) {
+        developerTapCount.current = 0;
+        setLockModalOpen(true);
+      }
+      return;
+    }
+
+    developerTapCount.current += 1;
+    if (developerTapResetTimer.current) clearTimeout(developerTapResetTimer.current);
+    developerTapResetTimer.current = setTimeout(() => {
+      developerTapCount.current = 0;
+    }, 3000);
+
+    if (developerTapCount.current >= 7) {
+      developerTapCount.current = 0;
+      setDeveloperPromptOpen(true);
+    }
+  }
+
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
-    if (submitting || !isValid) return;
+    if (submitting) return;
+    if (duplicateNumberOnly && !developerMode) {
+      handleDeveloperTap();
+      return;
+    }
+    if (!isValid) return;
 
     setSubmitting(true);
     setSubmitError(null);
@@ -325,11 +383,11 @@ export function RegistrationForm({ used, onAfterSubmit }: Props) {
         {/* Submit */}
         <button
           type="submit"
-          disabled={!isValid || submitting}
-          aria-disabled={!isValid || submitting}
+          disabled={(!isValid && !duplicateNumberOnly) || submitting}
+          aria-disabled={(!isValid && !duplicateNumberOnly) || submitting}
           className={cn(
             "jc-focus relative flex w-full items-center justify-center gap-2.5 rounded-xl px-5 py-3.5 text-sm font-bold transition-all",
-            !isValid || submitting
+            ((!isValid && !duplicateNumberOnly) || submitting)
               ? "cursor-not-allowed bg-app-border text-app-muted"
               : "bg-app-accent text-app-accent-fg shadow-sm hover:bg-app-accent-strong active:scale-[0.99]"
           )}
@@ -368,13 +426,39 @@ export function RegistrationForm({ used, onAfterSubmit }: Props) {
       <DeveloperVerificationModal
         open={developerPromptOpen}
         endpoint="/api/developer/verify"
+        title="Buktikan Diri Anda Developer"
         actionLabel="menggunakan nomor punggung yang sudah dipakai"
+        closeOnError
+        onVerificationFailed={() => {
+          setDeveloperFailedAttempts((attempts) => {
+            const nextAttempts = attempts + 1;
+            if (nextAttempts >= 2) {
+              setDeveloperLockUntil(Date.now() + 5 * 60 * 1000);
+            }
+            return nextAttempts;
+          });
+        }}
         onClose={() => setDeveloperPromptOpen(false)}
         onVerified={() => {
           setDeveloperMode(true);
+          setDeveloperFailedAttempts(0);
           setDeveloperPromptOpen(false);
         }}
       />
+      <Modal
+        open={lockModalOpen}
+        onClose={() => setLockModalOpen(false)}
+        title="Developer Mode Diblokir"
+        icon={<Clock3 className="h-5 w-5 text-app-danger" />}
+      >
+        <p className="text-sm text-app-fg-soft">
+          Percobaan password developer sudah mencapai batas. Silakan tunggu sebelum mencoba lagi.
+        </p>
+        <p className="mt-4 text-center text-3xl font-bold tabular-nums text-app-danger">
+          {String(Math.floor(lockRemaining / 60000)).padStart(2, "0")}:
+          {String(Math.floor((lockRemaining % 60000) / 1000)).padStart(2, "0")}
+        </p>
+      </Modal>
     </div>
   );
 }
