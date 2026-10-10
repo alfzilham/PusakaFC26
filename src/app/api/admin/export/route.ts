@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import * as XLSX from "xlsx";
 import { db } from "@/lib/db";
-import { isDeveloperAuthenticated } from "@/lib/auth";
+import { isSuperAdminAuthenticated } from "@/lib/auth";
 import {
   GENDER_LABEL,
   SLEEVE_LABEL,
@@ -16,9 +16,9 @@ import {
 export const dynamic = "force-dynamic";
 
 async function ensureAuth() {
-  if (!(await isDeveloperAuthenticated())) {
+  if (!(await isSuperAdminAuthenticated())) {
     return NextResponse.json(
-      { error: "Verifikasi developer diperlukan.", code: "DEVELOPER_REQUIRED" },
+      { error: "Verifikasi super admin diperlukan.", code: "SUPER_ADMIN_REQUIRED" },
       { status: 403 }
     );
   }
