@@ -6,11 +6,11 @@ export const APP_VERSION = "v1.3.0";
 
 export const UPDATE_NOTIFICATION = {
   label: `Update ${APP_VERSION}`,
-  summary: "Developer Mode, nomor punggung duplikat, dan perbaikan keamanan",
+  summary: "Super Admin Mode, nomor punggung duplikat, dan perbaikan keamanan",
   href: `https://github.com/alfzilham/PusakaFC26/releases/tag/${APP_VERSION}`,
 };
 
-export const DEVELOPER = {
+export const SUPER_ADMIN = {
   name: "Alfiz Ilham",
   whatsapp: "0852-1389-6460",
   // E.164 format for wa.me links (Indonesia +62, strip leading 0)
@@ -24,14 +24,14 @@ export const ADMIN_CONTACT = {
 };
 
 export const ADMIN_PASSWORD_ENV = "ADMIN_PASSWORD";
-export const DEVELOPER_PASSWORD_ENV = "DEVELOPER_PASSWORD";
+export const SUPER_ADMIN_PASSWORD_ENV = "SUPER_ADMIN_PASSWORD";
 export const ADMIN_SESSION_COOKIE = "jc26_admin";
-export const DEVELOPER_SESSION_COOKIE = "jc26_developer";
-export const PUBLIC_DEVELOPER_SESSION_COOKIE = "jc26_public_developer";
-export const DEVELOPER_FAILURE_COOKIE = "jc26_developer_failures";
+export const SUPER_ADMIN_SESSION_COOKIE = "jc26_super_admin";
+export const PUBLIC_SUPER_ADMIN_SESSION_COOKIE = "jc26_public_super_admin";
+export const SUPER_ADMIN_FAILURE_COOKIE = "jc26_super_admin_failures";
 export const ADMIN_SESSION_MAX_AGE = 60 * 60 * 8; // 8 hours
-export const DEVELOPER_SESSION_MAX_AGE = 60 * 60; // 1 hour
-export const DEVELOPER_LOCK_MAX_AGE = 60 * 5; // 5 minutes
+export const SUPER_ADMIN_SESSION_MAX_AGE = 60 * 60; // 1 hour
+export const SUPER_ADMIN_LOCK_MAX_AGE = 60 * 5; // 5 minutes
 
 // Rate limiting config
 export const LOGIN_MAX_ATTEMPTS = 5;
