@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
-import { isAdminAuthenticated, isDeveloperAuthenticated } from "@/lib/auth";
+import { isAdminAuthenticated, isSuperAdminAuthenticated } from "@/lib/auth";
 import {
   updateOrderSchema,
   isGender,
@@ -22,10 +22,10 @@ async function ensureAdminAuth() {
   return null;
 }
 
-async function ensureDeveloperAuth() {
-  if (!(await isDeveloperAuthenticated())) {
+async function ensureSuperAdminAuth() {
+  if (!(await isSuperAdminAuthenticated())) {
     return NextResponse.json(
-      { error: "Verifikasi developer diperlukan.", code: "DEVELOPER_REQUIRED" },
+      { error: "Verifikasi super admin diperlukan.", code: "SUPER_ADMIN_REQUIRED" },
       { status: 403 }
     );
   }
@@ -124,7 +124,7 @@ export async function GET(req: Request) {
 
 // PUT /api/admin/orders?id=... — update inline (no extra confirmation)
 export async function PUT(req: Request) {
-  const auth = await ensureDeveloperAuth();
+  const auth = await ensureSuperAdminAuth();
   if (auth) return auth;
 
   const url = new URL(req.url);
@@ -177,8 +177,8 @@ export async function PUT(req: Request) {
     update.backName = normalized;
   }
   if (typeof data.backNumber === "number") {
-    const developerAuthenticated = await isDeveloperAuthenticated();
-    if (!developerAuthenticated) {
+    const superAdminAuthenticated = await isSuperAdminAuthenticated();
+    if (!superAdminAuthenticated) {
       const clash = await db.jerseyOrder.findFirst({
         where: { backNumber: data.backNumber, NOT: { id } },
         select: { id: true },
@@ -218,7 +218,7 @@ export async function PUT(req: Request) {
 
 // DELETE /api/admin/orders?id=...
 export async function DELETE(req: Request) {
-  const auth = await ensureDeveloperAuth();
+  const auth = await ensureSuperAdminAuth();
   if (auth) return auth;
 
   const url = new URL(req.url);
