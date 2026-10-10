@@ -2,11 +2,11 @@
 
 import { Info, Shield, FileText, Phone } from "lucide-react";
 import { Modal } from "./Modal";
-import { ADMIN_CONTACT, APP_NAME, DEVELOPER } from "@/lib/constants";
+import { ADMIN_CONTACT, APP_NAME, SUPER_ADMIN } from "@/lib/constants";
 import type { InfoKey } from "./Sidebar";
 
-const WA_DISPLAY = DEVELOPER.whatsapp;
-const WA_HREF = DEVELOPER.whatsappHref;
+const WA_DISPLAY = SUPER_ADMIN.whatsapp;
+const WA_HREF = SUPER_ADMIN.whatsappHref;
 const ADMIN_WA_DISPLAY = ADMIN_CONTACT.whatsapp;
 const ADMIN_WA_HREF = ADMIN_CONTACT.whatsappHref;
 
@@ -22,7 +22,7 @@ export function InformationPanel({
     privacy: { title: "Privacy Policy", icon: <Shield className="h-5 w-5 text-app-accent" /> },
     terms: { title: "Terms of Services", icon: <FileText className="h-5 w-5 text-app-accent" /> },
     "admin-contact": { title: "Admin Contact", icon: <Phone className="h-5 w-5 text-app-accent" /> },
-    contact: { title: "Developer Contact", icon: <Phone className="h-5 w-5 text-app-accent" /> },
+    contact: { title: "Super Admin Contact", icon: <Phone className="h-5 w-5 text-app-accent" /> },
   };
 
   if (!info) return null;
@@ -87,11 +87,11 @@ function PrivacyContent() {
           Data disimpan pada basis data terproteksi. Akses pengelolaan hanya
           melalui panel admin yang dilindungi password dengan pembatasan
           percobaan login. Aksi perubahan dan export hanya tersedia untuk
-          developer setelah verifikasi tambahan.
+          super admin setelah verifikasi tambahan.
         </p>
       </div>
       <p className="text-xs text-app-muted">
-        Jika ada pertanyaan terkait privasi, hubungi admin atau developer
+        Jika ada pertanyaan terkait privasi, hubungi admin atau super admin
         melalui menu kontak yang tersedia.
       </p>
     </div>
@@ -114,7 +114,7 @@ function TermsContent() {
         </li>
         <li>
           <strong>Koreksi Data:</strong> Untuk koreksi data setelah submit,
-          peserta wajib menghubungi admin atau developer via WhatsApp.
+          peserta wajib menghubungi admin atau super admin via WhatsApp.
         </li>
         <li>
           <strong>Penggunaan Wajar:</strong> Pesenta dilarang melakukan upaya
@@ -159,10 +159,10 @@ function AdminContactContent() {
       <p>
         Hubungi admin untuk pertanyaan pendaftaran, konfirmasi data, atau
         koreksi informasi jersey. Aksi perubahan data dilakukan oleh admin
-        dengan otorisasi developer.
+        dengan otorisasi super admin.
       </p>
       <p className="text-xs text-app-muted">
-        Untuk bantuan teknis dan akses developer, buka menu Developer Contact.
+        Untuk bantuan teknis dan akses super admin, buka menu Super Admin Contact.
       </p>
     </div>
   );
@@ -176,8 +176,8 @@ function ContactContent() {
           AI
         </div>
         <div>
-          <p className="font-semibold text-app-fg">{DEVELOPER.name}</p>
-          <p className="text-sm text-app-muted">Developer · {APP_NAME}</p>
+          <p className="font-semibold text-app-fg">{SUPER_ADMIN.name}</p>
+          <p className="text-sm text-app-muted">Super Admin · {APP_NAME}</p>
         </div>
       </div>
       <a
@@ -198,7 +198,7 @@ function ContactContent() {
         </span>
       </a>
       <p className="text-xs text-app-muted">
-        Hubungi developer via WhatsApp untuk koreksi data atau pertanyaan
+        Hubungi super admin via WhatsApp untuk koreksi data atau pertanyaan
         teknis terkait pendaftaran.
       </p>
     </div>
