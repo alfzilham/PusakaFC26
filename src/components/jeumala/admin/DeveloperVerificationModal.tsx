@@ -10,6 +10,9 @@ type Props = {
   onClose: () => void;
   onVerified: () => void;
   endpoint?: string;
+  title?: string;
+  closeOnError?: boolean;
+  onVerificationFailed?: () => void;
 };
 
 export function DeveloperVerificationModal({
@@ -18,6 +21,9 @@ export function DeveloperVerificationModal({
   onClose,
   onVerified,
   endpoint = "/api/admin/developer/verify",
+  title = "Verifikasi Developer",
+  closeOnError = false,
+  onVerificationFailed,
 }: Props) {
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -42,6 +48,8 @@ export function DeveloperVerificationModal({
       const data = await res.json().catch(() => ({}));
       if (!res.ok) {
         setError(data.error || "Verifikasi developer gagal.");
+        onVerificationFailed?.();
+        if (closeOnError) close();
         return;
       }
       setPassword("");
@@ -57,7 +65,7 @@ export function DeveloperVerificationModal({
     <Modal
       open={open}
       onClose={close}
-      title="Verifikasi Developer"
+      title={title}
       icon={<ShieldCheck className="h-5 w-5 text-app-accent" />}
     >
       <form onSubmit={handleSubmit} className="space-y-4">
