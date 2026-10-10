@@ -104,7 +104,7 @@ export function UsedNumbersList({ used }: Props) {
       )}
 
       <p className="mt-6 text-center text-xs text-app-muted">
-        Data bersifat read-only. Untuk koreksi, hubungi admin atau developer.
+        Data bersifat read-only. Untuk koreksi, hubungi admin atau super admin.
       </p>
     </div>
   );
