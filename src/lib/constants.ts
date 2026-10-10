@@ -2,11 +2,11 @@
 
 export const APP_NAME = "PusakaFC26";
 export const APP_TAGLINE = "Sistem Pendaftaran Jersey";
-export const APP_VERSION = "v1.2.0";
+export const APP_VERSION = "v1.3.0";
 
 export const UPDATE_NOTIFICATION = {
   label: `Update ${APP_VERSION}`,
-  summary: "Admin read-only dan akses developer",
+  summary: "Developer Mode, nomor punggung duplikat, dan perbaikan keamanan",
   href: `https://github.com/alfzilham/PusakaFC26/releases/tag/${APP_VERSION}`,
 };
 
