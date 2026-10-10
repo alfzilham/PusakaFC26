@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState, type FormEvent } from "react";
+import { useEffect, useMemo, useRef, useState, type FormEvent } from "react";
 import {
   User,
   Shirt,
@@ -10,6 +10,7 @@ import {
   Send,
   AlertCircle,
   MessageCircle,
+  Clock3,
 } from "lucide-react";
 import { CustomDropdown } from "./CustomDropdown";
 import { useToast } from "./Toast";
@@ -25,6 +26,8 @@ import {
 } from "@/lib/validations";
 import { DEVELOPER } from "@/lib/constants";
 import { cn } from "@/lib/utils";
+import { DeveloperVerificationModal } from "./admin/DeveloperVerificationModal";
+import { Modal } from "./Modal";
 
 type Props = {
   used: UsedEntry[];
@@ -59,6 +62,18 @@ export function RegistrationForm({ used, onAfterSubmit }: Props) {
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [touched, setTouched] = useState<Record<string, boolean>>({});
+  const [developerMode, setDeveloperMode] = useState(false);
+  const [developerPromptOpen, setDeveloperPromptOpen] = useState(false);
+  const [developerLockUntil, setDeveloperLockUntil] = useState<number | null>(null);
+  const [lockModalOpen, setLockModalOpen] = useState(false);
+  const [lockRemaining, setLockRemaining] = useState(0);
+  const developerTapCount = useRef(0);
+  const developerTapResetTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Developer Mode is intentionally scoped to the current page visit.
+  useEffect(() => {
+    void fetch("/api/developer/logout", { method: "POST" });
+  }, []);
 
   // Indexes for O(1) duplicate lookup against the client cache
   const { nameSet, numberSet } = useMemo(() => {
@@ -101,7 +116,7 @@ export function RegistrationForm({ used, onAfterSubmit }: Props) {
       const n = parseInt(numStr, 10);
       if (n < 1) e.backNumber = "Minimal 1";
       else if (n > 999) e.backNumber = "Maksimal 999";
-      else if (numberSet.has(n)) e.backNumber = "Nomor sudah dipakai";
+      else if (!developerMode && numberSet.has(n)) e.backNumber = "Nomor sudah dipakai";
     }
 
     if (!f.size) e.size = "Ukuran wajib dipilih";
@@ -112,6 +127,26 @@ export function RegistrationForm({ used, onAfterSubmit }: Props) {
 
   const errors = validate(fields);
   const isValid = Object.keys(errors).length === 0;
+  const duplicateNumberOnly =
+    errors.backNumber === "Nomor sudah dipakai" && Object.keys(errors).length === 1;
+
+  useEffect(() => {
+    const lockUntil = developerLockUntil ?? 0;
+    if (lockUntil <= 0) return;
+
+    function updateTimer() {
+      const remaining = Math.max(0, lockUntil - Date.now());
+      setLockRemaining(remaining);
+      if (remaining === 0) {
+        setDeveloperLockUntil(null);
+        setLockModalOpen(false);
+      }
+    }
+
+    updateTimer();
+    const timer = setInterval(updateTimer, 1000);
+    return () => clearInterval(timer);
+  }, [developerLockUntil]);
 
   function setField<K extends keyof Fields>(key: K, value: string) {
     setFields((prev) => ({ ...prev, [key]: value }));
@@ -126,9 +161,50 @@ export function RegistrationForm({ used, onAfterSubmit }: Props) {
     return touched[key] && errors[key];
   }
 
+  async function handleDeveloperTap() {
+    setTouched((t) => ({ ...t, backNumber: true }));
+    setSubmitError(null);
+
+    if (developerLockUntil && Date.now() < developerLockUntil) {
+      developerTapCount.current += 1;
+      if (developerTapCount.current >= 7) {
+        developerTapCount.current = 0;
+        setLockModalOpen(true);
+      }
+      return;
+    }
+
+    developerTapCount.current += 1;
+    if (developerTapResetTimer.current) clearTimeout(developerTapResetTimer.current);
+    developerTapResetTimer.current = setTimeout(() => {
+      developerTapCount.current = 0;
+    }, 3000);
+
+    if (developerTapCount.current >= 7) {
+      developerTapCount.current = 0;
+      try {
+        const res = await fetch("/api/developer/status", { cache: "no-store" });
+        const data = await res.json().catch(() => ({}));
+        if (data.locked && Number(data.retryAfter) > 0) {
+          setDeveloperLockUntil(Date.now() + Number(data.retryAfter));
+          setLockModalOpen(true);
+        } else {
+          setDeveloperPromptOpen(true);
+        }
+      } catch {
+        setDeveloperPromptOpen(true);
+      }
+    }
+  }
+
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
-    if (submitting || !isValid) return;
+    if (submitting) return;
+    if (duplicateNumberOnly && !developerMode) {
+      void handleDeveloperTap();
+      return;
+    }
+    if (!isValid) return;
 
     setSubmitting(true);
     setSubmitError(null);
@@ -301,11 +377,11 @@ export function RegistrationForm({ used, onAfterSubmit }: Props) {
         {/* Submit */}
         <button
           type="submit"
-          disabled={!isValid || submitting}
-          aria-disabled={!isValid || submitting}
+          disabled={(!isValid && !duplicateNumberOnly) || submitting}
+          aria-disabled={(!isValid && !duplicateNumberOnly) || submitting}
           className={cn(
             "jc-focus relative flex w-full items-center justify-center gap-2.5 rounded-xl px-5 py-3.5 text-sm font-bold transition-all",
-            !isValid || submitting
+            ((!isValid && !duplicateNumberOnly) || submitting)
               ? "cursor-not-allowed bg-app-border text-app-muted"
               : "bg-app-accent text-app-accent-fg shadow-sm hover:bg-app-accent-strong active:scale-[0.99]"
           )}
@@ -341,6 +417,37 @@ export function RegistrationForm({ used, onAfterSubmit }: Props) {
           </p>
         </div>
       </form>
+      <DeveloperVerificationModal
+        open={developerPromptOpen}
+        endpoint="/api/developer/verify"
+        title="Buktikan Diri Anda Developer"
+        actionLabel="menggunakan nomor punggung yang sudah dipakai"
+        closeOnError
+        onVerificationFailed={({ locked, retryAfter }) => {
+          if (locked && retryAfter > 0) {
+            setDeveloperLockUntil(Date.now() + retryAfter);
+          }
+        }}
+        onClose={() => setDeveloperPromptOpen(false)}
+        onVerified={() => {
+          setDeveloperMode(true);
+          setDeveloperPromptOpen(false);
+        }}
+      />
+      <Modal
+        open={lockModalOpen}
+        onClose={() => setLockModalOpen(false)}
+        title="Developer Mode Diblokir"
+        icon={<Clock3 className="h-5 w-5 text-app-danger" />}
+      >
+        <p className="text-sm text-app-fg-soft">
+          Percobaan password developer sudah mencapai batas. Silakan tunggu sebelum mencoba lagi.
+        </p>
+        <p className="mt-4 text-center text-3xl font-bold tabular-nums text-app-danger">
+          {String(Math.floor(lockRemaining / 60000)).padStart(2, "0")}:
+          {String(Math.floor((lockRemaining % 60000) / 1000)).padStart(2, "0")}
+        </p>
+      </Modal>
     </div>
   );
 }

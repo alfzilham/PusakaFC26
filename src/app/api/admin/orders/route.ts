@@ -7,6 +7,7 @@ import {
   isSize,
   isSleeve,
   GENDER_VALUES,
+  normalizeBackName,
   normalizeFullName,
   type OrderRow,
 } from "@/lib/validations";
@@ -162,7 +163,7 @@ export async function PUT(req: Request) {
   if (data.size) update.size = data.size;
 
   if (data.backName) {
-    const normalized = data.backName.trim().replace(/\s+/g, " ");
+    const normalized = normalizeBackName(data.backName);
     const clash = await db.jerseyOrder.findFirst({
       where: { backName: { equals: normalized }, NOT: { id } },
       select: { id: true },
@@ -175,16 +176,19 @@ export async function PUT(req: Request) {
     }
     update.backName = normalized;
   }
-  if (typeof data.backNumber === "number" && !(await isDeveloperAuthenticated())) {
-    const clash = await db.jerseyOrder.findFirst({
-      where: { backNumber: data.backNumber, NOT: { id } },
-      select: { id: true },
-    });
-    if (clash) {
-      return NextResponse.json(
-        { error: `Nomor ${data.backNumber} sudah dipakai.`, field: "backNumber" },
-        { status: 409 }
-      );
+  if (typeof data.backNumber === "number") {
+    const developerAuthenticated = await isDeveloperAuthenticated();
+    if (!developerAuthenticated) {
+      const clash = await db.jerseyOrder.findFirst({
+        where: { backNumber: data.backNumber, NOT: { id } },
+        select: { id: true },
+      });
+      if (clash) {
+        return NextResponse.json(
+          { error: `Nomor ${data.backNumber} sudah dipakai.`, field: "backNumber" },
+          { status: 409 }
+        );
+      }
     }
     update.backNumber = data.backNumber;
   }

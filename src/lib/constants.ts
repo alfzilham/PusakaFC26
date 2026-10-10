@@ -27,8 +27,11 @@ export const ADMIN_PASSWORD_ENV = "ADMIN_PASSWORD";
 export const DEVELOPER_PASSWORD_ENV = "DEVELOPER_PASSWORD";
 export const ADMIN_SESSION_COOKIE = "jc26_admin";
 export const DEVELOPER_SESSION_COOKIE = "jc26_developer";
+export const PUBLIC_DEVELOPER_SESSION_COOKIE = "jc26_public_developer";
+export const DEVELOPER_FAILURE_COOKIE = "jc26_developer_failures";
 export const ADMIN_SESSION_MAX_AGE = 60 * 60 * 8; // 8 hours
 export const DEVELOPER_SESSION_MAX_AGE = 60 * 60; // 1 hour
+export const DEVELOPER_LOCK_MAX_AGE = 60 * 5; // 5 minutes
 
 // Rate limiting config
 export const LOGIN_MAX_ATTEMPTS = 5;
