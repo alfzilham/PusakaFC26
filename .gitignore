@@ -68,3 +68,4 @@ graphify-out/
 .vscode/
 *.swp
 Thumbs.db
+db/custom.db
