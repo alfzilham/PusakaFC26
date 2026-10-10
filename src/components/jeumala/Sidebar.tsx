@@ -144,7 +144,7 @@ export function Sidebar({
                 <InfoSubItem label="Privacy Policy" onClick={() => { onOpenInfo("privacy"); handleClose(); }} />
                 <InfoSubItem label="Terms of Services" onClick={() => { onOpenInfo("terms"); handleClose(); }} />
                 <InfoSubItem label="Admin Contact" onClick={() => { onOpenInfo("admin-contact"); handleClose(); }} />
-                <InfoSubItem label="Developer Contact" onClick={() => { onOpenInfo("contact"); handleClose(); }} />
+                <InfoSubItem label="Super Admin Contact" onClick={() => { onOpenInfo("contact"); handleClose(); }} />
               </div>
             )}
           </div>
@@ -165,7 +165,7 @@ export function Sidebar({
           </button>
         }
       >
-        Fitur detail data hanya dapat diakses oleh admin dan developer. Silakan
+        Fitur detail data hanya dapat diakses oleh admin dan super admin. Silakan
         gunakan halaman admin untuk melanjutkan.
       </Modal>
     </div>

@@ -8,7 +8,7 @@ Project ini akan dieksekusi/dibangun melalui [chat.z.ai](https://chat.z.ai), men
 
 ## 2. Siapa yang Terlibat
 
-- **Developer**: Alfiz Ilham (kontak developer juga ditampilkan di aplikasi untuk user yang perlu koreksi data).
+- **Super Admin**: Alfiz Ilham (kontak super admin juga ditampilkan di aplikasi untuk user yang perlu koreksi data).
 - **Target pengguna**: Peserta/pemesan jersey (publik, tanpa akun) dan admin panitia (satu akun, akses password).
 
 ## 3. Keputusan Kunci (Decision Log)
@@ -56,4 +56,4 @@ Project ini akan dieksekusi/dibangun melalui [chat.z.ai](https://chat.z.ai), men
 
 ## 7. Catatan Eksekusi
 
-Kelima dokumen ini dirancang agar bisa langsung dipakai sebagai acuan oleh AI builder (chat.z.ai) maupun developer manusia, tanpa perlu klarifikasi ulang — seluruh ambiguitas yang mungkin muncul sudah diselesaikan lewat sesi Q&A dan dicatat di §3.
+Kelima dokumen ini dirancang agar bisa langsung dipakai sebagai acuan oleh AI builder (chat.z.ai) maupun super admin manusia, tanpa perlu klarifikasi ulang — seluruh ambiguitas yang mungkin muncul sudah diselesaikan lewat sesi Q&A dan dicatat di §3.

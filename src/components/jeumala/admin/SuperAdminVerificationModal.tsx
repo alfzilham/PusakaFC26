@@ -15,13 +15,13 @@ type Props = {
   onVerificationFailed?: (result: { locked: boolean; retryAfter: number }) => void;
 };
 
-export function DeveloperVerificationModal({
+export function SuperAdminVerificationModal({
   open,
   actionLabel,
   onClose,
   onVerified,
-  endpoint = "/api/admin/developer/verify",
-  title = "Verifikasi Developer",
+  endpoint = "/api/admin/super-admin/verify",
+  title = "Verifikasi Super Admin",
   closeOnError = false,
   onVerificationFailed,
 }: Props) {
@@ -47,9 +47,9 @@ export function DeveloperVerificationModal({
       });
       const data = await res.json().catch(() => ({}));
       if (!res.ok) {
-        setError(data.error || "Verifikasi developer gagal.");
+        setError(data.error || "Verifikasi super admin gagal.");
         onVerificationFailed?.({
-          locked: data.code === "DEVELOPER_LOCKED" || res.status === 429,
+          locked: data.code === "SUPER_ADMIN_LOCKED" || res.status === 429,
           retryAfter: Number(data.retryAfter) || 0,
         });
         if (closeOnError) close();
@@ -73,16 +73,16 @@ export function DeveloperVerificationModal({
     >
       <form onSubmit={handleSubmit} className="space-y-4">
         <div className="rounded-xl border border-app-accent/20 bg-app-accent/5 p-3.5 text-sm text-app-fg-soft">
-          Tunjukkan bahwa diri anda developer untuk mengakses fitur admin terbatas: <strong>{actionLabel}</strong>.
+          Tunjukkan bahwa diri anda super admin untuk mengakses fitur admin terbatas: <strong>{actionLabel}</strong>.
         </div>
         <div>
-          <label htmlFor="developer-password" className="mb-1.5 block text-sm font-semibold text-app-fg">
-            Password khusus developer
+          <label htmlFor="super admin-password" className="mb-1.5 block text-sm font-semibold text-app-fg">
+            Password khusus super admin
           </label>
           <div className="relative">
             <KeyRound className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-app-muted" />
             <input
-              id="developer-password"
+              id="super admin-password"
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
@@ -91,7 +91,7 @@ export function DeveloperVerificationModal({
               required
               className="jc-input w-full"
               style={{ paddingLeft: "2.75rem" }}
-              placeholder="Masukkan password developer"
+              placeholder="Masukkan password super admin"
             />
           </div>
         </div>

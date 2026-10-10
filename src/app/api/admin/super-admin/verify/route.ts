@@ -1,10 +1,10 @@
 import { NextResponse } from "next/server";
 import {
-  createDeveloperSessionToken,
-  getDeveloperPassword,
+  createSuperAdminSessionToken,
+  getSuperAdminPassword,
   isAdminAuthenticated,
   secretsMatch,
-  setDeveloperSessionCookie,
+  setSuperAdminSessionCookie,
 } from "@/lib/auth";
 
 export async function POST(req: Request) {
@@ -20,17 +20,17 @@ export async function POST(req: Request) {
   }
 
   const password = body.password || "";
-  if (!getDeveloperPassword()) {
+  if (!getSuperAdminPassword()) {
     return NextResponse.json(
-      { error: "Password developer belum dikonfigurasi." },
+      { error: "Password super admin belum dikonfigurasi." },
       { status: 503 }
     );
   }
 
-  if (!secretsMatch(password, getDeveloperPassword())) {
-    return NextResponse.json({ error: "Password developer salah." }, { status: 401 });
+  if (!secretsMatch(password, getSuperAdminPassword())) {
+    return NextResponse.json({ error: "Password super admin salah." }, { status: 401 });
   }
 
-  await setDeveloperSessionCookie(createDeveloperSessionToken());
+  await setSuperAdminSessionCookie(createSuperAdminSessionToken());
   return NextResponse.json({ ok: true });
 }

@@ -35,7 +35,7 @@ Sistem input pemesanan nama/nomor punggung jersey untuk event "PusakaFC26". Tida
 **Setelah submit sukses:**
 - Tampilkan toast sukses (slide-in dari atas, auto-dismiss 3 detik).
 - Form di-reset otomatis, tetap di Halaman 1.
-- User **tidak bisa** mengedit/membatalkan input sendiri — harus menghubungi admin via WhatsApp (nomor developer) untuk koreksi.
+- User **tidak bisa** mengedit/membatalkan input sendiri — harus menghubungi admin via WhatsApp (nomor super admin) untuk koreksi.
 
 ### 3.2 Halaman 2 — "Nomor Punggung Terpakai"
 
@@ -59,7 +59,7 @@ Sistem input pemesanan nama/nomor punggung jersey untuk event "PusakaFC26". Tida
   - About (deskripsi software).
   - Privacy Policy.
   - Terms of Services.
-  - Developer Contact: Nama "Alfiz Ilham", No. WA "0852-1389-6460".
+  - Super Admin Contact: Nama "Alfiz Ilham", No. WA "0852-1389-6460".
 
 ## 5. Admin Panel (`/admin`)
 

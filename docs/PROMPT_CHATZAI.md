@@ -45,7 +45,7 @@ SIDEBAR (dibuka via hamburger):
    - About
    - Privacy Policy
    - Terms of Services
-   - Developer Contact: Nama "Alfiz Ilham", No. WA "0852-1389-6460"
+   - Super Admin Contact: Nama "Alfiz Ilham", No. WA "0852-1389-6460"
 
 ADMIN PANEL (path /admin, TIDAK ada link publik ke sini dari sidebar):
 - Login password-based, rate limiting: 5x gagal → lock 15 menit (catat per IP)

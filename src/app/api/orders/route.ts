@@ -7,7 +7,7 @@ import {
   normalizeBackName,
   normalizeFullName,
 } from "@/lib/validations";
-import { isPublicDeveloperAuthenticated } from "@/lib/auth";
+import { isPublicSuperAdminAuthenticated } from "@/lib/auth";
 
 // GET /api/orders — public: returns used entries (for Page 2 + client cache)
 export async function GET() {
@@ -52,7 +52,7 @@ export async function POST(req: Request) {
   const normalizedFullName = normalizeFullName(fullName);
 
   const normalizedBackName = normalizeBackName(backName);
-  const developerMode = await isPublicDeveloperAuthenticated();
+  const superAdminMode = await isPublicSuperAdminAuthenticated();
 
   // Explicit duplicate checks (race-condition aware) before relying on
   // the Prisma unique constraints below.
@@ -64,7 +64,7 @@ export async function POST(req: Request) {
         where: { backName: { equals: normalizedBackName } },
         select: { id: true },
       }),
-      developerMode
+      superAdminMode
         ? Promise.resolve(null)
         : db.jerseyOrder.findFirst({
             where: { backNumber },
