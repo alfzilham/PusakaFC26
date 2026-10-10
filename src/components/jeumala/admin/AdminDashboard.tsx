@@ -35,7 +35,7 @@ import {
   type OrderRow,
 } from "@/lib/validations";
 import { cn } from "@/lib/utils";
-import { DeveloperVerificationModal } from "@/components/jeumala/admin/DeveloperVerificationModal";
+import { SuperAdminVerificationModal } from "@/components/jeumala/admin/SuperAdminVerificationModal";
 
 type Stats = { total: number; pria: number; wanita: number };
 
@@ -54,9 +54,9 @@ export function AdminDashboard({ onLogout }: { onLogout: () => void }) {
 
   const [editing, setEditing] = useState<OrderRow | null>(null);
   const [deleting, setDeleting] = useState<OrderRow | null>(null);
-  const [developerPrompt, setDeveloperPrompt] = useState<string | null>(null);
-  const [developerVerified, setDeveloperVerified] = useState(false);
-  const pendingDeveloperAction = useRef<(() => void | Promise<void>) | null>(null);
+  const [superAdminPrompt, setSuperAdminPrompt] = useState<string | null>(null);
+  const [superAdminVerified, setSuperAdminVerified] = useState(false);
+  const pendingSuperAdminAction = useRef<(() => void | Promise<void>) | null>(null);
 
   // Derived gender filter for API
   const genderParam = (() => {
@@ -124,20 +124,20 @@ export function AdminDashboard({ onLogout }: { onLogout: () => void }) {
     fetchStats();
   }
 
-  function requireDeveloper(actionLabel: string, action: () => void | Promise<void>) {
-    if (developerVerified) {
+  function requireSuperAdmin(actionLabel: string, action: () => void | Promise<void>) {
+    if (superAdminVerified) {
       void action();
       return;
     }
-    pendingDeveloperAction.current = action;
-    setDeveloperPrompt(actionLabel);
+    pendingSuperAdminAction.current = action;
+    setSuperAdminPrompt(actionLabel);
   }
 
-  function handleDeveloperVerified() {
-    setDeveloperVerified(true);
-    setDeveloperPrompt(null);
-    const action = pendingDeveloperAction.current;
-    pendingDeveloperAction.current = null;
+  function handleSuperAdminVerified() {
+    setSuperAdminVerified(true);
+    setSuperAdminPrompt(null);
+    const action = pendingSuperAdminAction.current;
+    pendingSuperAdminAction.current = null;
     if (action) void action();
   }
 
@@ -246,7 +246,7 @@ export function AdminDashboard({ onLogout }: { onLogout: () => void }) {
         <section className="mb-6 flex flex-wrap items-center gap-3">
           <h2 className="mr-auto text-lg font-bold text-app-fg">Data Pendaftar</h2>
           <p className="basis-full text-xs text-app-muted">
-            Admin dapat melihat data. Export, edit, dan hapus hanya tersedia untuk developer.
+            Admin dapat melihat data. Export, edit, dan hapus hanya tersedia untuk super admin.
           </p>
           <p className="basis-full text-xs text-app-muted">
             No. Urut mengikuti waktu submit dan tidak dapat diedit. No. Punggung adalah nomor jersey.
@@ -262,7 +262,7 @@ export function AdminDashboard({ onLogout }: { onLogout: () => void }) {
           </button>
           <button
             type="button"
-            onClick={() => requireDeveloper("export Excel", () => handleExport("xlsx"))}
+            onClick={() => requireSuperAdmin("export Excel", () => handleExport("xlsx"))}
             disabled={!!exporting}
             className="jc-focus inline-flex items-center gap-1.5 rounded-xl bg-app-accent px-3.5 py-2 text-sm font-semibold text-app-accent-fg transition-colors hover:bg-app-accent-strong disabled:opacity-60"
           >
@@ -275,7 +275,7 @@ export function AdminDashboard({ onLogout }: { onLogout: () => void }) {
           </button>
           <button
             type="button"
-            onClick={() => requireDeveloper("export JSON", () => handleExport("json"))}
+            onClick={() => requireSuperAdmin("export JSON", () => handleExport("json"))}
             disabled={!!exporting}
             className="jc-focus inline-flex items-center gap-1.5 rounded-xl border border-app-border bg-app-surface px-3.5 py-2 text-sm font-semibold text-app-fg transition-colors hover:border-app-border-strong disabled:opacity-60"
           >
@@ -385,7 +385,7 @@ export function AdminDashboard({ onLogout }: { onLogout: () => void }) {
                         <div className="flex items-center justify-end gap-1">
                           <button
                             type="button"
-                            onClick={() => requireDeveloper("mengedit data", () => setEditing(r))}
+                            onClick={() => requireSuperAdmin("mengedit data", () => setEditing(r))}
                             aria-label={`Edit ${r.fullName}`}
                             className="jc-focus inline-flex h-8 w-8 items-center justify-center rounded-lg text-app-muted transition-colors hover:bg-app-accent/10 hover:text-app-accent"
                           >
@@ -393,7 +393,7 @@ export function AdminDashboard({ onLogout }: { onLogout: () => void }) {
                           </button>
                           <button
                             type="button"
-                            onClick={() => requireDeveloper("menghapus data", () => setDeleting(r))}
+                            onClick={() => requireSuperAdmin("menghapus data", () => setDeleting(r))}
                             aria-label={`Hapus ${r.fullName}`}
                             className="jc-focus inline-flex h-8 w-8 items-center justify-center rounded-lg text-app-muted transition-colors hover:bg-app-danger/10 hover:text-app-danger"
                           >
@@ -488,14 +488,14 @@ export function AdminDashboard({ onLogout }: { onLogout: () => void }) {
         )}
       </Modal>
 
-      <DeveloperVerificationModal
-        open={!!developerPrompt}
-        actionLabel={developerPrompt || "fitur terbatas"}
+      <SuperAdminVerificationModal
+        open={!!superAdminPrompt}
+        actionLabel={superAdminPrompt || "fitur terbatas"}
         onClose={() => {
-          pendingDeveloperAction.current = null;
-          setDeveloperPrompt(null);
+          pendingSuperAdminAction.current = null;
+          setSuperAdminPrompt(null);
         }}
-        onVerified={handleDeveloperVerified}
+        onVerified={handleSuperAdminVerified}
       />
     </div>
   );
