@@ -3,12 +3,12 @@ import crypto from "crypto";
 import {
   ADMIN_SESSION_COOKIE,
   ADMIN_SESSION_MAX_AGE,
-  DEVELOPER_PASSWORD_ENV,
-  DEVELOPER_SESSION_COOKIE,
-  DEVELOPER_SESSION_MAX_AGE,
-  PUBLIC_DEVELOPER_SESSION_COOKIE,
-  DEVELOPER_FAILURE_COOKIE,
-  DEVELOPER_LOCK_MAX_AGE,
+  SUPER_ADMIN_PASSWORD_ENV,
+  SUPER_ADMIN_SESSION_COOKIE,
+  SUPER_ADMIN_SESSION_MAX_AGE,
+  PUBLIC_SUPER_ADMIN_SESSION_COOKIE,
+  SUPER_ADMIN_FAILURE_COOKIE,
+  SUPER_ADMIN_LOCK_MAX_AGE,
   DEFAULT_ADMIN_PASSWORD,
   ADMIN_PASSWORD_ENV,
 } from "@/lib/constants";
@@ -73,54 +73,54 @@ export async function setSessionCookie(token: string) {
   });
 }
 
-export function createDeveloperSessionToken(): string {
-  return createToken(DEVELOPER_SESSION_MAX_AGE);
+export function createSuperAdminSessionToken(): string {
+  return createToken(SUPER_ADMIN_SESSION_MAX_AGE);
 }
 
-export async function setDeveloperSessionCookie(token: string) {
+export async function setSuperAdminSessionCookie(token: string) {
   const store = await cookies();
-  store.set(DEVELOPER_SESSION_COOKIE, token, {
+  store.set(SUPER_ADMIN_SESSION_COOKIE, token, {
     httpOnly: true,
     sameSite: "lax",
     secure: process.env.NODE_ENV === "production",
     path: "/",
-    maxAge: DEVELOPER_SESSION_MAX_AGE,
+    maxAge: SUPER_ADMIN_SESSION_MAX_AGE,
   });
 }
 
-export async function setPublicDeveloperSessionCookie(token: string) {
+export async function setPublicSuperAdminSessionCookie(token: string) {
   const store = await cookies();
-  store.set(PUBLIC_DEVELOPER_SESSION_COOKIE, token, {
+  store.set(PUBLIC_SUPER_ADMIN_SESSION_COOKIE, token, {
     httpOnly: true,
     sameSite: "lax",
     secure: process.env.NODE_ENV === "production",
     path: "/",
-    maxAge: DEVELOPER_SESSION_MAX_AGE,
+    maxAge: SUPER_ADMIN_SESSION_MAX_AGE,
   });
 }
 
-export async function clearDeveloperSessionCookie() {
+export async function clearSuperAdminSessionCookie() {
   const store = await cookies();
-  store.delete(DEVELOPER_SESSION_COOKIE);
+  store.delete(SUPER_ADMIN_SESSION_COOKIE);
 }
 
-export async function clearPublicDeveloperSessionCookie() {
+export async function clearPublicSuperAdminSessionCookie() {
   const store = await cookies();
-  store.delete(PUBLIC_DEVELOPER_SESSION_COOKIE);
+  store.delete(PUBLIC_SUPER_ADMIN_SESSION_COOKIE);
 }
 
-type DeveloperFailureState = { attempts: number; lockedUntil: number };
+type SuperAdminFailureState = { attempts: number; lockedUntil: number };
 
 function signState(payload: string): string {
   return `${payload}.${sign(payload)}`;
 }
 
-function verifyState(value: string | undefined): DeveloperFailureState | null {
+function verifyState(value: string | undefined): SuperAdminFailureState | null {
   if (!value) return null;
   const [payload, signature] = value.split(".");
   if (!payload || !signature || signature !== sign(payload)) return null;
   try {
-    const state = JSON.parse(Buffer.from(payload, "base64url").toString()) as DeveloperFailureState;
+    const state = JSON.parse(Buffer.from(payload, "base64url").toString()) as SuperAdminFailureState;
     if (!Number.isInteger(state.attempts) || state.attempts < 0) return null;
     if (!Number.isInteger(state.lockedUntil) || state.lockedUntil < 0) return null;
     return state;
@@ -129,31 +129,31 @@ function verifyState(value: string | undefined): DeveloperFailureState | null {
   }
 }
 
-export async function getDeveloperFailureState(): Promise<DeveloperFailureState> {
+export async function getSuperAdminFailureState(): Promise<SuperAdminFailureState> {
   const store = await cookies();
   return (
-    verifyState(store.get(DEVELOPER_FAILURE_COOKIE)?.value) || {
+    verifyState(store.get(SUPER_ADMIN_FAILURE_COOKIE)?.value) || {
       attempts: 0,
       lockedUntil: 0,
     }
   );
 }
 
-export async function setDeveloperFailureState(state: DeveloperFailureState) {
+export async function setSuperAdminFailureState(state: SuperAdminFailureState) {
   const payload = Buffer.from(JSON.stringify(state)).toString("base64url");
   const store = await cookies();
-  store.set(DEVELOPER_FAILURE_COOKIE, signState(payload), {
+  store.set(SUPER_ADMIN_FAILURE_COOKIE, signState(payload), {
     httpOnly: true,
     sameSite: "lax",
     secure: process.env.NODE_ENV === "production",
     path: "/",
-    maxAge: DEVELOPER_LOCK_MAX_AGE,
+    maxAge: SUPER_ADMIN_LOCK_MAX_AGE,
   });
 }
 
-export async function clearDeveloperFailureState() {
+export async function clearSuperAdminFailureState() {
   const store = await cookies();
-  store.delete(DEVELOPER_FAILURE_COOKIE);
+  store.delete(SUPER_ADMIN_FAILURE_COOKIE);
 }
 
 export async function clearSessionCookie() {
@@ -171,20 +171,20 @@ export async function isAdminAuthenticated(): Promise<boolean> {
   return verifySessionToken(token);
 }
 
-export async function isDeveloperAuthenticated(): Promise<boolean> {
+export async function isSuperAdminAuthenticated(): Promise<boolean> {
   if (!(await isAdminAuthenticated())) return false;
-  return isDeveloperCookieValid();
+  return isSuperAdminCookieValid();
 }
 
-/** Developer verification used by the public registration Developer Mode. */
-export async function isPublicDeveloperAuthenticated(): Promise<boolean> {
+/** Super Admin verification used by the public registration Super Admin Mode. */
+export async function isPublicSuperAdminAuthenticated(): Promise<boolean> {
   const store = await cookies();
-  return verifySessionToken(store.get(PUBLIC_DEVELOPER_SESSION_COOKIE)?.value);
+  return verifySessionToken(store.get(PUBLIC_SUPER_ADMIN_SESSION_COOKIE)?.value);
 }
 
-async function isDeveloperCookieValid(): Promise<boolean> {
+async function isSuperAdminCookieValid(): Promise<boolean> {
   const store = await cookies();
-  return verifySessionToken(store.get(DEVELOPER_SESSION_COOKIE)?.value);
+  return verifySessionToken(store.get(SUPER_ADMIN_SESSION_COOKIE)?.value);
 }
 
 function normalizeEnvironmentSecret(value: string): string {
@@ -204,8 +204,8 @@ export function getAdminPassword(): string {
   return configured ? normalizeEnvironmentSecret(configured) : DEFAULT_ADMIN_PASSWORD;
 }
 
-export function getDeveloperPassword(): string {
-  return normalizeEnvironmentSecret(process.env[DEVELOPER_PASSWORD_ENV] || "");
+export function getSuperAdminPassword(): string {
+  return normalizeEnvironmentSecret(process.env[SUPER_ADMIN_PASSWORD_ENV] || "");
 }
 
 export function secretsMatch(input: string, expected: string): boolean {
