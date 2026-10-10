@@ -10,6 +10,7 @@ import {
   Send,
   AlertCircle,
   MessageCircle,
+  ShieldCheck,
 } from "lucide-react";
 import { CustomDropdown } from "./CustomDropdown";
 import { useToast } from "./Toast";
@@ -25,6 +26,7 @@ import {
 } from "@/lib/validations";
 import { DEVELOPER } from "@/lib/constants";
 import { cn } from "@/lib/utils";
+import { DeveloperVerificationModal } from "./admin/DeveloperVerificationModal";
 
 type Props = {
   used: UsedEntry[];
@@ -59,6 +61,8 @@ export function RegistrationForm({ used, onAfterSubmit }: Props) {
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [touched, setTouched] = useState<Record<string, boolean>>({});
+  const [developerMode, setDeveloperMode] = useState(false);
+  const [developerPromptOpen, setDeveloperPromptOpen] = useState(false);
 
   // Indexes for O(1) duplicate lookup against the client cache
   const { nameSet, numberSet } = useMemo(() => {
@@ -101,7 +105,7 @@ export function RegistrationForm({ used, onAfterSubmit }: Props) {
       const n = parseInt(numStr, 10);
       if (n < 1) e.backNumber = "Minimal 1";
       else if (n > 999) e.backNumber = "Maksimal 999";
-      else if (numberSet.has(n)) e.backNumber = "Nomor sudah dipakai";
+      else if (!developerMode && numberSet.has(n)) e.backNumber = "Nomor sudah dipakai";
     }
 
     if (!f.size) e.size = "Ukuran wajib dipilih";
@@ -201,6 +205,26 @@ export function RegistrationForm({ used, onAfterSubmit }: Props) {
         noValidate
         className="space-y-5 rounded-2xl border border-app-border bg-app-surface p-5 shadow-sm sm:p-6"
       >
+        <button
+          type="button"
+          onClick={async () => {
+            if (developerMode) {
+              await fetch("/api/developer/logout", { method: "POST" });
+              setDeveloperMode(false);
+            } else {
+              setDeveloperPromptOpen(true);
+            }
+          }}
+          className={cn(
+            "jc-focus inline-flex items-center gap-2 rounded-lg border px-3 py-2 text-xs font-semibold transition-colors",
+            developerMode
+              ? "border-app-accent bg-app-accent/10 text-app-accent"
+              : "border-app-border text-app-muted hover:border-app-accent hover:text-app-accent"
+          )}
+        >
+          <ShieldCheck className="h-4 w-4" />
+          {developerMode ? "Developer Mode Aktif" : "Aktifkan Developer Mode"}
+        </button>
         {/* Gender */}
         <CustomDropdown
           label="Gender"
@@ -341,6 +365,16 @@ export function RegistrationForm({ used, onAfterSubmit }: Props) {
           </p>
         </div>
       </form>
+      <DeveloperVerificationModal
+        open={developerPromptOpen}
+        endpoint="/api/developer/verify"
+        actionLabel="menggunakan nomor punggung yang sudah dipakai"
+        onClose={() => setDeveloperPromptOpen(false)}
+        onVerified={() => {
+          setDeveloperMode(true);
+          setDeveloperPromptOpen(false);
+        }}
+      />
     </div>
   );
 }
