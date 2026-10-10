@@ -74,7 +74,7 @@ Urutan dari atas ke bawah:
 3. Link: Halaman 2 — "Nomor Punggung Terpakai".
 4. Link: "Lihat Detail Data" — tampil dengan ikon `Lock`, style disabled (opacity rendah, cursor not-allowed, tidak clickable untuk publik).
 5. Divider.
-6. "Information" — posisi sticky di bawah sidebar (seperti tombol settings), expand/collapse submenu: About, Privacy Policy, Terms of Services, Admin Contact, Developer Contact.
+6. "Information" — posisi sticky di bawah sidebar (seperti tombol settings), expand/collapse submenu: About, Privacy Policy, Terms of Services, Admin Contact, Super Admin Contact.
 
 ### 6.3 Halaman 1 — Form
 - Single column di mobile, max-width terpusat di desktop (misal 480–560px) agar tetap terasa mobile-first.
