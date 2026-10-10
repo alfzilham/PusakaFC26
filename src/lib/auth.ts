@@ -6,6 +6,9 @@ import {
   DEVELOPER_PASSWORD_ENV,
   DEVELOPER_SESSION_COOKIE,
   DEVELOPER_SESSION_MAX_AGE,
+  PUBLIC_DEVELOPER_SESSION_COOKIE,
+  DEVELOPER_FAILURE_COOKIE,
+  DEVELOPER_LOCK_MAX_AGE,
   DEFAULT_ADMIN_PASSWORD,
   ADMIN_PASSWORD_ENV,
 } from "@/lib/constants";
@@ -85,9 +88,72 @@ export async function setDeveloperSessionCookie(token: string) {
   });
 }
 
+export async function setPublicDeveloperSessionCookie(token: string) {
+  const store = await cookies();
+  store.set(PUBLIC_DEVELOPER_SESSION_COOKIE, token, {
+    httpOnly: true,
+    sameSite: "lax",
+    secure: process.env.NODE_ENV === "production",
+    path: "/",
+    maxAge: DEVELOPER_SESSION_MAX_AGE,
+  });
+}
+
 export async function clearDeveloperSessionCookie() {
   const store = await cookies();
   store.delete(DEVELOPER_SESSION_COOKIE);
+}
+
+export async function clearPublicDeveloperSessionCookie() {
+  const store = await cookies();
+  store.delete(PUBLIC_DEVELOPER_SESSION_COOKIE);
+}
+
+type DeveloperFailureState = { attempts: number; lockedUntil: number };
+
+function signState(payload: string): string {
+  return `${payload}.${sign(payload)}`;
+}
+
+function verifyState(value: string | undefined): DeveloperFailureState | null {
+  if (!value) return null;
+  const [payload, signature] = value.split(".");
+  if (!payload || !signature || signature !== sign(payload)) return null;
+  try {
+    const state = JSON.parse(Buffer.from(payload, "base64url").toString()) as DeveloperFailureState;
+    if (!Number.isInteger(state.attempts) || state.attempts < 0) return null;
+    if (!Number.isInteger(state.lockedUntil) || state.lockedUntil < 0) return null;
+    return state;
+  } catch {
+    return null;
+  }
+}
+
+export async function getDeveloperFailureState(): Promise<DeveloperFailureState> {
+  const store = await cookies();
+  return (
+    verifyState(store.get(DEVELOPER_FAILURE_COOKIE)?.value) || {
+      attempts: 0,
+      lockedUntil: 0,
+    }
+  );
+}
+
+export async function setDeveloperFailureState(state: DeveloperFailureState) {
+  const payload = Buffer.from(JSON.stringify(state)).toString("base64url");
+  const store = await cookies();
+  store.set(DEVELOPER_FAILURE_COOKIE, signState(payload), {
+    httpOnly: true,
+    sameSite: "lax",
+    secure: process.env.NODE_ENV === "production",
+    path: "/",
+    maxAge: DEVELOPER_LOCK_MAX_AGE,
+  });
+}
+
+export async function clearDeveloperFailureState() {
+  const store = await cookies();
+  store.delete(DEVELOPER_FAILURE_COOKIE);
 }
 
 export async function clearSessionCookie() {
@@ -112,7 +178,8 @@ export async function isDeveloperAuthenticated(): Promise<boolean> {
 
 /** Developer verification used by the public registration Developer Mode. */
 export async function isPublicDeveloperAuthenticated(): Promise<boolean> {
-  return isDeveloperCookieValid();
+  const store = await cookies();
+  return verifySessionToken(store.get(PUBLIC_DEVELOPER_SESSION_COOKIE)?.value);
 }
 
 async function isDeveloperCookieValid(): Promise<boolean> {
