@@ -9,6 +9,7 @@ type Props = {
   actionLabel: string;
   onClose: () => void;
   onVerified: () => void;
+  endpoint?: string;
 };
 
 export function DeveloperVerificationModal({
@@ -16,6 +17,7 @@ export function DeveloperVerificationModal({
   actionLabel,
   onClose,
   onVerified,
+  endpoint = "/api/admin/developer/verify",
 }: Props) {
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -32,7 +34,7 @@ export function DeveloperVerificationModal({
     setSubmitting(true);
     setError(null);
     try {
-      const res = await fetch("/api/admin/developer/verify", {
+      const res = await fetch(endpoint, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ password }),
