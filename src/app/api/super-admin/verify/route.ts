@@ -1,14 +1,14 @@
 import { NextResponse } from "next/server";
 import {
-  createDeveloperSessionToken,
-  clearDeveloperFailureState,
-  getDeveloperFailureState,
-  getDeveloperPassword,
+  createSuperAdminSessionToken,
+  clearSuperAdminFailureState,
+  getSuperAdminFailureState,
+  getSuperAdminPassword,
   secretsMatch,
-  setPublicDeveloperSessionCookie,
-  setDeveloperFailureState,
+  setPublicSuperAdminSessionCookie,
+  setSuperAdminFailureState,
 } from "@/lib/auth";
-import { DEVELOPER_LOCK_MAX_AGE } from "@/lib/constants";
+import { SUPER_ADMIN_LOCK_MAX_AGE } from "@/lib/constants";
 
 export async function POST(req: Request) {
   let body: { password?: string };
@@ -18,20 +18,20 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Body tidak valid." }, { status: 400 });
   }
 
-  const expected = getDeveloperPassword();
+  const expected = getSuperAdminPassword();
   if (!expected) {
     return NextResponse.json(
-      { error: "Password developer belum dikonfigurasi." },
+      { error: "Password super admin belum dikonfigurasi." },
       { status: 503 }
     );
   }
-  const failureState = await getDeveloperFailureState();
+  const failureState = await getSuperAdminFailureState();
   const now = Date.now();
   if (failureState.lockedUntil > now) {
     return NextResponse.json(
       {
-        error: "Developer Mode sedang diblokir.",
-        code: "DEVELOPER_LOCKED",
+        error: "Super Admin Mode sedang diblokir.",
+        code: "SUPER_ADMIN_LOCKED",
         retryAfter: failureState.lockedUntil - now,
       },
       { status: 429 }
@@ -39,19 +39,19 @@ export async function POST(req: Request) {
   }
   if (!secretsMatch(body.password || "", expected)) {
     const attempts = failureState.attempts + 1;
-    const lockedUntil = attempts >= 2 ? now + DEVELOPER_LOCK_MAX_AGE * 1000 : 0;
-    await setDeveloperFailureState({ attempts, lockedUntil });
+    const lockedUntil = attempts >= 2 ? now + SUPER_ADMIN_LOCK_MAX_AGE * 1000 : 0;
+    await setSuperAdminFailureState({ attempts, lockedUntil });
     return NextResponse.json(
       {
-        error: "Password developer salah.",
-        code: lockedUntil ? "DEVELOPER_LOCKED" : "DEVELOPER_INVALID",
+        error: "Password super admin salah.",
+        code: lockedUntil ? "SUPER_ADMIN_LOCKED" : "SUPER_ADMIN_INVALID",
         retryAfter: lockedUntil ? lockedUntil - now : 0,
       },
       { status: lockedUntil ? 429 : 401 }
     );
   }
 
-  await clearDeveloperFailureState();
-  await setPublicDeveloperSessionCookie(createDeveloperSessionToken());
+  await clearSuperAdminFailureState();
+  await setPublicSuperAdminSessionCookie(createSuperAdminSessionToken());
   return NextResponse.json({ ok: true });
 }
