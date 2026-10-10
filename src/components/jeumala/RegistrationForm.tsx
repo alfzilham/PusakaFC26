@@ -10,7 +10,6 @@ import {
   Send,
   AlertCircle,
   MessageCircle,
-  ShieldCheck,
   Clock3,
 } from "lucide-react";
 import { CustomDropdown } from "./CustomDropdown";
@@ -65,12 +64,16 @@ export function RegistrationForm({ used, onAfterSubmit }: Props) {
   const [touched, setTouched] = useState<Record<string, boolean>>({});
   const [developerMode, setDeveloperMode] = useState(false);
   const [developerPromptOpen, setDeveloperPromptOpen] = useState(false);
-  const [developerFailedAttempts, setDeveloperFailedAttempts] = useState(0);
   const [developerLockUntil, setDeveloperLockUntil] = useState<number | null>(null);
   const [lockModalOpen, setLockModalOpen] = useState(false);
   const [lockRemaining, setLockRemaining] = useState(0);
   const developerTapCount = useRef(0);
   const developerTapResetTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Developer Mode is intentionally scoped to the current page visit.
+  useEffect(() => {
+    void fetch("/api/developer/logout", { method: "POST" });
+  }, []);
 
   // Indexes for O(1) duplicate lookup against the client cache
   const { nameSet, numberSet } = useMemo(() => {
@@ -128,14 +131,14 @@ export function RegistrationForm({ used, onAfterSubmit }: Props) {
     errors.backNumber === "Nomor sudah dipakai" && Object.keys(errors).length === 1;
 
   useEffect(() => {
-    if (!developerLockUntil) return;
+    const lockUntil = developerLockUntil ?? 0;
+    if (lockUntil <= 0) return;
 
     function updateTimer() {
-      const remaining = Math.max(0, developerLockUntil - Date.now());
+      const remaining = Math.max(0, lockUntil - Date.now());
       setLockRemaining(remaining);
       if (remaining === 0) {
         setDeveloperLockUntil(null);
-        setDeveloperFailedAttempts(0);
         setLockModalOpen(false);
       }
     }
@@ -158,7 +161,7 @@ export function RegistrationForm({ used, onAfterSubmit }: Props) {
     return touched[key] && errors[key];
   }
 
-  function handleDeveloperTap() {
+  async function handleDeveloperTap() {
     setTouched((t) => ({ ...t, backNumber: true }));
     setSubmitError(null);
 
@@ -179,7 +182,18 @@ export function RegistrationForm({ used, onAfterSubmit }: Props) {
 
     if (developerTapCount.current >= 7) {
       developerTapCount.current = 0;
-      setDeveloperPromptOpen(true);
+      try {
+        const res = await fetch("/api/developer/status", { cache: "no-store" });
+        const data = await res.json().catch(() => ({}));
+        if (data.locked && Number(data.retryAfter) > 0) {
+          setDeveloperLockUntil(Date.now() + Number(data.retryAfter));
+          setLockModalOpen(true);
+        } else {
+          setDeveloperPromptOpen(true);
+        }
+      } catch {
+        setDeveloperPromptOpen(true);
+      }
     }
   }
 
@@ -187,7 +201,7 @@ export function RegistrationForm({ used, onAfterSubmit }: Props) {
     e.preventDefault();
     if (submitting) return;
     if (duplicateNumberOnly && !developerMode) {
-      handleDeveloperTap();
+      void handleDeveloperTap();
       return;
     }
     if (!isValid) return;
@@ -263,26 +277,6 @@ export function RegistrationForm({ used, onAfterSubmit }: Props) {
         noValidate
         className="space-y-5 rounded-2xl border border-app-border bg-app-surface p-5 shadow-sm sm:p-6"
       >
-        <button
-          type="button"
-          onClick={async () => {
-            if (developerMode) {
-              await fetch("/api/developer/logout", { method: "POST" });
-              setDeveloperMode(false);
-            } else {
-              setDeveloperPromptOpen(true);
-            }
-          }}
-          className={cn(
-            "jc-focus inline-flex items-center gap-2 rounded-lg border px-3 py-2 text-xs font-semibold transition-colors",
-            developerMode
-              ? "border-app-accent bg-app-accent/10 text-app-accent"
-              : "border-app-border text-app-muted hover:border-app-accent hover:text-app-accent"
-          )}
-        >
-          <ShieldCheck className="h-4 w-4" />
-          {developerMode ? "Developer Mode Aktif" : "Aktifkan Developer Mode"}
-        </button>
         {/* Gender */}
         <CustomDropdown
           label="Gender"
@@ -429,19 +423,14 @@ export function RegistrationForm({ used, onAfterSubmit }: Props) {
         title="Buktikan Diri Anda Developer"
         actionLabel="menggunakan nomor punggung yang sudah dipakai"
         closeOnError
-        onVerificationFailed={() => {
-          setDeveloperFailedAttempts((attempts) => {
-            const nextAttempts = attempts + 1;
-            if (nextAttempts >= 2) {
-              setDeveloperLockUntil(Date.now() + 5 * 60 * 1000);
-            }
-            return nextAttempts;
-          });
+        onVerificationFailed={({ locked, retryAfter }) => {
+          if (locked && retryAfter > 0) {
+            setDeveloperLockUntil(Date.now() + retryAfter);
+          }
         }}
         onClose={() => setDeveloperPromptOpen(false)}
         onVerified={() => {
           setDeveloperMode(true);
-          setDeveloperFailedAttempts(0);
           setDeveloperPromptOpen(false);
         }}
       />
