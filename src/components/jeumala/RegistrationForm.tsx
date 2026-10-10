@@ -25,9 +25,9 @@ import {
   type Gender,
   type UsedEntry,
 } from "@/lib/validations";
-import { DEVELOPER } from "@/lib/constants";
+import { SUPER_ADMIN } from "@/lib/constants";
 import { cn } from "@/lib/utils";
-import { DeveloperVerificationModal } from "./admin/DeveloperVerificationModal";
+import { SuperAdminVerificationModal } from "./admin/SuperAdminVerificationModal";
 import { Modal } from "./Modal";
 
 type Props = {
@@ -63,19 +63,19 @@ export function RegistrationForm({ used, onAfterSubmit }: Props) {
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [touched, setTouched] = useState<Record<string, boolean>>({});
-  const [developerMode, setDeveloperMode] = useState(false);
-  const [developerModeUntil, setDeveloperModeUntil] = useState<number | null>(null);
-  const [developerModeRemaining, setDeveloperModeRemaining] = useState(0);
-  const [developerPromptOpen, setDeveloperPromptOpen] = useState(false);
-  const [developerLockUntil, setDeveloperLockUntil] = useState<number | null>(null);
+  const [superAdminMode, setSuperAdminMode] = useState(false);
+  const [superAdminModeUntil, setSuperAdminModeUntil] = useState<number | null>(null);
+  const [superAdminModeRemaining, setSuperAdminModeRemaining] = useState(0);
+  const [superAdminPromptOpen, setSuperAdminPromptOpen] = useState(false);
+  const [superAdminLockUntil, setSuperAdminLockUntil] = useState<number | null>(null);
   const [lockModalOpen, setLockModalOpen] = useState(false);
   const [lockRemaining, setLockRemaining] = useState(0);
-  const developerTapCount = useRef(0);
-  const developerTapResetTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const superAdminTapCount = useRef(0);
+  const superAdminTapResetTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  // Developer Mode is intentionally scoped to the current page visit.
+  // Super Admin Mode is intentionally scoped to the current page visit.
   useEffect(() => {
-    void fetch("/api/developer/logout", { method: "POST" });
+    void fetch("/api/super-admin/logout", { method: "POST" });
   }, []);
 
   // Indexes for O(1) duplicate lookup against the client cache
@@ -119,7 +119,7 @@ export function RegistrationForm({ used, onAfterSubmit }: Props) {
       const n = parseInt(numStr, 10);
       if (n < 1) e.backNumber = "Minimal 1";
       else if (n > 999) e.backNumber = "Maksimal 999";
-      else if (!developerMode && numberSet.has(n)) e.backNumber = "Nomor sudah dipakai";
+      else if (!superAdminMode && numberSet.has(n)) e.backNumber = "Nomor sudah dipakai";
     }
 
     if (!f.size) e.size = "Ukuran wajib dipilih";
@@ -134,14 +134,14 @@ export function RegistrationForm({ used, onAfterSubmit }: Props) {
     errors.backNumber === "Nomor sudah dipakai" && Object.keys(errors).length === 1;
 
   useEffect(() => {
-    const lockUntil = developerLockUntil ?? 0;
+    const lockUntil = superAdminLockUntil ?? 0;
     if (lockUntil <= 0) return;
 
     function updateTimer() {
       const remaining = Math.max(0, lockUntil - Date.now());
       setLockRemaining(remaining);
       if (remaining === 0) {
-        setDeveloperLockUntil(null);
+        setSuperAdminLockUntil(null);
         setLockModalOpen(false);
       }
     }
@@ -149,26 +149,26 @@ export function RegistrationForm({ used, onAfterSubmit }: Props) {
     updateTimer();
     const timer = setInterval(updateTimer, 1000);
     return () => clearInterval(timer);
-  }, [developerLockUntil]);
+  }, [superAdminLockUntil]);
 
   useEffect(() => {
-    const sessionUntil = developerModeUntil ?? 0;
+    const sessionUntil = superAdminModeUntil ?? 0;
     if (sessionUntil <= 0) return;
 
-    function updateDeveloperTimer() {
+    function updateSuperAdminTimer() {
       const remaining = Math.max(0, sessionUntil - Date.now());
-      setDeveloperModeRemaining(remaining);
+      setSuperAdminModeRemaining(remaining);
       if (remaining === 0) {
-        setDeveloperMode(false);
-        setDeveloperModeUntil(null);
-        void fetch("/api/developer/logout", { method: "POST" });
+        setSuperAdminMode(false);
+        setSuperAdminModeUntil(null);
+        void fetch("/api/super-admin/logout", { method: "POST" });
       }
     }
 
-    updateDeveloperTimer();
-    const timer = setInterval(updateDeveloperTimer, 1000);
+    updateSuperAdminTimer();
+    const timer = setInterval(updateSuperAdminTimer, 1000);
     return () => clearInterval(timer);
-  }, [developerModeUntil]);
+  }, [superAdminModeUntil]);
 
   function setField<K extends keyof Fields>(key: K, value: string) {
     setFields((prev) => ({ ...prev, [key]: value }));
@@ -183,38 +183,38 @@ export function RegistrationForm({ used, onAfterSubmit }: Props) {
     return touched[key] && errors[key];
   }
 
-  async function handleDeveloperTap() {
+  async function handleSuperAdminTap() {
     setTouched((t) => ({ ...t, backNumber: true }));
     setSubmitError(null);
 
-    if (developerLockUntil && Date.now() < developerLockUntil) {
-      developerTapCount.current += 1;
-      if (developerTapCount.current >= 7) {
-        developerTapCount.current = 0;
+    if (superAdminLockUntil && Date.now() < superAdminLockUntil) {
+      superAdminTapCount.current += 1;
+      if (superAdminTapCount.current >= 7) {
+        superAdminTapCount.current = 0;
         setLockModalOpen(true);
       }
       return;
     }
 
-    developerTapCount.current += 1;
-    if (developerTapResetTimer.current) clearTimeout(developerTapResetTimer.current);
-    developerTapResetTimer.current = setTimeout(() => {
-      developerTapCount.current = 0;
+    superAdminTapCount.current += 1;
+    if (superAdminTapResetTimer.current) clearTimeout(superAdminTapResetTimer.current);
+    superAdminTapResetTimer.current = setTimeout(() => {
+      superAdminTapCount.current = 0;
     }, 3000);
 
-    if (developerTapCount.current >= 7) {
-      developerTapCount.current = 0;
+    if (superAdminTapCount.current >= 7) {
+      superAdminTapCount.current = 0;
       try {
-        const res = await fetch("/api/developer/status", { cache: "no-store" });
+        const res = await fetch("/api/super-admin/status", { cache: "no-store" });
         const data = await res.json().catch(() => ({}));
         if (data.locked && Number(data.retryAfter) > 0) {
-          setDeveloperLockUntil(Date.now() + Number(data.retryAfter));
+          setSuperAdminLockUntil(Date.now() + Number(data.retryAfter));
           setLockModalOpen(true);
         } else {
-          setDeveloperPromptOpen(true);
+          setSuperAdminPromptOpen(true);
         }
       } catch {
-        setDeveloperPromptOpen(true);
+        setSuperAdminPromptOpen(true);
       }
     }
   }
@@ -222,8 +222,8 @@ export function RegistrationForm({ used, onAfterSubmit }: Props) {
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
     if (submitting) return;
-    if (duplicateNumberOnly && !developerMode) {
-      void handleDeveloperTap();
+    if (duplicateNumberOnly && !superAdminMode) {
+      void handleSuperAdminTap();
       return;
     }
     if (!isValid) return;
@@ -299,20 +299,20 @@ export function RegistrationForm({ used, onAfterSubmit }: Props) {
         noValidate
         className="space-y-5 rounded-2xl border border-app-border bg-app-surface p-5 shadow-sm sm:p-6"
       >
-        {developerMode && (
+        {superAdminMode && (
           <button
             type="button"
             onClick={() => {
-              setDeveloperMode(false);
-              setDeveloperModeUntil(null);
-              setDeveloperModeRemaining(0);
-              void fetch("/api/developer/logout", { method: "POST" });
+              setSuperAdminMode(false);
+              setSuperAdminModeUntil(null);
+              setSuperAdminModeRemaining(0);
+              void fetch("/api/super-admin/logout", { method: "POST" });
             }}
             className="jc-focus inline-flex items-center gap-2 rounded-lg border border-app-accent bg-app-accent/10 px-3 py-2 text-xs font-semibold text-app-accent transition-colors hover:bg-app-accent/15"
           >
             <ShieldCheck className="h-4 w-4" />
-            Developer Mode aktif · {String(Math.floor(developerModeRemaining / 60000)).padStart(2, "0")}:
-            {String(Math.floor((developerModeRemaining % 60000) / 1000)).padStart(2, "0")}
+            Super Admin Mode aktif · {String(Math.floor(superAdminModeRemaining / 60000)).padStart(2, "0")}:
+            {String(Math.floor((superAdminModeRemaining % 60000) / 1000)).padStart(2, "0")}
             <span className="ml-1 underline underline-offset-2">Nonaktifkan</span>
           </button>
         )}
@@ -443,47 +443,47 @@ export function RegistrationForm({ used, onAfterSubmit }: Props) {
           <MessageCircle className="mt-0.5 h-4 w-4 shrink-0 text-app-accent" />
           <p>
             Data yang sudah disimpan <strong className="font-semibold text-app-fg-soft">tidak dapat diedit/dibatalkan</strong> sendiri.
-            Untuk koreksi, hubungi admin atau developer via WhatsApp:{" "}
+            Untuk koreksi, hubungi admin atau super admin via WhatsApp:{" "}
             <a
-              href={DEVELOPER.whatsappHref}
+              href={SUPER_ADMIN.whatsappHref}
               target="_blank"
               rel="noopener noreferrer"
               className="font-semibold text-app-accent underline underline-offset-2"
             >
-              {DEVELOPER.whatsapp}
+              {SUPER_ADMIN.whatsapp}
             </a>
             .
           </p>
         </div>
       </form>
-      <DeveloperVerificationModal
-        open={developerPromptOpen}
-        endpoint="/api/developer/verify"
-        title="Buktikan Diri Anda Developer"
+      <SuperAdminVerificationModal
+        open={superAdminPromptOpen}
+        endpoint="/api/super-admin/verify"
+        title="Buktikan Diri Anda Super Admin"
         actionLabel="menggunakan nomor punggung yang sudah dipakai"
         closeOnError
         onVerificationFailed={({ locked, retryAfter }) => {
           if (locked && retryAfter > 0) {
-            setDeveloperLockUntil(Date.now() + retryAfter);
+            setSuperAdminLockUntil(Date.now() + retryAfter);
           }
         }}
-        onClose={() => setDeveloperPromptOpen(false)}
+        onClose={() => setSuperAdminPromptOpen(false)}
         onVerified={() => {
           const expiresAt = Date.now() + 5 * 60 * 1000;
-          setDeveloperMode(true);
-          setDeveloperModeUntil(expiresAt);
-          setDeveloperModeRemaining(expiresAt - Date.now());
-          setDeveloperPromptOpen(false);
+          setSuperAdminMode(true);
+          setSuperAdminModeUntil(expiresAt);
+          setSuperAdminModeRemaining(expiresAt - Date.now());
+          setSuperAdminPromptOpen(false);
         }}
       />
       <Modal
         open={lockModalOpen}
         onClose={() => setLockModalOpen(false)}
-        title="Developer Mode Diblokir"
+        title="Super Admin Mode Diblokir"
         icon={<Clock3 className="h-5 w-5 text-app-danger" />}
       >
         <p className="text-sm text-app-fg-soft">
-          Percobaan password developer sudah mencapai batas. Silakan tunggu sebelum mencoba lagi.
+          Percobaan password super admin sudah mencapai batas. Silakan tunggu sebelum mencoba lagi.
         </p>
         <p className="mt-4 text-center text-3xl font-bold tabular-nums text-app-danger">
           {String(Math.floor(lockRemaining / 60000)).padStart(2, "0")}:
