@@ -33,7 +33,7 @@ implemented, lint-clean, and browser-verified.
 - Prisma schema (`prisma/schema.prisma`): `JerseyOrder` + `AdminLoginAttempt`.
 - `src/lib/validations.ts`: zod schemas, enum types/labels, type guards.
 - `src/lib/auth.ts`: session tokens, cookie helpers, rate limiting, IP extraction.
-- `src/lib/constants.ts`: app name, developer contact (Alfiz Ilham, 0852-1389-6460), admin config.
+- `src/lib/constants.ts`: app name, super admin contact (Alfiz Ilham, 0852-1389-6460), admin config.
 - `src/app/layout.tsx`: Plus Jakarta Sans via next/font.
 - `src/app/globals.css`: design tokens, custom scrollbar, splash/skeleton/toast/
   dropdown/checkbox/sidebar animations, `.jc-input`, `.jc-focus`, reduced-motion.
@@ -43,13 +43,13 @@ implemented, lint-clean, and browser-verified.
 - **Skeleton** (`Skeleton.tsx`): shimmer, min 400ms display via `Promise.all`.
 - **TopBar** (`TopBar.tsx`): sticky, logo + name + hamburger.
 - **Sidebar** (`Sidebar.tsx`): slide-in, nav links, disabled "Lihat Detail Data"
-  (lock), sticky Information submenu (About/Privacy/Terms/Developer Contact).
+  (lock), sticky Information submenu (About/Privacy/Terms/Super Admin Contact).
 - **RegistrationForm** (Page 1): all 6 fields in order + custom dropdowns, real-time
   validation, disabled-submit-when-invalid, double-submit prevention, success toast
   (slide-in top, 3s auto-dismiss), form reset, WhatsApp correction note.
 - **UsedNumbersList** (Page 2): combined read-only list, gender text badges, summary
   cards, search.
-- **InformationPanel** + **Modal**: About/Privacy/Terms/Developer Contact content.
+- **InformationPanel** + **Modal**: About/Privacy/Terms/Super Admin Contact content.
 - **Toast** (`Toast.tsx`): context provider, aria-live, slide-in/out.
 
 ### API Routes
@@ -80,7 +80,7 @@ All golden-path flows verified end-to-end in the browser:
 - ✅ Edit modal saves directly; delete shows confirmation modal.
 - ✅ Rate limiting: 5 fails → 15-min lock with countdown.
 - ✅ Export: xlsx has exactly 2 sheets (Pria/Wanita); json valid.
-- ✅ Developer Contact modal shows Alfiz Ilham + 0852-1389-6460.
+- ✅ Super Admin Contact modal shows Alfiz Ilham + 0852-1389-6460.
 - ✅ No console errors; lint clean (`bun run lint` passes).
 
 ## Unresolved Issues / Risks / Next-Phase Priorities
