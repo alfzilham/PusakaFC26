@@ -107,6 +107,15 @@ export async function isAdminAuthenticated(): Promise<boolean> {
 
 export async function isDeveloperAuthenticated(): Promise<boolean> {
   if (!(await isAdminAuthenticated())) return false;
+  return isDeveloperCookieValid();
+}
+
+/** Developer verification used by the public registration Developer Mode. */
+export async function isPublicDeveloperAuthenticated(): Promise<boolean> {
+  return isDeveloperCookieValid();
+}
+
+async function isDeveloperCookieValid(): Promise<boolean> {
   const store = await cookies();
   return verifySessionToken(store.get(DEVELOPER_SESSION_COOKIE)?.value);
 }
