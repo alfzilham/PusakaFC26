@@ -70,7 +70,7 @@ export function AdminLogin({ onSuccess, onBack }: Props) {
               Admin {APP_NAME}
             </h1>
             <p className="mt-1 text-sm text-app-muted">
-              Admin dapat melihat data. Aksi terbatas memerlukan verifikasi developer.
+              Admin dapat melihat data. Aksi terbatas memerlukan verifikasi super admin.
             </p>
           </div>
 
