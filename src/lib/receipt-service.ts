@@ -27,15 +27,16 @@ function normalizePhone(value: string) {
 
 async function validateWhatsapp(phoneNumber: string) {
   const baseUrl = requiredEnv("WAHA_BASE_URL").replace(/\/$/, "");
+  const session = process.env.WAHA_SESSION?.trim() || "default";
   const phone = normalizePhone(phoneNumber);
   if (phone.length < 10 || phone.length > 15) {
     throw new ReceiptServiceError("INVALID_PHONE", "Nomor WhatsApp tidak valid.", 400);
   }
   const headers: HeadersInit = {};
-  if (process.env.WAHA_API_KEY) headers.Authorization = `Bearer ${process.env.WAHA_API_KEY}`;
+  if (process.env.WAHA_API_KEY) headers["X-Api-Key"] = process.env.WAHA_API_KEY;
   let response: Response;
   try {
-    response = await fetch(`${baseUrl}/api/contacts/check-exists?phone=${encodeURIComponent(phone)}`, {
+    response = await fetch(`${baseUrl}/api/contacts/check-exists?phone=${encodeURIComponent(phone)}&session=${encodeURIComponent(session)}`, {
       method: "GET",
       headers,
       cache: "no-store",
@@ -158,12 +159,14 @@ export async function processReceiptSubmission({
 
 export async function sendReceiptRejection(phoneNumber: string) {
   const baseUrl = requiredEnv("WAHA_BASE_URL").replace(/\/$/, "");
+  const session = process.env.WAHA_SESSION?.trim() || "default";
   const headers: HeadersInit = { "Content-Type": "application/json" };
-  if (process.env.WAHA_API_KEY) headers.Authorization = `Bearer ${process.env.WAHA_API_KEY}`;
+  if (process.env.WAHA_API_KEY) headers["X-Api-Key"] = process.env.WAHA_API_KEY;
   const response = await fetch(`${baseUrl}/api/sendText`, {
     method: "POST",
     headers,
     body: JSON.stringify({
+      session,
       chatId: `${normalizePhone(phoneNumber)}@c.us`,
       text: "Bukti transfer Anda ditolak. Silakan unggah ulang foto struk yang lebih jelas atau hubungi Bendahara.",
     }),
