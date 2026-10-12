@@ -14,7 +14,7 @@ export async function GET() {
   try {
     const rows = await db.jerseyOrder.findMany({
       orderBy: [{ backNumber: "asc" }],
-      select: { id: true, gender: true, backName: true, backNumber: true },
+      select: { id: true, gender: true, fullName: true, backName: true, backNumber: true },
     });
 
     const data = rows.map((r) => ({
