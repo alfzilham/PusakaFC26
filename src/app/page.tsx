@@ -5,6 +5,7 @@ import { Splash } from "@/components/jeumala/Splash";
 import { TopBar } from "@/components/jeumala/TopBar";
 import { Sidebar, type ViewKey, type InfoKey } from "@/components/jeumala/Sidebar";
 import { RegistrationForm } from "@/components/jeumala/RegistrationForm";
+import { ReceiptSubmission } from "@/components/jeumala/ReceiptSubmission";
 import { UsedNumbersList } from "@/components/jeumala/UsedNumbersList";
 import { FormSkeleton, NumbersSkeleton } from "@/components/jeumala/Skeleton";
 import { InformationPanel } from "@/components/jeumala/InformationPanel";
@@ -97,8 +98,10 @@ function AppShell() {
         <div key={view} className="jc-fade-in">
           {view === "form" ? (
             <RegistrationForm used={data} onAfterSubmit={fetchUsed} />
-          ) : (
+          ) : view === "numbers" ? (
             <UsedNumbersList used={data} />
+          ) : (
+            <ReceiptSubmission used={data} />
           )}
         </div>
       </main>

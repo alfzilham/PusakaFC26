@@ -111,11 +111,13 @@ export type OrderRow = {
   sleeve: SleeveType;
   createdAt: string;
   updatedAt: string;
+  paymentStatus?: "PENDING_VERIFICATION" | "VERIFIED" | "REJECTED";
 };
 
 export type UsedEntry = {
   id: string;
   gender: Gender;
+  fullName: string;
   backName: string;
   backNumber: number;
 };

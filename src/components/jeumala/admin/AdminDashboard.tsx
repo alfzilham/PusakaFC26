@@ -17,6 +17,7 @@ import {
   AlertTriangle,
   RefreshCw,
   Inbox,
+  ReceiptText,
 } from "lucide-react";
 import { Logo } from "@/components/jeumala/Logo";
 import { CustomDropdown } from "@/components/jeumala/CustomDropdown";
@@ -36,6 +37,7 @@ import {
 } from "@/lib/validations";
 import { cn } from "@/lib/utils";
 import { SuperAdminVerificationModal } from "@/components/jeumala/admin/SuperAdminVerificationModal";
+import { ReceiptReview } from "@/components/jeumala/admin/ReceiptReview";
 
 type Stats = { total: number; pria: number; wanita: number };
 
@@ -56,6 +58,7 @@ export function AdminDashboard({ onLogout }: { onLogout: () => void }) {
   const [deleting, setDeleting] = useState<OrderRow | null>(null);
   const [superAdminPrompt, setSuperAdminPrompt] = useState<string | null>(null);
   const [superAdminVerified, setSuperAdminVerified] = useState(false);
+  const [receiptReviewOpen, setReceiptReviewOpen] = useState(false);
   const pendingSuperAdminAction = useRef<(() => void | Promise<void>) | null>(null);
 
   // Derived gender filter for API
@@ -216,10 +219,18 @@ export function AdminDashboard({ onLogout }: { onLogout: () => void }) {
             <LogOut className="h-4 w-4" />
             <span className="hidden sm:inline">Keluar</span>
           </button>
+          <button
+            type="button"
+            onClick={() => requireSuperAdmin("mengakses review bukti transfer", () => setReceiptReviewOpen(true))}
+            className="jc-focus inline-flex items-center gap-1.5 rounded-xl border border-app-accent/30 bg-app-accent/5 px-3 py-2 text-sm font-semibold text-app-accent-strong transition-colors hover:bg-app-accent/10"
+          >
+            <ReceiptText className="h-4 w-4" />
+            <span className="hidden sm:inline">Review Struk</span>
+          </button>
         </div>
       </header>
 
-      <main className="mx-auto max-w-6xl px-4 py-8 sm:px-6">
+      {receiptReviewOpen ? <ReceiptReview onBack={() => setReceiptReviewOpen(false)} /> : <main className="mx-auto max-w-6xl px-4 py-8 sm:px-6">
         {/* Stats */}
         <section className="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-3">
           <StatCard
@@ -358,7 +369,7 @@ export function AdminDashboard({ onLogout }: { onLogout: () => void }) {
                   rows.map((r) => (
                     <tr
                       key={r.id}
-                      className="border-b border-app-border/70 transition-colors last:border-0 hover:bg-app-surface-2"
+                      className={cn("border-b border-app-border/70 transition-colors last:border-0 hover:bg-app-surface-2", r.paymentStatus === "PENDING_VERIFICATION" && "bg-amber-50", r.paymentStatus === "VERIFIED" && "bg-emerald-50", r.paymentStatus === "REJECTED" && "bg-rose-50")}
                     >
                       <td className="px-4 py-3 font-bold tabular-nums text-app-fg">
                         {r.sequenceNumber ?? "—"}
@@ -442,7 +453,7 @@ export function AdminDashboard({ onLogout }: { onLogout: () => void }) {
             </div>
           </div>
         </section>
-      </main>
+      </main>}
 
       {/* Edit modal */}
       {editing && (

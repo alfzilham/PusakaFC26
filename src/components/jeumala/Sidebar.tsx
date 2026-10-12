@@ -8,6 +8,7 @@ import {
   Lock,
   Info,
   ShieldAlert,
+  ReceiptText,
   ChevronDown,
   type LucideIcon,
 } from "lucide-react";
@@ -16,7 +17,7 @@ import { Modal } from "./Modal";
 import { APP_NAME } from "@/lib/constants";
 import { cn } from "@/lib/utils";
 
-export type ViewKey = "form" | "numbers";
+export type ViewKey = "form" | "numbers" | "receipts";
 export type InfoKey = "about" | "privacy" | "terms" | "admin-contact" | "contact";
 
 type SidebarProps = {
@@ -105,6 +106,12 @@ export function Sidebar({
             label="Nomor Punggung Terpakai"
             active={current === "numbers"}
             onClick={() => navigate("numbers")}
+          />
+          <NavItem
+            icon={ReceiptText}
+            label="Submit Bukti Transfer"
+            active={current === "receipts"}
+            onClick={() => navigate("receipts")}
           />
           <NavItem
             icon={Lock}
