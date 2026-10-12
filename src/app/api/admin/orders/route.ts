@@ -43,12 +43,14 @@ function toRow(r: {
   sleeve: string;
   createdAt: Date;
   updatedAt: Date;
+  paymentReceipt?: { status: string } | null;
 }): OrderRow {
   return {
     id: r.id,
     sequenceNumber: r.sequenceNumber,
     gender: isGender(r.gender) ? r.gender : "PRIA",
     fullName: r.fullName,
+    paymentStatus: r.paymentReceipt?.status as OrderRow["paymentStatus"],
     backName: r.backName,
     backNumber: r.backNumber,
     size: isSize(r.size) ? r.size : "M",
@@ -100,6 +102,7 @@ export async function GET(req: Request) {
       orderBy: [{ createdAt: "desc" }],
       skip: (page - 1) * pageSize,
       take: pageSize,
+      include: { paymentReceipt: { select: { status: true } } },
     }),
     db.jerseyOrder.findMany({
       orderBy: [{ createdAt: "asc" }, { id: "asc" }],
