@@ -18,6 +18,7 @@ import {
   RefreshCw,
   Inbox,
   ReceiptText,
+  Upload,
 } from "lucide-react";
 import { Logo } from "@/components/jeumala/Logo";
 import { CustomDropdown } from "@/components/jeumala/CustomDropdown";
@@ -53,6 +54,8 @@ export function AdminDashboard({ onLogout }: { onLogout: () => void }) {
   const [filterWanita, setFilterWanita] = useState(false);
   const [loading, setLoading] = useState(false);
   const [exporting, setExporting] = useState<null | "xlsx" | "json">(null);
+  const [importing, setImporting] = useState(false);
+  const importInputRef = useRef<HTMLInputElement>(null);
 
   const [editing, setEditing] = useState<OrderRow | null>(null);
   const [deleting, setDeleting] = useState<OrderRow | null>(null);
@@ -166,6 +169,33 @@ export function AdminDashboard({ onLogout }: { onLogout: () => void }) {
       show({ variant: "error", title: "Export gagal. Coba lagi." });
     } finally {
       setExporting(null);
+    }
+  }
+
+  async function handleImport(file: File) {
+    setImporting(true);
+    try {
+      const form = new FormData();
+      form.append("file", file);
+      const res = await fetch("/api/admin/import", {
+        method: "POST",
+        body: form,
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(data.error || "Import gagal.");
+      show({
+        variant: "success",
+        title: `Import berhasil: ${data.imported} data ditambahkan.`,
+      });
+      refreshAll();
+    } catch (error) {
+      show({
+        variant: "error",
+        title: error instanceof Error ? error.message : "Import gagal.",
+      });
+    } finally {
+      setImporting(false);
+      if (importInputRef.current) importInputRef.current.value = "";
     }
   }
 
@@ -296,6 +326,27 @@ export function AdminDashboard({ onLogout }: { onLogout: () => void }) {
               <FileJson className="h-4 w-4" />
             )}
             <span>Export .json</span>
+          </button>
+          <input
+            ref={importInputRef}
+            type="file"
+            accept="application/json,.json"
+            className="sr-only"
+            onChange={(event) => {
+              const file = event.target.files?.[0];
+              if (file) void handleImport(file);
+            }}
+          />
+          <button
+            type="button"
+            onClick={() =>
+              requireSuperAdmin("import data backup", () => importInputRef.current?.click())
+            }
+            disabled={importing}
+            className="jc-focus inline-flex items-center gap-1.5 rounded-xl border border-app-accent/30 bg-app-accent/5 px-3.5 py-2 text-sm font-semibold text-app-accent-strong transition-colors hover:bg-app-accent/10 disabled:opacity-60"
+          >
+            {importing ? <span className="jc-spinner" /> : <Upload className="h-4 w-4" />}
+            <span>Import JSON</span>
           </button>
         </section>
 
