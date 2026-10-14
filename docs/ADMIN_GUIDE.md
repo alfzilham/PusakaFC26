@@ -18,6 +18,9 @@ Pada area aksi di atas tabel Data Pendaftar tersedia:
 - **Export .json** untuk mengunduh backup data JSON.
 - **Import JSON** untuk memasukkan kembali data dari backup JSON. Aksi ini memerlukan verifikasi Super Admin.
 - **Review Struk** untuk membuka daftar bukti transfer yang menunggu verifikasi. Tombol ini berada di sebelah Import JSON.
+- **Generator Struk Bendahara** untuk membuat, menyimpan, mengunduh, dan membagikan gambar bukti pembayaran.
+
+Menu aksi Export, Import, Review Struk, Generator Struk Bendahara, dan Keluar tersedia di sidebar Admin. Tombol Refresh tetap berada di area tabel Data Pendaftar.
 
 ## Pagination dan pencarian
 

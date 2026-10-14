@@ -5,10 +5,6 @@ import {
   Users,
   UserCheck,
   UserX,
-  Download,
-  FileJson,
-  FileSpreadsheet,
-  LogOut,
   Search,
   Pencil,
   Trash2,
@@ -17,8 +13,6 @@ import {
   AlertTriangle,
   RefreshCw,
   Inbox,
-  ReceiptText,
-  Upload,
 } from "lucide-react";
 import { Logo } from "@/components/jeumala/Logo";
 import { CustomDropdown } from "@/components/jeumala/CustomDropdown";
@@ -39,6 +33,8 @@ import {
 import { cn } from "@/lib/utils";
 import { SuperAdminVerificationModal } from "@/components/jeumala/admin/SuperAdminVerificationModal";
 import { ReceiptReview } from "@/components/jeumala/admin/ReceiptReview";
+import { AdminSidebar, AdminSidebarTrigger, type AdminView } from "@/components/jeumala/admin/AdminSidebar";
+import { TreasurerReceiptGenerator } from "@/components/jeumala/admin/TreasurerReceiptGenerator";
 
 type Stats = { total: number; pria: number; wanita: number };
 
@@ -61,7 +57,8 @@ export function AdminDashboard({ onLogout }: { onLogout: () => void }) {
   const [deleting, setDeleting] = useState<OrderRow | null>(null);
   const [superAdminPrompt, setSuperAdminPrompt] = useState<string | null>(null);
   const [superAdminVerified, setSuperAdminVerified] = useState(false);
-  const [receiptReviewOpen, setReceiptReviewOpen] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [view, setView] = useState<AdminView>("dashboard");
   const pendingSuperAdminAction = useRef<(() => void | Promise<void>) | null>(null);
 
   // Derived gender filter for API
@@ -140,6 +137,14 @@ export function AdminDashboard({ onLogout }: { onLogout: () => void }) {
     const action = pendingSuperAdminAction.current;
     pendingSuperAdminAction.current = null;
     if (action) void action();
+  }
+
+  function navigateView(nextView: AdminView) {
+    if (nextView === "review") {
+      requireSuperAdmin("mengakses review bukti transfer", () => setView("review"));
+      return;
+    }
+    setView(nextView);
   }
 
   async function handleExport(fmt: "xlsx" | "json") {
@@ -223,10 +228,12 @@ export function AdminDashboard({ onLogout }: { onLogout: () => void }) {
   }
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen md:pl-72">
+      <AdminSidebar open={sidebarOpen} view={view} onClose={() => setSidebarOpen(false)} onView={navigateView} onExport={(format) => requireSuperAdmin(`export ${format}`, () => void handleExport(format))} onImport={() => requireSuperAdmin("import data backup", () => importInputRef.current?.click())} onLogout={handleLogout} />
       {/* Admin top bar */}
       <header className="sticky top-0 z-40 border-b border-app-border bg-app-surface/90 backdrop-blur-md">
         <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4 sm:px-6">
+          <AdminSidebarTrigger onClick={() => setSidebarOpen(true)} />
           <div className="flex items-center gap-2.5">
             <Logo size={32} />
             <div className="leading-tight">
@@ -236,18 +243,10 @@ export function AdminDashboard({ onLogout }: { onLogout: () => void }) {
               <p className="text-[11px] text-app-muted">Panel Admin · Read-only</p>
             </div>
           </div>
-          <button
-            type="button"
-            onClick={handleLogout}
-            className="jc-focus inline-flex items-center gap-1.5 rounded-xl border border-app-border bg-app-surface px-3 py-2 text-sm font-semibold text-app-fg transition-colors hover:border-app-danger/40 hover:text-app-danger"
-          >
-            <LogOut className="h-4 w-4" />
-            <span className="hidden sm:inline">Keluar</span>
-          </button>
         </div>
       </header>
 
-      {receiptReviewOpen ? <ReceiptReview onBack={() => setReceiptReviewOpen(false)} /> : <main className="mx-auto max-w-6xl px-4 py-8 sm:px-6">
+      {view === "review" ? <ReceiptReview onBack={() => setView("dashboard")} /> : view === "generator" ? <main className="mx-auto max-w-6xl px-4 py-8 sm:px-6"><TreasurerReceiptGenerator /></main> : <main className="mx-auto max-w-6xl px-4 py-8 sm:px-6">
         {/* Stats */}
         <section className="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-3">
           <StatCard
@@ -288,32 +287,6 @@ export function AdminDashboard({ onLogout }: { onLogout: () => void }) {
             <RefreshCw className={cn("h-4 w-4", loading && "animate-spin")} />
             <span className="hidden sm:inline">Refresh</span>
           </button>
-          <button
-            type="button"
-            onClick={() => requireSuperAdmin("export Excel", () => handleExport("xlsx"))}
-            disabled={!!exporting}
-            className="jc-focus inline-flex items-center gap-1.5 rounded-xl bg-app-accent px-3.5 py-2 text-sm font-semibold text-app-accent-fg transition-colors hover:bg-app-accent-strong disabled:opacity-60"
-          >
-            {exporting === "xlsx" ? (
-              <span className="jc-spinner" />
-            ) : (
-              <FileSpreadsheet className="h-4 w-4" />
-            )}
-            <span>Export .xlsx</span>
-          </button>
-          <button
-            type="button"
-            onClick={() => requireSuperAdmin("export JSON", () => handleExport("json"))}
-            disabled={!!exporting}
-            className="jc-focus inline-flex items-center gap-1.5 rounded-xl border border-app-border bg-app-surface px-3.5 py-2 text-sm font-semibold text-app-fg transition-colors hover:border-app-border-strong disabled:opacity-60"
-          >
-            {exporting === "json" ? (
-              <span className="jc-spinner" />
-            ) : (
-              <FileJson className="h-4 w-4" />
-            )}
-            <span>Export .json</span>
-          </button>
           <input
             ref={importInputRef}
             type="file"
@@ -324,25 +297,6 @@ export function AdminDashboard({ onLogout }: { onLogout: () => void }) {
               if (file) void handleImport(file);
             }}
           />
-          <button
-            type="button"
-            onClick={() =>
-              requireSuperAdmin("import data backup", () => importInputRef.current?.click())
-            }
-            disabled={importing}
-            className="jc-focus inline-flex items-center gap-1.5 rounded-xl border border-app-accent/30 bg-app-accent/5 px-3.5 py-2 text-sm font-semibold text-app-accent-strong transition-colors hover:bg-app-accent/10 disabled:opacity-60"
-          >
-            {importing ? <span className="jc-spinner" /> : <Upload className="h-4 w-4" />}
-            <span>Import JSON</span>
-          </button>
-          <button
-            type="button"
-            onClick={() => requireSuperAdmin("mengakses review bukti transfer", () => setReceiptReviewOpen(true))}
-            className="jc-focus inline-flex items-center gap-1.5 rounded-xl border border-app-accent/30 bg-app-accent/5 px-3.5 py-2 text-sm font-semibold text-app-accent-strong transition-colors hover:bg-app-accent/10"
-          >
-            <ReceiptText className="h-4 w-4" />
-            <span>Review Struk</span>
-          </button>
         </section>
 
         {/* Search + filter */}

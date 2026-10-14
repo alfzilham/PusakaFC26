@@ -15,6 +15,7 @@ Repository: https://github.com/pusakajeumala26/PusakaFC26
 - Panel admin menampilkan nomor urut berdasarkan waktu submit dan nomor punggung sebagai field terpisah.
 - Panel admin menyediakan import data JSON, pagination 20 data per halaman, dan tombol Review Struk di area aksi data.
 - Fitur Struk Submission Scanner untuk upload langsung dan review bukti transfer oleh Bendahara atau Super Admin.
+- Generator Struk Bendahara untuk membuat gambar bukti pembayaran, menyimpan riwayat, mengunduh, dan membagikannya melalui WhatsApp.
 - Status bukti transfer ditampilkan melalui warna baris data tanpa menambahkan kolom status baru.
 - Sidebar publik menyediakan kontak Admin, Bendahara, Sekretaris, dan Super Admin.
 - API Next.js untuk orders dan operasi admin.
@@ -103,6 +104,7 @@ examples/websocket/      Contoh server dan frontend WebSocket
 - Ganti secret dan password bawaan sebelum deployment.
 - Endpoint admin mengandalkan cookie HTTP-only dan validasi session server-side.
 - Untuk deployment, sesuaikan `DATABASE_URL`, `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`, dan `SUPABASE_STORAGE_BUCKET` dengan environment production.
+- Setelah merge, jalankan migration `20261014000000_add_treasurer_receipts` pada database production.
 - Jangan menaruh service-role key Supabase pada kode client atau environment variable yang diawali `NEXT_PUBLIC_`.
 
 ## Lisensi
