@@ -7,6 +7,7 @@ import {
   ListOrdered,
   Lock,
   Info,
+  ContactRound,
   ShieldAlert,
   ReceiptText,
   ChevronDown,
@@ -18,7 +19,14 @@ import { APP_NAME } from "@/lib/constants";
 import { cn } from "@/lib/utils";
 
 export type ViewKey = "form" | "numbers" | "receipts";
-export type InfoKey = "about" | "privacy" | "terms" | "admin-contact" | "contact";
+export type InfoKey =
+  | "about"
+  | "privacy"
+  | "terms"
+  | "admin-main-contact"
+  | "treasurer-contact"
+  | "secretary-contact"
+  | "super-admin-contact";
 
 type SidebarProps = {
   open: boolean;
@@ -37,6 +45,7 @@ export function Sidebar({
 }: SidebarProps) {
   const [closing, setClosing] = useState(false);
   const [infoOpen, setInfoOpen] = useState(false);
+  const [contactsOpen, setContactsOpen] = useState(false);
   const [accessNoticeOpen, setAccessNoticeOpen] = useState(false);
 
   function handleClose() {
@@ -150,8 +159,36 @@ export function Sidebar({
                 <InfoSubItem label="About" onClick={() => { onOpenInfo("about"); handleClose(); }} />
                 <InfoSubItem label="Privacy Policy" onClick={() => { onOpenInfo("privacy"); handleClose(); }} />
                 <InfoSubItem label="Terms of Services" onClick={() => { onOpenInfo("terms"); handleClose(); }} />
-                <InfoSubItem label="Admin Contact" onClick={() => { onOpenInfo("admin-contact"); handleClose(); }} />
-                <InfoSubItem label="Super Admin Contact" onClick={() => { onOpenInfo("contact"); handleClose(); }} />
+              </div>
+            )}
+
+            <button
+              type="button"
+              onClick={() => setContactsOpen((v) => !v)}
+              aria-expanded={contactsOpen}
+              aria-controls="contacts-submenu"
+              className={cn(
+                "jc-focus mt-2 flex w-full items-center justify-between gap-2 rounded-xl px-3 py-3 text-left text-sm font-semibold text-app-fg transition-colors hover:bg-app-bg",
+                contactsOpen && "bg-app-bg"
+              )}
+            >
+              <span className="flex items-center gap-3">
+                <ContactRound className="h-5 w-5 text-app-accent" />
+                Contacts
+              </span>
+              <ChevronDown
+                className={cn(
+                  "h-4 w-4 text-app-muted transition-transform duration-200",
+                  contactsOpen && "rotate-180"
+                )}
+              />
+            </button>
+            {contactsOpen && (
+              <div id="contacts-submenu" className="jc-pop-in mt-1.5 flex flex-col gap-0.5 pl-2">
+                <InfoSubItem label="Admin Utama" onClick={() => { onOpenInfo("admin-main-contact"); handleClose(); }} />
+                <InfoSubItem label="Bendahara" onClick={() => { onOpenInfo("treasurer-contact"); handleClose(); }} />
+                <InfoSubItem label="Sekretaris" onClick={() => { onOpenInfo("secretary-contact"); handleClose(); }} />
+                <InfoSubItem label="Super Admin" onClick={() => { onOpenInfo("super-admin-contact"); handleClose(); }} />
               </div>
             )}
           </div>
