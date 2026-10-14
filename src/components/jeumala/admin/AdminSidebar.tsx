@@ -26,7 +26,7 @@ export function AdminSidebar({ open, view, onClose, onView, onExport, onImport, 
         </div>
         <nav className="space-y-1">
           <button type="button" className={item(view === "dashboard")} onClick={() => { onView("dashboard"); onClose(); }}><Menu className="h-4 w-4" />Data Pendaftar</button>
-          <button type="button" className={item(view === "generator")} onClick={() => { onView("generator"); onClose(); }}><ReceiptText className="h-4 w-4" />Generator Struk Bendahara</button>
+          <button type="button" className={item(view === "generator")} onClick={() => { onView("generator"); onClose(); }}><ReceiptText className="h-4 w-4" />Struk Generator</button>
           <button type="button" className={item(view === "review")} onClick={() => { onView("review"); onClose(); }}><ReceiptText className="h-4 w-4" />Review Struk</button>
         </nav>
         <div className="my-5 border-t border-app-border" />

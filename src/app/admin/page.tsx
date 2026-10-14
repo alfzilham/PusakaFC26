@@ -8,7 +8,7 @@ import { UpdateNotification } from "@/components/jeumala/UpdateNotification";
 
 export default function AdminPage() {
   return (
-    <ToastProvider>
+    <ToastProvider position="right">
       <UpdateNotification />
       <AdminGate />
     </ToastProvider>

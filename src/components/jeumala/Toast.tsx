@@ -41,7 +41,7 @@ export function useToast() {
 
 let counter = 0;
 
-export function ToastProvider({ children }: { children: ReactNode }) {
+export function ToastProvider({ children, position = "center" }: { children: ReactNode; position?: "center" | "right" }) {
   const [toasts, setToasts] = useState<ToastItem[]>([]);
   const timers = useRef<Record<number, ReturnType<typeof setTimeout>>>({});
 
@@ -75,7 +75,12 @@ export function ToastProvider({ children }: { children: ReactNode }) {
       <div
         aria-live="assertive"
         aria-atomic="true"
-        className="pointer-events-none fixed inset-x-0 top-0 z-[90] flex flex-col items-center gap-2 px-4 pt-4 sm:pt-6"
+        className={cn(
+          "pointer-events-none fixed top-0 z-[90] flex flex-col gap-2 px-4 pt-4 sm:pt-6",
+          position === "right"
+            ? "right-0 items-end sm:right-4"
+            : "inset-x-0 items-center"
+        )}
       >
         {toasts.map((t) => (
           <ToastCard key={t.id} toast={t} onClose={() => remove(t.id)} />

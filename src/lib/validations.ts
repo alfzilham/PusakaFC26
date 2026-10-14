@@ -129,4 +129,5 @@ export type UsedEntry = {
   fullName: string;
   backName: string;
   backNumber: number;
+  paymentStatus?: "PENDING_VERIFICATION" | "VERIFIED" | "REJECTED";
 };

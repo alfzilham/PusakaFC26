@@ -14,12 +14,13 @@ export async function GET() {
   try {
     const rows = await db.jerseyOrder.findMany({
       orderBy: [{ backNumber: "asc" }],
-      select: { id: true, gender: true, fullName: true, backName: true, backNumber: true },
+      include: { paymentReceipt: { select: { status: true } } },
     });
 
     const data = rows.map((r) => ({
       ...r,
       gender: isGender(r.gender) ? r.gender : "PRIA",
+      paymentStatus: r.paymentReceipt?.status,
     }));
 
     return NextResponse.json({ data });

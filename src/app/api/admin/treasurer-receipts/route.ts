@@ -61,6 +61,6 @@ export async function POST(request: Request) {
     return NextResponse.json({ data: row }, { status: 201 });
   } catch (error) {
     console.error("[treasurer receipt]", error);
-    return NextResponse.json({ error: error instanceof Error ? error.message : "Gagal membuat struk." }, { status: 500 });
+    return NextResponse.json({ error: "Gagal menyimpan struk. Pastikan migration database sudah dijalankan." }, { status: 500 });
   }
 }
