@@ -90,7 +90,7 @@ export function ReceiptSubmission({ used }: { used: UsedEntry[] }) {
         {done && <p className="flex items-center gap-2 rounded-xl border border-app-accent/30 bg-app-accent/5 p-3 text-sm font-medium text-app-accent-strong"><CheckCircle2 className="h-4 w-4" /> Bukti transfer sedang menunggu verifikasi.</p>}
         <button type="submit" disabled={!registrantId || !phoneNumber.trim() || !file || submitting} className={cn("jc-focus flex w-full items-center justify-center gap-2 rounded-xl px-5 py-3.5 text-sm font-bold transition-all", (!registrantId || !phoneNumber.trim() || !file || submitting) ? "cursor-not-allowed bg-app-border text-app-muted" : "bg-app-accent text-app-accent-fg shadow-sm hover:bg-app-accent-strong active:scale-[0.99]")}>
           {submitting ? <span className="jc-spinner" /> : <Send className="h-4 w-4" />}
-          {submitting ? "Memindai struk…" : "Kirim Bukti Transfer"}
+          {submitting ? "Menyimpan bukti…" : "Kirim Bukti Transfer"}
         </button>
       </form>
     </div>
