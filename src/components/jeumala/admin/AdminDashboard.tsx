@@ -113,7 +113,7 @@ export function AdminDashboard({ onLogout }: { onLogout: () => void }) {
       if (page !== 1) setPage(1);
     }, 300);
     return () => clearTimeout(t);
-  }, [query, page]);
+  }, [query]);
 
   function refreshAll() {
     fetchTable();
@@ -572,7 +572,7 @@ function EditOrderModal({
           gender,
           fullName: fullName.trim(),
           backName: backName.trim(),
-          backNumber: parseInt(backNumber, 10),
+          backNumber,
           size,
           sleeve,
         }),
@@ -659,6 +659,7 @@ function EditOrderModal({
             inputMode="numeric"
             value={backNumber}
             onChange={(e) => setBackNumber(e.target.value.replace(/[^\d]/g, ""))}
+            placeholder="01 atau 1–999"
             className="jc-input"
           />
         </Field>

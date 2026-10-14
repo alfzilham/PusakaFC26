@@ -1,8 +1,9 @@
 "use client";
 
 import type { UsedEntry } from "@/lib/validations";
-import { GENDER_LABEL } from "@/lib/validations";
+import { formatBackNumber, GENDER_LABEL } from "@/lib/validations";
 import { cn } from "@/lib/utils";
+import { useMemo, useState } from "react";
 
 function statusLabel(status: UsedEntry["paymentStatus"]) {
   if (status === "VERIFIED") return "Sudah Bayar";
@@ -19,7 +20,20 @@ function rowTone(status: UsedEntry["paymentStatus"]) {
 }
 
 export function PaymentStatusList({ used }: { used: UsedEntry[] }) {
-  const rows = [...used].sort((a, b) => a.backNumber - b.backNumber);
+  const [filter, setFilter] = useState<"ALL" | "VERIFIED" | "PENDING_VERIFICATION" | "REJECTED" | "UNPAID">("ALL");
+  const rows = useMemo(
+    () => [...used]
+      .filter((row) => filter === "ALL" || (filter === "UNPAID" ? !row.paymentStatus : row.paymentStatus === filter))
+      .sort((a, b) => Number(a.backNumber) - Number(b.backNumber)),
+    [filter, used]
+  );
+  const filters = [
+    ["ALL", "Semua"],
+    ["VERIFIED", "Sudah Input / Bayar"],
+    ["PENDING_VERIFICATION", "Pending Verifikasi"],
+    ["UNPAID", "Belum Input Struk"],
+    ["REJECTED", "Verifikasi Ditolak"],
+  ] as const;
 
   return (
     <div className="mx-auto w-full max-w-5xl">
@@ -28,6 +42,11 @@ export function PaymentStatusList({ used }: { used: UsedEntry[] }) {
         <h1 className="text-2xl font-extrabold tracking-tight text-app-fg sm:text-3xl">Status Pembayaran</h1>
         <p className="mt-1.5 text-sm text-app-muted">Daftar ini hanya dapat dilihat. Status diperbarui setelah verifikasi Bendahara.</p>
       </header>
+      <div className="mb-4 flex flex-wrap gap-2" aria-label="Filter status pembayaran">
+        {filters.map(([value, label]) => (
+          <button key={value} type="button" onClick={() => setFilter(value)} className={cn("rounded-full border px-3 py-2 text-xs font-semibold transition-colors", filter === value ? "border-app-accent bg-app-accent text-app-accent-fg" : "border-app-border bg-app-surface text-app-fg-soft hover:bg-app-bg")}>{label}</button>
+        ))}
+      </div>
       <section className="overflow-hidden rounded-2xl border border-app-border bg-app-surface shadow-sm">
         <div className="jc-scroll overflow-x-auto">
           <table className="w-full min-w-[760px] text-left text-sm">
@@ -48,7 +67,7 @@ export function PaymentStatusList({ used }: { used: UsedEntry[] }) {
                   <td className="px-4 py-3 font-semibold text-app-fg">{GENDER_LABEL[row.gender]}</td>
                   <td className="px-4 py-3 font-medium text-app-fg">{row.fullName}</td>
                   <td className="px-4 py-3 font-medium text-app-fg-soft">{row.backName}</td>
-                  <td className="px-4 py-3 font-bold tabular-nums text-app-fg">{row.backNumber}</td>
+                  <td className="px-4 py-3 font-bold tabular-nums text-app-fg">{formatBackNumber(row.backNumber)}</td>
                   <td className="px-4 py-3 font-semibold text-app-fg">{statusLabel(row.paymentStatus)}</td>
                 </tr>
               ))}

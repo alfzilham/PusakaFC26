@@ -12,7 +12,7 @@ type PendingReceipt = {
   phoneNumber: string;
   imageUrl: string;
   createdAt: string;
-  registrant: { id: string; fullName: string; backNumber: number };
+  registrant: { id: string; fullName: string; backNumber: string };
 };
 
 export function ReceiptReview({ onBack }: { onBack: () => void }) {

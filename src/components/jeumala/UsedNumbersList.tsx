@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 import { Hash, Users, Search, Inbox } from "lucide-react";
 import {
   GENDER_LABEL,
+  formatBackNumber,
   type Gender,
   type UsedEntry,
 } from "@/lib/validations";
@@ -17,7 +18,7 @@ export function UsedNumbersList({ used }: Props) {
   const [query, setQuery] = useState("");
 
   const sorted = useMemo(
-    () => [...used].sort((a, b) => a.backNumber - b.backNumber),
+    () => [...used].sort((a, b) => Number(a.backNumber) - Number(b.backNumber)),
     [used]
   );
 
@@ -26,7 +27,7 @@ export function UsedNumbersList({ used }: Props) {
     if (!q) return sorted;
     return sorted.filter(
       (e) =>
-        String(e.backNumber).includes(q) ||
+        formatBackNumber(e.backNumber).includes(q) ||
         e.backName.toLowerCase().includes(q)
     );
   }, [sorted, query]);
@@ -128,7 +129,7 @@ function NumberCard({ entry }: { entry: UsedEntry }) {
       />
       <div className="flex items-baseline justify-between pl-1.5">
         <span className="text-2xl font-extrabold tabular-nums text-app-fg">
-          {entry.backNumber}
+          {formatBackNumber(entry.backNumber)}
         </span>
         <GenderBadge gender={gender} />
       </div>

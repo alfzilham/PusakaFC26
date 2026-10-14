@@ -5,6 +5,7 @@ import { Download, ImagePlus, MessageCircle, Send } from "lucide-react";
 import type { UsedEntry } from "@/lib/validations";
 import { CustomDropdown } from "@/components/jeumala/CustomDropdown";
 import { useToast } from "@/components/jeumala/Toast";
+import { SuperAdminVerificationModal } from "@/components/jeumala/admin/SuperAdminVerificationModal";
 
 function currency(value: number) {
   return new Intl.NumberFormat("id-ID", { style: "currency", currency: "IDR", maximumFractionDigits: 0 }).format(value);
@@ -18,6 +19,8 @@ export function TreasurerReceiptGenerator() {
   const [amount, setAmount] = useState("");
   const [note, setNote] = useState("");
   const [busy, setBusy] = useState(false);
+  const [superAdminVerified, setSuperAdminVerified] = useState(false);
+  const [verificationOpen, setVerificationOpen] = useState(false);
   const [loadingRegistrants, setLoadingRegistrants] = useState(true);
   const [imageUrl, setImageUrl] = useState<string | null>(null);
   const [imageFile, setImageFile] = useState<File | null>(null);
@@ -44,6 +47,15 @@ export function TreasurerReceiptGenerator() {
 
   async function submit(event: FormEvent) {
     event.preventDefault();
+    if (!selected || !phone.trim() || !amount || busy) return;
+    if (!superAdminVerified) {
+      setVerificationOpen(true);
+      return;
+    }
+    await generateReceipt();
+  }
+
+  async function generateReceipt() {
     if (!selected || !phone.trim() || !amount || busy) return;
     setBusy(true);
     try {
@@ -93,13 +105,14 @@ export function TreasurerReceiptGenerator() {
       <form onSubmit={submit} className="grid gap-5 rounded-2xl border border-app-border bg-app-surface p-5 shadow-sm sm:grid-cols-2 sm:p-6">
         <CustomDropdown label="Nama Lengkap" required value={registrantId} onChange={setRegistrantId} options={options} placeholder={loadingRegistrants ? "Memuat pendaftar…" : "Pilih nama pendaftar"} disabled={loadingRegistrants} />
         <div><label htmlFor="generator-phone" className="mb-1.5 block text-sm font-semibold text-app-fg">No. HP / WhatsApp <span className="text-app-danger">*</span></label><div className="relative flex items-center rounded-xl border border-app-border bg-app-surface transition-colors focus-within:border-app-accent focus-within:ring-2 focus-within:ring-app-accent/20"><MessageCircle className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-app-muted" /><span className="ml-10 border-r border-app-border pr-2.5 text-sm font-semibold text-app-fg-soft">+62</span><input id="generator-phone" required value={phone} onChange={(event) => handlePhoneChange(event.target.value)} placeholder="85213896460" inputMode="tel" className="w-full rounded-r-xl bg-transparent py-3 pl-2.5 pr-3.5 text-sm text-app-fg outline-none placeholder:text-app-muted" /></div><p className="mt-1.5 text-xs text-app-muted">Masukkan nomor setelah +62, contoh: 85213896460.</p></div>
-        <label className="text-sm font-semibold text-app-fg">Nominal<input required type="number" min="1" value={amount} onChange={(event) => setAmount(event.target.value)} className="mt-1.5 w-full rounded-xl border border-app-border bg-transparent px-3 py-3 font-normal outline-none focus:border-app-accent" /></label>
+        <label className="text-sm font-semibold text-app-fg">Nominal (Rp)<input required type="text" inputMode="numeric" minLength={1} value={amount} onChange={(event) => setAmount(event.target.value.replace(/[^\d]/g, ""))} placeholder="Contoh: 170000" className="mt-1.5 w-full rounded-xl border border-app-border bg-transparent px-3 py-3 font-normal outline-none focus:border-app-accent" /><span className="mt-1.5 block text-xs font-normal text-app-muted">Masukkan angka penuh tanpa titik atau koma, contoh: 170000.</span></label>
         <label className="text-sm font-semibold text-app-fg">Note <span className="font-normal text-app-muted">(opsional)</span><input value={note} onChange={(event) => setNote(event.target.value)} className="mt-1.5 w-full rounded-xl border border-app-border bg-transparent px-3 py-3 font-normal outline-none focus:border-app-accent" /></label>
         <button type="submit" disabled={busy || !registrantId} className="jc-focus inline-flex items-center justify-center gap-2 rounded-xl bg-app-accent px-4 py-3 font-bold text-app-accent-fg disabled:opacity-60 sm:col-span-2">{busy ? <span className="jc-spinner" /> : <Send className="h-4 w-4" />}Generate &amp; Simpan</button>
       </form>
       <canvas ref={canvasRef} className="hidden" />
       {imageUrl && <section className="mt-6 rounded-2xl border border-app-border bg-app-surface p-5 shadow-sm"><div className="rounded-xl bg-app-surface-2 p-3"><img src={imageUrl} alt="Preview struk pembayaran" className="mx-auto max-h-[560px] w-full object-contain" /></div><div className="mt-4 flex flex-wrap gap-3"><button type="button" onClick={download} className="jc-focus inline-flex items-center gap-2 rounded-xl bg-app-accent px-4 py-3 text-sm font-bold text-app-accent-fg"><Download className="h-4 w-4" />Download</button><button type="button" onClick={() => void share()} className="jc-focus inline-flex items-center gap-2 rounded-xl border border-app-accent/30 px-4 py-3 text-sm font-bold text-app-accent-strong"><MessageCircle className="h-4 w-4" />WhatsApp</button></div></section>}
       <div className="mt-4 flex items-center gap-2 text-xs text-app-muted"><ImagePlus className="h-4 w-4" />Struk dibuat sebagai gambar dan disimpan sebagai riwayat.</div>
+      <SuperAdminVerificationModal open={verificationOpen} actionLabel="membuat dan menyimpan struk" onClose={() => setVerificationOpen(false)} onVerified={() => { setVerificationOpen(false); setSuperAdminVerified(true); void generateReceipt(); }} />
     </div>
   );
 }

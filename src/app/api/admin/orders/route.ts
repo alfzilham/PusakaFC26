@@ -38,7 +38,7 @@ function toRow(r: {
   gender: string;
   fullName: string;
   backName: string;
-  backNumber: number;
+  backNumber: string;
   size: string;
   sleeve: string;
   createdAt: Date;
@@ -72,23 +72,20 @@ export async function GET(req: Request) {
   const pageSize = 20;
 
   const where: {
-    OR?: { fullName?: { contains: string }; backName?: { contains: string }; backNumber?: number }[];
+    OR?: { fullName?: { contains: string }; backName?: { contains: string }; backNumber?: { contains: string } }[];
     gender?: string;
   } = {};
 
   if (q) {
-    const asNum = parseInt(q, 10);
     const or: {
       fullName?: { contains: string };
       backName?: { contains: string };
-      backNumber?: number;
+      backNumber?: { contains: string };
     }[] = [
       { fullName: { contains: q } },
       { backName: { contains: q } },
     ];
-    if (!Number.isNaN(asNum)) {
-      or.push({ backNumber: asNum });
-    }
+    or.push({ backNumber: { contains: q } });
     where.OR = or;
   }
   if (gender && (GENDER_VALUES as readonly string[]).includes(gender)) {
@@ -179,7 +176,7 @@ export async function PUT(req: Request) {
     }
     update.backName = normalized;
   }
-  if (typeof data.backNumber === "number") {
+  if (typeof data.backNumber === "string") {
     const superAdminAuthenticated = await isSuperAdminAuthenticated();
     if (!superAdminAuthenticated) {
       const clash = await db.jerseyOrder.findFirst({

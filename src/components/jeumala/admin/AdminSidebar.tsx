@@ -37,7 +37,7 @@ export function AdminSidebar({ open, view, onClose, onView, onExport, onImport, 
           <button type="button" className={item(false)} onClick={onImport}><Upload className="h-4 w-4" />Import JSON</button>
         </div>
         <div className="mt-auto border-t border-app-border pt-4">
-          <button type="button" className={item(false)} onClick={onLogout}><LogOut className="h-4 w-4" />Keluar</button>
+          <button type="button" className="flex w-full items-center gap-3 rounded-xl border border-app-danger/20 bg-app-danger-soft px-3 py-2.5 text-left text-sm font-semibold text-app-danger transition-colors hover:border-app-danger/40 hover:bg-app-danger/15" onClick={onLogout}><LogOut className="h-4 w-4" />Keluar</button>
         </div>
       </aside>
     </>

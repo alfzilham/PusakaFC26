@@ -5,17 +5,14 @@ import {
   X,
   ClipboardList,
   ListOrdered,
-  Lock,
   Info,
   ContactRound,
-  ShieldAlert,
   ReceiptText,
   BadgeCheck,
   ChevronDown,
   type LucideIcon,
 } from "lucide-react";
 import { Logo } from "./Logo";
-import { Modal } from "./Modal";
 import { APP_NAME } from "@/lib/constants";
 import { cn } from "@/lib/utils";
 
@@ -47,7 +44,6 @@ export function Sidebar({
   const [closing, setClosing] = useState(false);
   const [infoOpen, setInfoOpen] = useState(false);
   const [contactsOpen, setContactsOpen] = useState(false);
-  const [accessNoticeOpen, setAccessNoticeOpen] = useState(false);
 
   function handleClose() {
     setClosing(true);
@@ -129,12 +125,6 @@ export function Sidebar({
             active={current === "payment-status"}
             onClick={() => navigate("payment-status")}
           />
-          <NavItem
-            icon={Lock}
-            label="Lihat Detail Data"
-            onClick={() => setAccessNoticeOpen(true)}
-          />
-
           {/* Information — sticky bottom */}
           <div className="sticky bottom-0 mt-4 border-t border-app-border bg-app-surface px-3 pt-3 pb-4">
             <button
@@ -201,24 +191,6 @@ export function Sidebar({
           </div>
         </nav>
       </aside>
-      <Modal
-        open={accessNoticeOpen}
-        onClose={() => setAccessNoticeOpen(false)}
-        title="Akses terbatas"
-        icon={<ShieldAlert className="h-5 w-5 text-app-danger" />}
-        footer={
-          <button
-            type="button"
-            onClick={() => setAccessNoticeOpen(false)}
-            className="jc-focus w-full rounded-xl bg-app-accent px-4 py-2.5 text-sm font-bold text-app-accent-fg transition-colors hover:bg-app-accent-strong"
-          >
-            Mengerti
-          </button>
-        }
-      >
-        Fitur detail data hanya dapat diakses oleh admin dan super admin. Silakan
-        gunakan halaman admin untuk melanjutkan.
-      </Modal>
     </div>
   );
 }
