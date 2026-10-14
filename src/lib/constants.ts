@@ -23,6 +23,18 @@ export const ADMIN_CONTACT = {
   whatsappHref: "https://wa.me/628136173909",
 };
 
+export const TREASURER_CONTACT = {
+  name: "Raisya Zumara",
+  whatsapp: "0812-6204-0241",
+  whatsappHref: "https://wa.me/6281262040241",
+};
+
+export const SECRETARY_CONTACT = {
+  name: "Naurah Syifa",
+  whatsapp: "0822-7724-7480",
+  whatsappHref: "https://wa.me/6282277247480",
+};
+
 export const ADMIN_PASSWORD_ENV = "ADMIN_PASSWORD";
 export const SUPER_ADMIN_PASSWORD_ENV = "SUPER_ADMIN_PASSWORD";
 export const ADMIN_SESSION_COOKIE = "jc26_admin";

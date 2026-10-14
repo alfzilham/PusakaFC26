@@ -2,13 +2,8 @@
 
 import { Info, Shield, FileText, Phone } from "lucide-react";
 import { Modal } from "./Modal";
-import { ADMIN_CONTACT, APP_NAME, SUPER_ADMIN } from "@/lib/constants";
+import { ADMIN_CONTACT, APP_NAME, SECRETARY_CONTACT, SUPER_ADMIN, TREASURER_CONTACT } from "@/lib/constants";
 import type { InfoKey } from "./Sidebar";
-
-const WA_DISPLAY = SUPER_ADMIN.whatsapp;
-const WA_HREF = SUPER_ADMIN.whatsappHref;
-const ADMIN_WA_DISPLAY = ADMIN_CONTACT.whatsapp;
-const ADMIN_WA_HREF = ADMIN_CONTACT.whatsappHref;
 
 export function InformationPanel({
   info,
@@ -21,8 +16,10 @@ export function InformationPanel({
     about: { title: "About", icon: <Info className="h-5 w-5 text-app-accent" /> },
     privacy: { title: "Privacy Policy", icon: <Shield className="h-5 w-5 text-app-accent" /> },
     terms: { title: "Terms of Services", icon: <FileText className="h-5 w-5 text-app-accent" /> },
-    "admin-contact": { title: "Admin Contact", icon: <Phone className="h-5 w-5 text-app-accent" /> },
-    contact: { title: "Super Admin Contact", icon: <Phone className="h-5 w-5 text-app-accent" /> },
+    "admin-main-contact": { title: "Admin Utama", icon: <Phone className="h-5 w-5 text-app-accent" /> },
+    "treasurer-contact": { title: "Bendahara", icon: <Phone className="h-5 w-5 text-app-accent" /> },
+    "secretary-contact": { title: "Sekretaris", icon: <Phone className="h-5 w-5 text-app-accent" /> },
+    "super-admin-contact": { title: "Super Admin", icon: <Phone className="h-5 w-5 text-app-accent" /> },
   };
 
   if (!info) return null;
@@ -32,8 +29,10 @@ export function InformationPanel({
       {info === "about" && <AboutContent />}
       {info === "privacy" && <PrivacyContent />}
       {info === "terms" && <TermsContent />}
-      {info === "admin-contact" && <AdminContactContent />}
-      {info === "contact" && <ContactContent />}
+      {info === "admin-main-contact" && <DirectoryContactContent role="Admin Utama" contact={ADMIN_CONTACT} />}
+      {info === "treasurer-contact" && <DirectoryContactContent role="Bendahara" contact={TREASURER_CONTACT} />}
+      {info === "secretary-contact" && <DirectoryContactContent role="Sekretaris" contact={SECRETARY_CONTACT} />}
+      {info === "super-admin-contact" && <DirectoryContactContent role="Super Admin" contact={SUPER_ADMIN} />}
     </Modal>
   );
 }
@@ -132,15 +131,21 @@ function TermsContent() {
   );
 }
 
-function AdminContactContent() {
+function DirectoryContactContent({
+  role,
+  contact,
+}: {
+  role: string;
+  contact: { name: string; whatsapp: string; whatsappHref: string };
+}) {
   return (
     <div className="space-y-4">
       <div className="rounded-xl border border-app-border bg-app-surface-2 p-4">
-        <p className="font-semibold text-app-fg">{ADMIN_CONTACT.name}</p>
-        <p className="mt-1 text-sm text-app-muted">Admin · {APP_NAME}</p>
+        <p className="font-semibold text-app-fg">{contact.name}</p>
+        <p className="mt-1 text-sm text-app-muted">{role} · {APP_NAME}</p>
       </div>
       <a
-        href={ADMIN_WA_HREF}
+        href={contact.whatsappHref}
         target="_blank"
         rel="noopener noreferrer"
         className="jc-focus flex items-center justify-between gap-3 rounded-xl border border-app-border bg-app-surface-2 p-4 transition-colors hover:border-app-accent/40 hover:bg-app-accent/5"
@@ -148,59 +153,12 @@ function AdminContactContent() {
         <div className="flex items-center gap-3">
           <Phone className="h-5 w-5 text-app-accent" />
           <div>
-            <p className="text-xs text-app-muted">WhatsApp Admin</p>
-            <p className="font-semibold text-app-fg">{ADMIN_WA_DISPLAY}</p>
+            <p className="text-xs text-app-muted">WhatsApp {role}</p>
+            <p className="font-semibold text-app-fg">{contact.whatsapp}</p>
           </div>
         </div>
-        <span className="rounded-lg bg-app-accent px-3 py-1.5 text-xs font-semibold text-app-accent-fg">
-          Chat
-        </span>
+        <span className="rounded-lg bg-app-accent px-3 py-1.5 text-xs font-semibold text-app-accent-fg">Chat</span>
       </a>
-      <p>
-        Hubungi admin untuk pertanyaan pendaftaran, konfirmasi data, atau
-        koreksi informasi jersey. Aksi perubahan data dilakukan oleh admin
-        dengan otorisasi super admin.
-      </p>
-      <p className="text-xs text-app-muted">
-        Untuk bantuan teknis dan akses super admin, buka menu Super Admin Contact.
-      </p>
-    </div>
-  );
-}
-
-function ContactContent() {
-  return (
-    <div className="space-y-4">
-      <div className="flex items-center gap-4 rounded-xl border border-app-border bg-app-surface-2 p-4">
-        <div className="flex h-12 w-12 items-center justify-center rounded-full bg-app-accent/10 text-base font-bold text-app-accent-strong">
-          AI
-        </div>
-        <div>
-          <p className="font-semibold text-app-fg">{SUPER_ADMIN.name}</p>
-          <p className="text-sm text-app-muted">Super Admin · {APP_NAME}</p>
-        </div>
-      </div>
-      <a
-        href={WA_HREF}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="jc-focus flex items-center justify-between gap-3 rounded-xl border border-app-border bg-app-surface-2 p-4 transition-colors hover:border-app-accent/40 hover:bg-app-accent/5"
-      >
-        <div className="flex items-center gap-3">
-          <Phone className="h-5 w-5 text-app-accent" />
-          <div>
-            <p className="text-xs text-app-muted">WhatsApp</p>
-            <p className="font-semibold text-app-fg">{WA_DISPLAY}</p>
-          </div>
-        </div>
-        <span className="rounded-lg bg-app-accent px-3 py-1.5 text-xs font-semibold text-app-accent-fg">
-          Chat
-        </span>
-      </a>
-      <p className="text-xs text-app-muted">
-        Hubungi super admin via WhatsApp untuk koreksi data atau pertanyaan
-        teknis terkait pendaftaran.
-      </p>
     </div>
   );
 }
