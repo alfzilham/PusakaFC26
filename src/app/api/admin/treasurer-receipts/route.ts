@@ -23,13 +23,14 @@ export async function POST(request: Request) {
 
   try {
     const form = await request.formData();
+    const registrantId = String(form.get("registrantId") || "").trim();
     const fullName = String(form.get("fullName") || "").trim();
     const phoneNumber = normalizePhone(String(form.get("phoneNumber") || ""));
     const amount = Number(String(form.get("amount") || ""));
     const noteValue = String(form.get("note") || "").trim();
     const image = form.get("image");
 
-    if (!fullName || phoneNumber.length < 10 || phoneNumber.length > 15 || !Number.isSafeInteger(amount) || amount <= 0) {
+    if (!registrantId || !fullName || phoneNumber.length < 10 || phoneNumber.length > 15 || !Number.isSafeInteger(amount) || amount <= 0) {
       return NextResponse.json({ error: "Lengkapi nama, nomor WhatsApp, dan nominal dengan benar." }, { status: 422 });
     }
     if (!(image instanceof File) || !ALLOWED_TYPES.has(image.type) || image.size > MAX_IMAGE_BYTES) {
@@ -40,6 +41,7 @@ export async function POST(request: Request) {
     const supabaseUrl = requiredEnv("SUPABASE_URL").replace(/\/$/, "");
     const bucket = requiredEnv("SUPABASE_STORAGE_BUCKET");
     const webp = await sharp(new Uint8Array(await image.arrayBuffer())).webp({ quality: 88 }).toBuffer();
+    const receiptHash = crypto.createHash("sha256").update(webp).digest("hex");
     const path = `treasurer-receipts/${Date.now()}-${crypto.randomUUID()}.webp`;
     const upload = await fetch(`${supabaseUrl}/storage/v1/object/${encodeURIComponent(bucket)}/${path}`, {
       method: "POST",
@@ -48,15 +50,23 @@ export async function POST(request: Request) {
     });
     if (!upload.ok) throw new Error("Gagal menyimpan gambar struk.");
 
-    const row = await db.treasurerReceipt.create({
-      data: {
-        fullName,
-        phoneNumber,
-        amount,
-        note: noteValue || null,
-        imageUrl: `${supabaseUrl}/storage/v1/object/public/${bucket}/${path}`,
-        createdBy: "Bendahara",
-      },
+    const imageUrl = `${supabaseUrl}/storage/v1/object/public/${bucket}/${path}`;
+    const row = await db.$transaction(async (tx) => {
+      const registrant = await tx.jerseyOrder.findUnique({ where: { id: registrantId }, select: { id: true } });
+      if (!registrant) throw new Error("Pendaftar tidak ditemukan.");
+
+      const created = await tx.treasurerReceipt.create({
+        data: { registrantId, fullName, phoneNumber, amount, note: noteValue || null, imageUrl, createdBy: "Bendahara" },
+      });
+
+      // Cash/manual receipts are already verified by the Treasurer. Keep the
+      // canonical payment status in PaymentReceipt so public rows turn green.
+      await tx.paymentReceipt.upsert({
+        where: { registrantId },
+        create: { registrantId, phoneNumber, phoneVerified: true, imageUrl, receiptHash, status: "VERIFIED", reviewedBy: "Bendahara", reviewedAt: new Date() },
+        update: { phoneNumber, phoneVerified: true, imageUrl, receiptHash, status: "VERIFIED", reviewedBy: "Bendahara", reviewedAt: new Date() },
+      });
+      return created;
     });
     return NextResponse.json({ data: row }, { status: 201 });
   } catch (error) {

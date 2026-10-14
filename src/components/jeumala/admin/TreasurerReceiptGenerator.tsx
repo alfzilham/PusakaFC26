@@ -70,7 +70,7 @@ export function TreasurerReceiptGenerator() {
       const blob = await new Promise<Blob>((resolve, reject) => canvas.toBlob((value) => value ? resolve(value) : reject(new Error("Gagal membuat gambar.")), "image/png"));
       const file = new File([blob], `struk-${Date.now()}.png`, { type: "image/png" });
       const form = new FormData();
-      form.append("fullName", selected.fullName); form.append("phoneNumber", `62${phone.trim()}`); form.append("amount", amount); form.append("note", note); form.append("image", file);
+      form.append("registrantId", selected.id); form.append("fullName", selected.fullName); form.append("phoneNumber", `62${phone.trim()}`); form.append("amount", amount); form.append("note", note); form.append("image", file);
       const response = await fetch("/api/admin/treasurer-receipts", { method: "POST", body: form });
       const body = await response.json().catch(() => ({}));
       if (!response.ok) throw new Error(body.error || "Gagal menyimpan struk.");
