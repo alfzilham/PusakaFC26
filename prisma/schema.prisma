@@ -28,6 +28,7 @@ model JerseyOrder {
   updatedAt  DateTime @updatedAt
 
   paymentReceipt PaymentReceipt?
+  treasurerReceipts TreasurerReceipt[]
 
   @@index([gender])
   @@index([backNumber])
@@ -59,6 +60,7 @@ model PaymentReceipt {
 
 model TreasurerReceipt {
   id           String   @id @default(cuid())
+  registrantId String?
   fullName     String
   phoneNumber  String
   amount       Int
@@ -68,8 +70,11 @@ model TreasurerReceipt {
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 
+  registrant JerseyOrder? @relation(fields: [registrantId], references: [id], onDelete: SetNull)
+
   @@index([createdAt])
   @@index([phoneNumber])
+  @@index([registrantId])
 }
 
 model AdminLoginAttempt {
