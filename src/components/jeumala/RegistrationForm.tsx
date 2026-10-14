@@ -370,7 +370,7 @@ export function RegistrationForm({ used, onAfterSubmit }: Props) {
           value={fields.backNumber}
           onChange={(v) => setField("backNumber", v.replace(/[^\d]/g, ""))}
           onBlur={() => markTouched("backNumber")}
-          placeholder="1–999"
+          placeholder="01 atau 1–999"
           inputMode="numeric"
           invalid={!!shouldShow("backNumber")}
           errorText={errors.backNumber}

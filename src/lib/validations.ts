@@ -34,6 +34,11 @@ export function normalizeBackName(value: string): string {
   return value.trim().replace(/\s+/g, " ").toLocaleUpperCase("id-ID");
 }
 
+/** Display jersey numbers below 10 with the two-digit format used on jerseys. */
+export function formatBackNumber(value: number): string {
+  return String(value).padStart(2, "0");
+}
+
 /** Normalize Indonesian phone numbers to digits without a leading plus sign. */
 export function normalizePhone(value: string): string {
   const digits = value.replace(/\D/g, "");

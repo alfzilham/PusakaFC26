@@ -113,7 +113,7 @@ export function AdminDashboard({ onLogout }: { onLogout: () => void }) {
       if (page !== 1) setPage(1);
     }, 300);
     return () => clearTimeout(t);
-  }, [query, page]);
+  }, [query]);
 
   function refreshAll() {
     fetchTable();
@@ -373,7 +373,7 @@ export function AdminDashboard({ onLogout }: { onLogout: () => void }) {
                         {r.backName}
                       </td>
                       <td className="px-4 py-3 font-bold tabular-nums text-app-fg">
-                        {r.backNumber}
+                        {String(r.backNumber).padStart(2, "0")}
                       </td>
                       <td className="px-4 py-3 text-app-fg-soft">
                         {SIZE_LABEL[r.size]}
@@ -659,6 +659,7 @@ function EditOrderModal({
             inputMode="numeric"
             value={backNumber}
             onChange={(e) => setBackNumber(e.target.value.replace(/[^\d]/g, ""))}
+            placeholder="01 atau 1–999"
             className="jc-input"
           />
         </Field>
