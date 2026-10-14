@@ -116,14 +116,9 @@ export function AdminDashboard({ onLogout }: { onLogout: () => void }) {
   useEffect(() => {
     const t = setTimeout(() => {
       if (page !== 1) setPage(1);
-      else fetchTable();
     }, 300);
     return () => clearTimeout(t);
-  }, [query]);
-
-  useEffect(() => {
-    fetchTable();
-  }, [genderParam, page]);
+  }, [query, page]);
 
   function refreshAll() {
     fetchTable();
