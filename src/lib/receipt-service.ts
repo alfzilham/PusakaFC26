@@ -24,24 +24,9 @@ function validatePhoneNumber(phoneNumber: string) {
   return phone;
 }
 
-async function scanReceipt(file: File) {
-  const ocrUrl = requiredEnv("OCR_SERVICE_URL").replace(/\/$/, "");
-  const bytes = new Uint8Array(await file.arrayBuffer());
-  const form = new FormData();
-  form.append("file", new Blob([bytes], { type: file.type }), file.name || "receipt-image");
-  let response: Response;
-  try {
-    response = await fetch(`${ocrUrl}/scan`, { method: "POST", body: form, cache: "no-store" });
-  } catch {
-    throw new ReceiptServiceError("OCR_UNAVAILABLE", "Layanan pemindai struk sedang tidak tersedia.", 502);
-  }
-  if (!response.ok) throw new ReceiptServiceError("OCR_UNAVAILABLE", "Layanan pemindai struk gagal merespons.", 502);
-  const body = (await response.json().catch(() => ({}))) as { status?: string; receiptHash?: string };
-  if (!body.receiptHash) throw new ReceiptServiceError("OCR_INVALID_RESPONSE", "Hasil pemindaian struk tidak valid.", 502);
-  if (body.status !== "success") {
-    throw new ReceiptServiceError("SCAN_FAILED", "Struk tidak terbaca. Silakan unggah foto yang lebih jelas.", 422);
-  }
-  return { bytes, receiptHash: body.receiptHash };
+function createReceiptFingerprint(bytes: Uint8Array) {
+  // Metadata only. It is not compared and never blocks duplicate submissions.
+  return crypto.createHash("sha256").update(bytes).digest("hex");
 }
 
 async function uploadWebp(bytes: Uint8Array, registrantId: string) {
@@ -107,7 +92,7 @@ export async function processReceiptSubmission({
   registrantId,
   phoneNumber,
   file,
-  replace = false,
+  replace: _replace = false,
 }: {
   registrantId: string;
   phoneNumber: string;
@@ -121,8 +106,9 @@ export async function processReceiptSubmission({
   if (!registrant) throw new ReceiptServiceError("REGISTRANT_NOT_FOUND", "Data pendaftar tidak ditemukan.", 404);
 
   const normalizedPhone = validatePhoneNumber(phoneNumber);
-  const scan = await scanReceipt(file);
-  const imageUrl = await uploadWebp(scan.bytes, registrantId);
+  const bytes = new Uint8Array(await file.arrayBuffer());
+  const imageUrl = await uploadWebp(bytes, registrantId);
+  const receiptHash = createReceiptFingerprint(bytes);
 
   await db.paymentReceipt.upsert({
     where: { registrantId },
@@ -131,14 +117,14 @@ export async function processReceiptSubmission({
       phoneNumber: normalizedPhone,
       phoneVerified: true,
       imageUrl,
-      receiptHash: scan.receiptHash,
+      receiptHash,
       status: "PENDING_VERIFICATION",
     },
     update: {
       phoneNumber: normalizedPhone,
       phoneVerified: true,
       imageUrl,
-      receiptHash: scan.receiptHash,
+      receiptHash,
       status: "PENDING_VERIFICATION",
       reviewedBy: null,
       reviewedAt: null,
