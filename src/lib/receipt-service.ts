@@ -2,6 +2,7 @@ import crypto from "crypto";
 import sharp from "sharp";
 import { db } from "@/lib/db";
 import { RECEIPT_PHASH_THRESHOLD } from "@/lib/constants";
+import { normalizePhone } from "@/lib/validations";
 
 const MAX_RECEIPT_BYTES = 10 * 1024 * 1024;
 const ALLOWED_TYPES = new Set(["image/jpeg", "image/png", "image/webp"]);
@@ -11,43 +12,15 @@ export class ReceiptServiceError extends Error {
     super(message);
   }
 }
-
 function requiredEnv(name: string) {
   const value = process.env[name]?.trim();
   if (!value) throw new ReceiptServiceError("CONFIGURATION_ERROR", `${name} belum dikonfigurasi.`, 500);
   return value;
 }
-
-function normalizePhone(value: string) {
-  const digits = value.replace(/[^\d]/g, "");
-  if (digits.startsWith("0")) return `62${digits.slice(1)}`;
-  if (digits.startsWith("62")) return digits;
-  return digits;
-}
-
-async function validateWhatsapp(phoneNumber: string) {
-  const baseUrl = requiredEnv("WAHA_BASE_URL").replace(/\/$/, "");
-  const session = process.env.WAHA_SESSION?.trim() || "default";
+function validatePhoneNumber(phoneNumber: string) {
   const phone = normalizePhone(phoneNumber);
   if (phone.length < 10 || phone.length > 15) {
     throw new ReceiptServiceError("INVALID_PHONE", "Nomor WhatsApp tidak valid.", 400);
-  }
-  const headers: HeadersInit = {};
-  if (process.env.WAHA_API_KEY) headers["X-Api-Key"] = process.env.WAHA_API_KEY;
-  let response: Response;
-  try {
-    response = await fetch(`${baseUrl}/api/contacts/check-exists?phone=${encodeURIComponent(phone)}&session=${encodeURIComponent(session)}`, {
-      method: "GET",
-      headers,
-      cache: "no-store",
-    });
-  } catch {
-    throw new ReceiptServiceError("WAHA_UNAVAILABLE", "Validasi WhatsApp sedang tidak tersedia.", 502);
-  }
-  if (!response.ok) throw new ReceiptServiceError("WAHA_UNAVAILABLE", "Validasi WhatsApp gagal.", 502);
-  const body = (await response.json().catch(() => ({}))) as { exists?: boolean; numberExists?: boolean; status?: boolean };
-  if (!(body.exists === true || body.numberExists === true || body.status === true)) {
-    throw new ReceiptServiceError("PHONE_NOT_REGISTERED", "Nomor tersebut belum terdaftar di WhatsApp.", 400);
   }
   return phone;
 }
@@ -130,7 +103,7 @@ export async function processReceiptSubmission({
   const registrant = await db.jerseyOrder.findUnique({ where: { id: registrantId }, select: { id: true } });
   if (!registrant) throw new ReceiptServiceError("REGISTRANT_NOT_FOUND", "Data pendaftar tidak ditemukan.", 404);
 
-  const normalizedPhone = await validateWhatsapp(phoneNumber);
+  const normalizedPhone = validatePhoneNumber(phoneNumber);
   const scan = await scanReceipt(file);
   await ensureNotDuplicate(scan.receiptHash, replace ? registrantId : undefined);
   const imageUrl = await uploadWebp(scan.bytes, registrantId);
@@ -155,21 +128,4 @@ export async function processReceiptSubmission({
       reviewedAt: null,
     },
   });
-}
-
-export async function sendReceiptRejection(phoneNumber: string) {
-  const baseUrl = requiredEnv("WAHA_BASE_URL").replace(/\/$/, "");
-  const session = process.env.WAHA_SESSION?.trim() || "default";
-  const headers: HeadersInit = { "Content-Type": "application/json" };
-  if (process.env.WAHA_API_KEY) headers["X-Api-Key"] = process.env.WAHA_API_KEY;
-  const response = await fetch(`${baseUrl}/api/sendText`, {
-    method: "POST",
-    headers,
-    body: JSON.stringify({
-      session,
-      chatId: `${normalizePhone(phoneNumber)}@c.us`,
-      text: "Bukti transfer Anda ditolak. Silakan unggah ulang foto struk yang lebih jelas atau hubungi Bendahara.",
-    }),
-  });
-  if (!response.ok) throw new Error(`WAHA rejection notification failed: ${response.status}`);
 }

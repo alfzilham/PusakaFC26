@@ -2,12 +2,12 @@
 
 export const APP_NAME = "PusakaFC26";
 export const APP_TAGLINE = "Sistem Pendaftaran Jersey";
-export const APP_VERSION = "v1.3.0";
+export const APP_VERSION = "v1.3.1";
 
 export const UPDATE_NOTIFICATION = {
   label: `Update ${APP_VERSION}`,
-  summary: "Super Admin Mode, nomor punggung duplikat, dan perbaikan keamanan",
-  href: `https://github.com/alfzilham/PusakaFC26/releases/tag/${APP_VERSION}`,
+  summary: "Notifikasi WhatsApp manual, format nomor +62, dan penghapusan WAHA",
+  href: `https://github.com/pusakajeumala26/PusakaFC26/releases/tag/${APP_VERSION}`,
 };
 
 export const SUPER_ADMIN = {

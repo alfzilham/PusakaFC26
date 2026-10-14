@@ -34,6 +34,15 @@ export function normalizeBackName(value: string): string {
   return value.trim().replace(/\s+/g, " ").toLocaleUpperCase("id-ID");
 }
 
+/** Normalize Indonesian phone numbers to digits without a leading plus sign. */
+export function normalizePhone(value: string): string {
+  const digits = value.replace(/\D/g, "");
+  if (digits.startsWith("0")) return `62${digits.slice(1)}`;
+  if (digits.startsWith("62")) return digits;
+  if (digits.startsWith("8")) return `62${digits}`;
+  return digits;
+}
+
 // ---- Public-facing labels ----
 export const GENDER_LABEL: Record<Gender, string> = {
   PRIA: "Pria",
