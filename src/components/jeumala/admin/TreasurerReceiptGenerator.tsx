@@ -5,7 +5,6 @@ import { Download, ImagePlus, MessageCircle, Send } from "lucide-react";
 import type { UsedEntry } from "@/lib/validations";
 import { CustomDropdown } from "@/components/jeumala/CustomDropdown";
 import { useToast } from "@/components/jeumala/Toast";
-import { SuperAdminVerificationModal } from "@/components/jeumala/admin/SuperAdminVerificationModal";
 
 function currency(value: number) {
   return new Intl.NumberFormat("id-ID", { style: "currency", currency: "IDR", maximumFractionDigits: 0 }).format(value);
@@ -19,8 +18,6 @@ export function TreasurerReceiptGenerator() {
   const [amount, setAmount] = useState("");
   const [note, setNote] = useState("");
   const [busy, setBusy] = useState(false);
-  const [superAdminVerified, setSuperAdminVerified] = useState(false);
-  const [verificationOpen, setVerificationOpen] = useState(false);
   const [loadingRegistrants, setLoadingRegistrants] = useState(true);
   const [imageUrl, setImageUrl] = useState<string | null>(null);
   const [imageFile, setImageFile] = useState<File | null>(null);
@@ -48,10 +45,6 @@ export function TreasurerReceiptGenerator() {
   async function submit(event: FormEvent) {
     event.preventDefault();
     if (!selected || !phone.trim() || !amount || busy) return;
-    if (!superAdminVerified) {
-      setVerificationOpen(true);
-      return;
-    }
     await generateReceipt();
   }
 
@@ -112,7 +105,6 @@ export function TreasurerReceiptGenerator() {
       <canvas ref={canvasRef} className="hidden" />
       {imageUrl && <section className="mt-6 rounded-2xl border border-app-border bg-app-surface p-5 shadow-sm"><div className="rounded-xl bg-app-surface-2 p-3"><img src={imageUrl} alt="Preview struk pembayaran" className="mx-auto max-h-[560px] w-full object-contain" /></div><div className="mt-4 flex flex-wrap gap-3"><button type="button" onClick={download} className="jc-focus inline-flex items-center gap-2 rounded-xl bg-app-accent px-4 py-3 text-sm font-bold text-app-accent-fg"><Download className="h-4 w-4" />Download</button><button type="button" onClick={() => void share()} className="jc-focus inline-flex items-center gap-2 rounded-xl border border-app-accent/30 px-4 py-3 text-sm font-bold text-app-accent-strong"><MessageCircle className="h-4 w-4" />WhatsApp</button></div></section>}
       <div className="mt-4 flex items-center gap-2 text-xs text-app-muted"><ImagePlus className="h-4 w-4" />Struk dibuat sebagai gambar dan disimpan sebagai riwayat.</div>
-      <SuperAdminVerificationModal open={verificationOpen} actionLabel="membuat dan menyimpan struk" onClose={() => setVerificationOpen(false)} onVerified={() => { setVerificationOpen(false); setSuperAdminVerified(true); void generateReceipt(); }} />
     </div>
   );
 }

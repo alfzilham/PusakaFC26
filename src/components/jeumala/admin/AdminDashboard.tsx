@@ -142,6 +142,10 @@ export function AdminDashboard({ onLogout }: { onLogout: () => void }) {
       requireSuperAdmin("mengakses review bukti transfer", () => setView("review"));
       return;
     }
+    if (nextView === "generator") {
+      requireSuperAdmin("mengakses Struk Generator", () => setView("generator"));
+      return;
+    }
     setView(nextView);
   }
 
