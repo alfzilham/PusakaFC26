@@ -1,7 +1,6 @@
 import crypto from "crypto";
 import sharp from "sharp";
 import { db } from "@/lib/db";
-import { RECEIPT_PHASH_THRESHOLD } from "@/lib/constants";
 import { normalizePhone } from "@/lib/validations";
 
 const MAX_RECEIPT_BYTES = 10 * 1024 * 1024;
@@ -25,45 +24,9 @@ function validatePhoneNumber(phoneNumber: string) {
   return phone;
 }
 
-async function scanReceipt(file: File) {
-  const ocrUrl = requiredEnv("OCR_SERVICE_URL").replace(/\/$/, "");
-  const bytes = new Uint8Array(await file.arrayBuffer());
-  const form = new FormData();
-  form.append("file", new Blob([bytes], { type: file.type }), file.name || "receipt-image");
-  let response: Response;
-  try {
-    response = await fetch(`${ocrUrl}/scan`, { method: "POST", body: form, cache: "no-store" });
-  } catch {
-    throw new ReceiptServiceError("OCR_UNAVAILABLE", "Layanan pemindai struk sedang tidak tersedia.", 502);
-  }
-  if (!response.ok) throw new ReceiptServiceError("OCR_UNAVAILABLE", "Layanan pemindai struk gagal merespons.", 502);
-  const body = (await response.json().catch(() => ({}))) as { status?: string; receiptHash?: string };
-  if (!body.receiptHash) throw new ReceiptServiceError("OCR_INVALID_RESPONSE", "Hasil pemindaian struk tidak valid.", 502);
-  if (body.status !== "success") {
-    throw new ReceiptServiceError("SCAN_FAILED", "Struk tidak terbaca. Silakan unggah foto yang lebih jelas.", 422);
-  }
-  return { bytes, receiptHash: body.receiptHash };
-}
-
-function hammingDistance(left: string, right: string) {
-  const a = left.toLowerCase().replace(/^0x/, "").padStart(Math.max(left.length, right.length), "0");
-  const b = right.toLowerCase().replace(/^0x/, "").padStart(Math.max(left.length, right.length), "0");
-  let distance = 0;
-  for (let i = 0; i < a.length; i += 1) {
-    const value = Number.parseInt(a[i], 16) ^ Number.parseInt(b[i], 16);
-    distance += value.toString(2).split("1").length - 1;
-  }
-  return distance;
-}
-
-async function ensureNotDuplicate(receiptHash: string, excludeId?: string) {
-  const hashes = await db.paymentReceipt.findMany({
-    where: excludeId ? { NOT: { registrantId: excludeId } } : undefined,
-    select: { receiptHash: true },
-  });
-  if (hashes.some((row) => hammingDistance(receiptHash, row.receiptHash) <= RECEIPT_PHASH_THRESHOLD)) {
-    throw new ReceiptServiceError("DUPLICATE_RECEIPT", "Struk terdeteksi sebagai duplikat. Hubungi Admin atau Super Admin.", 409);
-  }
+function createReceiptFingerprint(bytes: Uint8Array) {
+  // Metadata only. It is not compared and never blocks duplicate submissions.
+  return crypto.createHash("sha256").update(bytes).digest("hex");
 }
 
 async function uploadWebp(bytes: Uint8Array, registrantId: string) {
@@ -129,7 +92,7 @@ export async function processReceiptSubmission({
   registrantId,
   phoneNumber,
   file,
-  replace = false,
+  replace: _replace = false,
 }: {
   registrantId: string;
   phoneNumber: string;
@@ -143,9 +106,9 @@ export async function processReceiptSubmission({
   if (!registrant) throw new ReceiptServiceError("REGISTRANT_NOT_FOUND", "Data pendaftar tidak ditemukan.", 404);
 
   const normalizedPhone = validatePhoneNumber(phoneNumber);
-  const scan = await scanReceipt(file);
-  await ensureNotDuplicate(scan.receiptHash, replace ? registrantId : undefined);
-  const imageUrl = await uploadWebp(scan.bytes, registrantId);
+  const bytes = new Uint8Array(await file.arrayBuffer());
+  const imageUrl = await uploadWebp(bytes, registrantId);
+  const receiptHash = createReceiptFingerprint(bytes);
 
   await db.paymentReceipt.upsert({
     where: { registrantId },
@@ -154,14 +117,14 @@ export async function processReceiptSubmission({
       phoneNumber: normalizedPhone,
       phoneVerified: true,
       imageUrl,
-      receiptHash: scan.receiptHash,
+      receiptHash,
       status: "PENDING_VERIFICATION",
     },
     update: {
       phoneNumber: normalizedPhone,
       phoneVerified: true,
       imageUrl,
-      receiptHash: scan.receiptHash,
+      receiptHash,
       status: "PENDING_VERIFICATION",
       reviewedBy: null,
       reviewedAt: null,

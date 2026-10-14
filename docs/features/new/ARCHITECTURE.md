@@ -1,130 +1,54 @@
-# ARCHITECTURE.md — Struk Scanner Feature
+# ARCHITECTURE.md — Struk Scanner
 
-> **Current implementation note (14 Oktober 2026):** The implemented topology is Vercel + Supabase. WAHA and automatic WhatsApp delivery were removed; rejection uses manual click-to-chat.
+## Topologi produksi
 
-## Entry Point (All Documents Start Here)
-
-```
-[User Input Full Name (dropdown)] + [User Input Phone/WA Number] + [User Input Receipt Image] → Submit
-```
-
-## 1. Service Topology
-
-The current deployment uses two Vercel projects plus Supabase:
-
-```mermaid
-flowchart TB
-    subgraph Client["Browser"]
-        U[User / Bendahara / Super Admin]
-    end
-
-    subgraph Vercel["Vercel Projects"]
-        NextJS["Next.js App<br/>(existing — main app + API routes)"]
-        OCR["FastAPI OCR Service<br/>(new — Python, isolated)"]
-    end
-
-    DB[(PostgreSQL<br/>via Supabase)]
-    Supabase[(Supabase Storage<br/>.webp receipt images)]
-    Gemini[Gemini AI API]
-    WA[WhatsApp Network]
-
-    U -->|submit form / review| NextJS
-    NextJS -->|POST /scan| OCR
-    OCR -->|fallback if structure check fails| Gemini
-    NextJS <--> DB
-    NextJS -->|upload .webp| Supabase
+```text
+Browser pengguna
+      │ POST multipart
+      ▼
+Next.js API di Vercel
+      ├─ validasi registrant, nomor WhatsApp, tipe, dan ukuran file
+      ├─ konversi gambar ke WebP
+      ├─ upload ke Supabase Storage
+      └─ upsert PaymentReceipt ke Supabase PostgreSQL
+                         │
+                         ▼
+             Review manual Bendahara/Super Admin
 ```
 
-### Why OCR is a separate service (not a child process inside Next.js)
+Tidak ada service OCR, Gemini, WAHA, queue, atau child process. Bukti yang lolos validasi file langsung masuk antrean review manusia.
 
-Decided after structured trade-off analysis (see brainstorming transcript, "Poin 2" council discussion). Summary of the reasoning:
+## Alur submit
 
-- OCR + Gemini fallback is CPU/AI-bound work, fundamentally different in nature from Next.js's request-response web serving.
-- Running it as an in-process child process (`child_process.exec`) would share Railway's resource limits (RAM/CPU billing) with the main app — a slow or crashing OCR call could degrade the public jersey registration pages.
-- The OCR service is deployed separately so image processing cannot degrade the main Next.js request path.
-- Recommendation was to keep the FastAPI service **minimal at first** (single `POST /scan` endpoint, no auth/queue complexity) rather than over-engineering it — isolation matters more than feature completeness at this stage.
+1. Browser mengirim `registrantId`, `phoneNumber`, dan `receiptImage` ke `POST /api/receipts/submit`.
+2. Next.js memastikan pendaftar ada, nomor valid, file berupa JPG/PNG/WEBP, dan ukurannya maksimal 10 MB.
+3. Gambar dikonversi ke WebP dan diunggah ke bucket Supabase `receipts`.
+4. `PaymentReceipt` dibuat atau di-overwrite untuk registrant yang sama dengan status `PENDING_VERIFICATION`.
+5. Bendahara atau Super Admin memutuskan approve/reject secara manual.
 
-## 2. End-to-End Data Flow
+## API
 
-```mermaid
-sequenceDiagram
-    participant U as User
-    participant N as Next.js API
-    participant O as FastAPI OCR
-    participant G as Gemini AI
-    participant S as Supabase
-    participant D as PostgreSQL
+| Route | Method | Fungsi | Akses |
+| --- | --- | --- | --- |
+| `/api/receipts/submit` | POST | Validasi, upload, dan simpan bukti | Publik |
+| `/api/receipts/pending` | GET | Daftar bukti pending | Bendahara/Super Admin |
+| `/api/receipts/:id/approve` | POST | Menyetujui bukti | Bendahara/Super Admin |
+| `/api/receipts/:id/reject` | POST | Menolak dan menghapus bukti | Bendahara/Super Admin |
+| `/api/receipts/:id/replace` | POST | Mengganti bukti | Super Admin |
 
-    U->>N: Submit (name, phone, receipt image)
-    N->>N: normalize phone number
-    alt phone valid
-        N->>O: POST /scan (image)
-        O->>O: OCR structure check
-        alt OCR fails
-            O->>G: fallback scan (handles handwritten/cash receipts)
-        end
-        O-->>N: { status, receiptHash }
-        alt scan failed (OCR + Gemini both failed)
-            N-->>U: 422 — ask for clearer photo (no DB write)
-        else scan succeeded
-            N->>D: compare receiptHash vs stored hashes (pHash, Hamming distance)
-            alt duplicate detected
-                N-->>U: 409 — contact Admin/Super Admin (no DB write)
-            else no duplicate
-                N->>N: convert image to .webp
-                N->>S: upload .webp
-                N->>D: upsert PaymentReceipt (status=PENDING_VERIFICATION)
-                N-->>U: success — row turns yellow
-            end
-        end
-    end
+## Penyimpanan
+
+File WebP disimpan pada `receipts/<registrantId>-<uuid>.webp`. `receiptHash` berisi SHA-256 lokal untuk metadata/traceability saja; nilainya tidak dibandingkan dan tidak pernah memblokir submit duplikat.
+
+Saat reject, row database dan object Storage dihapus. Saat submit ulang, row registrant yang sama di-overwrite.
+
+## Environment produksi
+
+```env
+DATABASE_URL=...
+SUPABASE_URL=...
+SUPABASE_SERVICE_ROLE_KEY=...
+SUPABASE_STORAGE_BUCKET=receipts
 ```
 
-## 3. Bendahara Review Flow
-
-```mermaid
-sequenceDiagram
-    participant B as Bendahara / Super Admin
-    participant N as Next.js API
-    participant D as PostgreSQL
-    participant C as WhatsApp click-to-chat
-
-    B->>N: GET /api/receipts/pending
-    N->>D: query status=PENDING_VERIFICATION
-    D-->>N: rows (name, phone, image preview)
-    N-->>B: render review queue
-
-    alt Approve
-        B->>N: POST /api/receipts/:id/approve
-        N->>D: status=VERIFIED
-        N-->>B: row turns green (no notification sent)
-    else Reject
-        B->>N: POST /api/receipts/:id/reject
-        N->>D: delete PaymentReceipt and storage image
-        N-->>B: return phone number
-        B->>C: open prefilled message and send manually
-    end
-```
-
-## 4. Deployment Topology
-
-| Service | Type | Notes |
-|---|---|---|
-| `pusakafc26` | Next.js app on Vercel | Public-facing + admin panel + API routes |
-| `pusakafc26-ocr` | FastAPI on Vercel | Single `/scan` endpoint; stateless |
-
-External managed services:
-- **Supabase PostgreSQL** — database for registrant + payment data.
-- **Supabase** — object storage for `.webp` receipt images.
-- **Gemini AI API** — called only by the FastAPI OCR service, never directly by Next.js.
-
-## 5. Isolation & Resource Rationale
-
-- The FastAPI OCR service runs independently from the main app and remains stateless.
-- Next.js is the single orchestrator: it is the only service that talks to the database and decides what gets persisted. OCR only processes images and returns scan metadata.
-
-## 6. Known Constraints (carried over from brainstorming)
-
-- Rejection has no server-side WhatsApp dependency; the reviewer sends the prefilled click-to-chat message manually.
-- No automated amount verification exists anywhere in this pipeline; OCR/Gemini only confirm the receipt's structural validity, not its financial content. Final payment correctness is a human (Bendahara) judgment call.
-- Scale is intentionally small (~250 users, seasonal usage) — this architecture is deliberately not over-built for high concurrency or long-term multi-tenant reuse.
+OCR_SERVICE_URL, GEMINI_API_KEY, dan GEMINI_MODEL sudah tidak diperlukan dan harus dihapus dari deployment.

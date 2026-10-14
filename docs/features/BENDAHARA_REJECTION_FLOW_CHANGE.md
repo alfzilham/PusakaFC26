@@ -81,4 +81,4 @@ https://wa.me/6281234567890?text=Halo%2C%20bukti%20transfer%20Anda%20untuk%20pen
 ## Not Affected by This Change
 
 - Phone numbers are validated locally by format and normalized to digits beginning with `62`; WhatsApp registration is not checked automatically.
-- All other parts of the Struk Scanner flow (OCR, Gemini fallback, perceptual hash duplicate detection, status color-coding, Supabase storage) are unchanged.
+- The current flow has no OCR, Gemini fallback, or automatic duplicate detection. File validation, WebP conversion, Supabase storage, and status color-coding remain active.
