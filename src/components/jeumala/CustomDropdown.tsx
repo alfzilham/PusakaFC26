@@ -8,7 +8,7 @@ import {
   useCallback,
   type KeyboardEvent,
 } from "react";
-import { ChevronDown, Check } from "lucide-react";
+import { ChevronDown, Check, Search } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 export type DropdownOption = {
@@ -28,6 +28,7 @@ type CustomDropdownProps = {
   errorText?: string;
   hint?: string;
   disabled?: boolean;
+  searchable?: boolean;
 };
 
 export function CustomDropdown({
@@ -42,6 +43,7 @@ export function CustomDropdown({
   errorText,
   hint,
   disabled,
+  searchable = false,
 }: CustomDropdownProps) {
   const autoId = useId();
   const listboxId = id || `dd-${autoId}`;
@@ -50,15 +52,20 @@ export function CustomDropdown({
   const [open, setOpen] = useState(false);
   const [closing, setClosing] = useState(false);
   const [activeIndex, setActiveIndex] = useState(-1);
+  const [query, setQuery] = useState("");
 
   const triggerRef = useRef<HTMLButtonElement>(null);
   const panelRef = useRef<HTMLDivElement>(null);
   const optionRefs = useRef<(HTMLDivElement | null)[]>([]);
 
   const selectedOption = options.find((o) => o.value === value);
+  const filteredOptions = searchable
+    ? options.filter((option) => option.label.toLocaleLowerCase("id-ID").includes(query.trim().toLocaleLowerCase("id-ID")))
+    : options;
 
   const close = useCallback(() => {
     setClosing(true);
+    setQuery("");
     window.setTimeout(() => {
       setOpen(false);
       setClosing(false);
@@ -69,9 +76,9 @@ export function CustomDropdown({
   const openMenu = useCallback(() => {
     setClosing(false);
     setOpen(true);
-    const idx = options.findIndex((o) => o.value === value);
+    const idx = filteredOptions.findIndex((o) => o.value === value);
     setActiveIndex(idx >= 0 ? idx : 0);
-  }, [options, value]);
+  }, [filteredOptions, value]);
 
   // Click outside / Esc to close
   useEffect(() => {
@@ -113,17 +120,17 @@ export function CustomDropdown({
     if (e.key === "Enter" || e.key === " " || e.key === "ArrowDown") {
       e.preventDefault();
       if (!open) openMenu();
-      else setActiveIndex((i) => Math.min(i + 1, options.length - 1));
+      else setActiveIndex((i) => Math.min(i + 1, filteredOptions.length - 1));
     } else if (e.key === "ArrowUp" && open) {
       e.preventDefault();
       setActiveIndex((i) => Math.max(i - 1, 0));
     }
   }
 
-  function handlePanelKeyDown(e: KeyboardEvent<HTMLDivElement>) {
+  function handlePanelKeyDown(e: KeyboardEvent<HTMLElement>) {
     if (e.key === "ArrowDown") {
       e.preventDefault();
-      setActiveIndex((i) => Math.min(i + 1, options.length - 1));
+      setActiveIndex((i) => Math.min(i + 1, filteredOptions.length - 1));
     } else if (e.key === "ArrowUp") {
       e.preventDefault();
       setActiveIndex((i) => Math.max(i - 1, 0));
@@ -132,7 +139,7 @@ export function CustomDropdown({
       setActiveIndex(0);
     } else if (e.key === "End") {
       e.preventDefault();
-      setActiveIndex(options.length - 1);
+      setActiveIndex(Math.max(filteredOptions.length - 1, 0));
     } else if (e.key === "Enter" || e.key === " ") {
       e.preventDefault();
       if (activeIndex >= 0) {
@@ -143,6 +150,7 @@ export function CustomDropdown({
 
   function select(opt: DropdownOption) {
     onChange(opt.value);
+    setQuery("");
     close();
     triggerRef.current?.focus();
   }
@@ -219,7 +227,27 @@ export function CustomDropdown({
               closing && "closing"
             )}
           >
-            {options.map((opt, i) => {
+            {searchable && (
+              <div className="sticky top-0 z-10 border-b border-app-border bg-app-surface p-1.5">
+                <div className="relative">
+                  <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-app-muted" />
+                  <input
+                    type="search"
+                    value={query}
+                    onChange={(event) => {
+                      setQuery(event.target.value);
+                      setActiveIndex(0);
+                    }}
+                    onKeyDown={handlePanelKeyDown}
+                    autoFocus
+                    placeholder="Cari nama…"
+                    aria-label="Cari nama pendaftar"
+                    className="jc-focus w-full rounded-lg border border-app-border bg-app-surface-2 py-2 pl-9 pr-3 text-sm text-app-fg outline-none placeholder:text-app-muted"
+                  />
+                </div>
+              </div>
+            )}
+            {filteredOptions.map((opt, i) => {
               const isActive = i === activeIndex;
               const isSelected = opt.value === value;
               return (
@@ -251,6 +279,9 @@ export function CustomDropdown({
                 </div>
               );
             })}
+            {filteredOptions.length === 0 && (
+              <p className="px-3 py-3 text-center text-sm text-app-muted">Nama tidak ditemukan.</p>
+            )}
           </div>
         )}
       </div>
