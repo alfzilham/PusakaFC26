@@ -69,3 +69,7 @@ graphify-out/
 *.swp
 Thumbs.db
 db/custom.db
+
+# Service OCR
+services/receipt-ocr-backup.zip
+services/receipt-ocr-legacy/
