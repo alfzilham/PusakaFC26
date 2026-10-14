@@ -74,7 +74,8 @@ Urutan dari atas ke bawah:
 3. Link: Halaman 2 — "Nomor Punggung Terpakai".
 4. Link: "Lihat Detail Data" — tampil dengan ikon `Lock`, style disabled (opacity rendah, cursor not-allowed, tidak clickable untuk publik).
 5. Divider.
-6. "Information" — posisi sticky di bawah sidebar (seperti tombol settings), expand/collapse submenu: About, Privacy Policy, Terms of Services, Admin Contact, Super Admin Contact.
+6. "Information" — posisi sticky di bawah sidebar (seperti tombol settings), expand/collapse submenu: About, Privacy Policy, dan Terms of Services.
+7. "Contacts" — section terpisah dari Information yang berisi Admin Utama, Bendahara, Sekretaris, dan Super Admin beserta tautan WhatsApp.
 
 ### 6.3 Halaman 1 — Form
 - Single column di mobile, max-width terpusat di desktop (misal 480–560px) agar tetap terasa mobile-first.
@@ -91,6 +92,8 @@ Urutan dari atas ke bawah:
 - 3 summary cards (grid 1 kolom mobile → 3 kolom desktop): Total Entri, Total Pria, Total Wanita.
 - Tombol export (.xlsx, .json) — ikon `Download`, posisi dekat judul tabel.
 - Tabel data: responsive (card-style di mobile, table di desktop), dengan search bar + filter gender (custom checkbox/dropdown) + pagination 20/halaman.
+- Area aksi tabel menempatkan Review Struk di sebelah Import JSON.
+- Navigasi pagination mempertahankan halaman yang dipilih dan tidak di-reset oleh request tabel duplikat.
 - Row actions: ikon `Pencil` (edit) dan `Trash2` (hapus) di tiap baris.
 
 ## 7. Accessibility Checklist

@@ -1,3 +1,5 @@
+> **Catatan status:** Dokumen ini adalah prompt dan catatan keputusan historis saat project masih dirancang. Untuk status aplikasi yang berjalan, gunakan `README.md`, `docs/ADMIN_GUIDE.md`, `docs/ARCHITECTURE.md`, dan `docs/SPEC.md`. Deployment production sekarang menggunakan Vercel + Supabase dan WAHA sudah dihapus.
+
 Jadi, saya ada project untuk membuat sistem untuk Input nama yang ingin membuat baju bola. project ini dibuat tanpa loginpage. jadi, alur kerjanya, ketika ada orang yang membuka halaman ini, akan muncul logo dengan overlay animation dari kecil ke besar. dan dilanjutkan ke halaman UI nya. ketika sudah tiba di halaman UI, akan ada skeleton loader. setelah skeleton loader selesai, akan muncul form untuk input sebagai berikut:
 Halaman Pertama:
 

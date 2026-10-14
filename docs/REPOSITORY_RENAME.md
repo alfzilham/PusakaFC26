@@ -1,5 +1,7 @@
 # Repository Rename: PusakaFC26
 
+Repository sudah dipindahkan ke organization `pusakajeumala26`. Deployment aplikasi saat ini menggunakan Vercel; referensi Railway di bagian berikut adalah catatan historis migrasi domain.
+
 Repository project ini sekarang menggunakan nama:
 
 ```text

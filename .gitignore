@@ -73,3 +73,6 @@ db/custom.db
 # Service OCR
 services/receipt-ocr-backup.zip
 services/receipt-ocr-legacy/
+
+# Local documentation notes may contain credentials or private deployment values
+docs/notes/NOTE.md

@@ -1,21 +1,34 @@
-# Railway Database Configuration
+# Database Production Configuration
 
-Service aplikasi harus memakai URL dari service PostgreSQL Railway.
+Dokumen ini menggantikan panduan database Railway lama. Database production PusakaFC26 sekarang menggunakan PostgreSQL Supabase, sedangkan Vercel menjalankan aplikasi Next.js.
 
-Pada Railway, buka service aplikasi PusakaFC26 → **Variables**, lalu set:
+## Environment Vercel
 
-```text
-DATABASE_URL=${{Postgres.DATABASE_URL}}
+Set `DATABASE_URL` pada environment **Production** dan **Preview** menggunakan connection string PostgreSQL Supabase. Untuk Prisma migration dari komputer lokal, gunakan connection string pooler Supabase yang dapat dijangkau dari jaringan lokal.
+
+```env
+DATABASE_URL=<Supabase pooler connection string>
 ```
 
-Ganti `Postgres` jika nama service database Anda berbeda. Nilai tersebut harus berupa URL PostgreSQL lengkap yang diawali `postgresql://` atau `postgres://`.
+Jangan memasukkan password database ke repository atau membagikannya di log.
+
+## Migration
+
+Dari root project:
+
+```powershell
+$env:DATABASE_URL = Read-Host "Paste DATABASE_URL Supabase"
+bunx prisma migrate deploy
+bunx prisma migrate status
+Remove-Item Env:DATABASE_URL
+```
+
+Jika koneksi langsung `db.*.supabase.co:5432` tidak dapat dijangkau, gunakan connection string pooler Supabase. Pastikan `Test-NetConnection` ke host dan port berhasil sebelum menjalankan migration.
 
 ## Verifikasi
 
-1. Simpan variable dan redeploy service aplikasi.
-2. Buka log deployment dan pastikan tidak ada pesan `Database railwaypostgresql: does not exist`.
+1. Redeploy project Vercel setelah environment berubah.
+2. Uji `https://DOMAIN/api/orders`.
 3. Buka halaman utama dan `/admin`.
-4. Sinkronisasi schema production dijalankan otomatis oleh `bun run start` melalui `prisma db push --skip-generate` sebelum server Next.js dimulai. Mode ini dipakai agar database existing tidak gagal dengan Prisma `P3005` saat baseline migration belum tersedia.
-5. Setelah deploy, periksa log Railway dan pastikan schema berhasil disinkronkan serta tidak ada error Prisma `P2021` atau `P3005`.
-
-Jika database belum terhubung, API akan mengembalikan status `503` dengan kode `DATABASE_UNAVAILABLE` agar masalah konfigurasi dapat dibedakan dari password admin yang salah.
+4. Pastikan data pendaftar, import JSON, pagination, dan Review Struk dapat dimuat.
+5. Jika database gagal, API mengembalikan HTTP `503` dengan kode `DATABASE_UNAVAILABLE`.

@@ -1,5 +1,7 @@
 # SPEC.md — PusakaFC26 Jersey Order System
 
+> **Status implementasi (14 Oktober 2026):** Dokumen ini memuat spesifikasi dasar pendaftaran jersey. Fitur Struk Scanner, perubahan kontak, penghapusan WAHA, import JSON, dan perilaku pagination terbaru dijelaskan pada `ADMIN_GUIDE.md` serta `features/BENDAHARA_REJECTION_FLOW_CHANGE.md`.
+
 ## 1. Overview
 
 Sistem input pemesanan nama/nomor punggung jersey untuk event "PusakaFC26". Tidak ada login page untuk pengguna umum. Terdapat halaman admin terproteksi password untuk melihat, mengelola, dan mengekspor data.
@@ -59,15 +61,14 @@ Sistem input pemesanan nama/nomor punggung jersey untuk event "PusakaFC26". Tida
   - About (deskripsi software).
   - Privacy Policy.
   - Terms of Services.
-  - Admin Contact: kanal komunikasi admin event.
-  - Super Admin Contact: Nama "Alfiz Ilham", No. WA "0852-1389-6460".
+  - "Contacts" adalah section terpisah dari Information dan menampilkan Admin Utama, Bendahara, Sekretaris, serta Super Admin.
 
 ## 5. Admin Panel (`/admin`)
 
 ### 5.1 Proteksi Akses
 - Tidak ada login page publik — admin mengakses langsung via path `/admin`.
 - Login form: password-based.
-- Rate limiting: 5x percobaan gagal → lock 15 menit (dicatat per IP).
+- Rate limiting: login admin memiliki pembatasan percobaan; verifikasi Super Admin memberi 2 kesempatan gagal lalu lock 5 menit.
 
 ### 5.2 Fitur Admin
 - **Dashboard summary cards**: total entri, total Pria, total Wanita.
@@ -81,6 +82,7 @@ Sistem input pemesanan nama/nomor punggung jersey untuk event "PusakaFC26". Tida
   - Search bar (nama lengkap / nama belakang / nomor).
   - Filter gender (custom checkbox atau dropdown).
   - Pagination: 20 entri/halaman.
+  - Tombol Review Struk berada di sebelah Import JSON.
 - **Row actions**:
   - Edit — inline atau modal, langsung tersimpan tanpa konfirmasi tambahan.
   - Hapus — wajib modal konfirmasi sebelum eksekusi.
@@ -112,3 +114,4 @@ Sistem input pemesanan nama/nomor punggung jersey untuk event "PusakaFC26". Tida
 - Login/akun untuk user publik.
 - Edit/cancel self-service untuk user publik.
 - Notifikasi otomatis (email/WA blast) ke user.
+- Pengiriman WhatsApp otomatis melalui WAHA; penolakan menggunakan click-to-chat manual.
