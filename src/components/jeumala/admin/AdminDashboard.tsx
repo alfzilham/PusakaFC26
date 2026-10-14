@@ -116,14 +116,9 @@ export function AdminDashboard({ onLogout }: { onLogout: () => void }) {
   useEffect(() => {
     const t = setTimeout(() => {
       if (page !== 1) setPage(1);
-      else fetchTable();
     }, 300);
     return () => clearTimeout(t);
-  }, [query]);
-
-  useEffect(() => {
-    fetchTable();
-  }, [genderParam, page]);
+  }, [query, page]);
 
   function refreshAll() {
     fetchTable();
@@ -249,14 +244,6 @@ export function AdminDashboard({ onLogout }: { onLogout: () => void }) {
             <LogOut className="h-4 w-4" />
             <span className="hidden sm:inline">Keluar</span>
           </button>
-          <button
-            type="button"
-            onClick={() => requireSuperAdmin("mengakses review bukti transfer", () => setReceiptReviewOpen(true))}
-            className="jc-focus inline-flex items-center gap-1.5 rounded-xl border border-app-accent/30 bg-app-accent/5 px-3 py-2 text-sm font-semibold text-app-accent-strong transition-colors hover:bg-app-accent/10"
-          >
-            <ReceiptText className="h-4 w-4" />
-            <span className="hidden sm:inline">Review Struk</span>
-          </button>
         </div>
       </header>
 
@@ -347,6 +334,14 @@ export function AdminDashboard({ onLogout }: { onLogout: () => void }) {
           >
             {importing ? <span className="jc-spinner" /> : <Upload className="h-4 w-4" />}
             <span>Import JSON</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => requireSuperAdmin("mengakses review bukti transfer", () => setReceiptReviewOpen(true))}
+            className="jc-focus inline-flex items-center gap-1.5 rounded-xl border border-app-accent/30 bg-app-accent/5 px-3.5 py-2 text-sm font-semibold text-app-accent-strong transition-colors hover:bg-app-accent/10"
+          >
+            <ReceiptText className="h-4 w-4" />
+            <span>Review Struk</span>
           </button>
         </section>
 
