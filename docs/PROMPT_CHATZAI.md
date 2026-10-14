@@ -1,4 +1,4 @@
-> **Catatan status:** Dokumen ini adalah prompt builder historis dan bukan panduan deployment aktual. Status aplikasi saat ini terdokumentasi di `README.md` dan `docs/ADMIN_GUIDE.md`; deployment menggunakan Vercel + Supabase, OCR terpisah di Vercel, dan tidak menggunakan WAHA.
+> **Catatan status:** Dokumen ini adalah prompt builder historis dan bukan panduan deployment aktual. Status aplikasi saat ini terdokumentasi di `README.md` dan `docs/ADMIN_GUIDE.md`; deployment menggunakan Vercel + Supabase, tanpa OCR, Gemini, atau WAHA.
 
 Buatkan saya aplikasi web full-stack bernama "PusakaFC26" — sistem pendaftaran nama/nomor punggung jersey bola, tanpa login page untuk user publik, dengan panel admin terproteksi.
 
