@@ -81,7 +81,7 @@ export function RegistrationForm({ used, onAfterSubmit }: Props) {
   // Indexes for O(1) duplicate lookup against the client cache
   const { nameSet, numberSet } = useMemo(() => {
     const nameSet = new Set<string>();
-    const numberSet = new Set<number>();
+    const numberSet = new Set<string>();
     for (const e of used) {
       nameSet.add(normalizeBackName(e.backName));
       numberSet.add(e.backNumber);
@@ -119,7 +119,7 @@ export function RegistrationForm({ used, onAfterSubmit }: Props) {
       const n = parseInt(numStr, 10);
       if (n < 1) e.backNumber = "Minimal 1";
       else if (n > 999) e.backNumber = "Maksimal 999";
-      else if (!superAdminMode && numberSet.has(n)) e.backNumber = "Nomor sudah dipakai";
+      else if (!superAdminMode && numberSet.has(numStr)) e.backNumber = "Nomor sudah dipakai";
     }
 
     if (!f.size) e.size = "Ukuran wajib dipilih";
@@ -239,7 +239,7 @@ export function RegistrationForm({ used, onAfterSubmit }: Props) {
           gender: fields.gender,
           fullName: fields.fullName.trim(),
           backName: fields.backName.trim(),
-          backNumber: parseInt(fields.backNumber, 10),
+          backNumber: fields.backNumber,
           size: fields.size,
           sleeve: fields.sleeve,
         }),

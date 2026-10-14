@@ -15,7 +15,10 @@ const backupRowSchema = z.object({
   gender: z.enum(GENDER_VALUES),
   fullName: z.string().min(1).max(80),
   backName: z.string().min(1).max(20),
-  backNumber: z.number().int().min(1).max(999),
+  backNumber: z.preprocess(
+    (value) => String(value),
+    z.string().regex(/^(?:0?[1-9]|[1-9]\d{1,2})$/).refine((value) => Number(value) >= 1 && Number(value) <= 999)
+  ),
   size: z.enum(SIZE_VALUES),
   sleeve: z.enum(SLEEVE_VALUES),
   createdAt: z.coerce.date(),
@@ -74,7 +77,7 @@ export async function POST(req: Request) {
     gender: (typeof GENDER_VALUES)[number];
     fullName: string;
     backName: string;
-    backNumber: number;
+    backNumber: string;
     size: (typeof SIZE_VALUES)[number];
     sleeve: (typeof SLEEVE_VALUES)[number];
     createdAt: Date;

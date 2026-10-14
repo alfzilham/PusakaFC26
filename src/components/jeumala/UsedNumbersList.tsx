@@ -18,7 +18,7 @@ export function UsedNumbersList({ used }: Props) {
   const [query, setQuery] = useState("");
 
   const sorted = useMemo(
-    () => [...used].sort((a, b) => a.backNumber - b.backNumber),
+    () => [...used].sort((a, b) => Number(a.backNumber) - Number(b.backNumber)),
     [used]
   );
 

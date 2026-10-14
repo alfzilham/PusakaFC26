@@ -24,7 +24,7 @@ export function PaymentStatusList({ used }: { used: UsedEntry[] }) {
   const rows = useMemo(
     () => [...used]
       .filter((row) => filter === "ALL" || (filter === "UNPAID" ? !row.paymentStatus : row.paymentStatus === filter))
-      .sort((a, b) => a.backNumber - b.backNumber),
+      .sort((a, b) => Number(a.backNumber) - Number(b.backNumber)),
     [filter, used]
   );
   const filters = [

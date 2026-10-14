@@ -35,8 +35,8 @@ export function normalizeBackName(value: string): string {
 }
 
 /** Display jersey numbers below 10 with the two-digit format used on jerseys. */
-export function formatBackNumber(value: number): string {
-  return String(value).padStart(2, "0");
+export function formatBackNumber(value: string): string {
+  return String(value);
 }
 
 /** Normalize Indonesian phone numbers to digits without a leading plus sign. */
@@ -86,10 +86,10 @@ export const createOrderSchema = z.object({
       "Nama belakang hanya boleh huruf, angka, dan spasi"
     ),
   backNumber: z
-    .number({ message: "Nomor belakang wajib diisi" })
-    .int("Nomor belakang harus berupa bilangan bulat")
-    .min(1, "Nomor belakang minimal 1")
-    .max(999, "Nomor belakang maksimal 999"),
+    .string({ message: "Nomor belakang wajib diisi" })
+    .regex(/^(?:0?[1-9]|[1-9]\d{1,2})$/, "Gunakan 1–999, atau 01–09 untuk nomor satu digit")
+    .refine((value) => Number(value) >= 1, "Nomor belakang minimal 1")
+    .refine((value) => Number(value) <= 999, "Nomor belakang maksimal 999"),
   size: z.enum(SIZE_VALUES, { message: "Ukuran wajib dipilih" }),
   sleeve: z.enum(SLEEVE_VALUES, { message: "Panjang lengan wajib dipilih" }),
 });
@@ -106,7 +106,12 @@ export const updateOrderSchema = z.object({
     .max(20)
     .regex(/^[A-Za-z0-9 ]+$/)
     .optional(),
-  backNumber: z.number().int().min(1).max(999).optional(),
+  backNumber: z
+    .string()
+    .regex(/^(?:0?[1-9]|[1-9]\d{1,2})$/, "Gunakan 1–999, atau 01–09 untuk nomor satu digit")
+    .refine((value) => Number(value) >= 1, "Nomor belakang minimal 1")
+    .refine((value) => Number(value) <= 999, "Nomor belakang maksimal 999")
+    .optional(),
   size: z.enum(SIZE_VALUES).optional(),
   sleeve: z.enum(SLEEVE_VALUES).optional(),
 });
@@ -120,7 +125,7 @@ export type OrderRow = {
   gender: Gender;
   fullName: string;
   backName: string;
-  backNumber: number;
+  backNumber: string;
   size: Size;
   sleeve: SleeveType;
   createdAt: string;
@@ -133,6 +138,6 @@ export type UsedEntry = {
   gender: Gender;
   fullName: string;
   backName: string;
-  backNumber: number;
+  backNumber: string;
   paymentStatus?: "PENDING_VERIFICATION" | "VERIFIED" | "REJECTED";
 };

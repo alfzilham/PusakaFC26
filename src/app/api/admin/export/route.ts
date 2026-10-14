@@ -30,7 +30,7 @@ function toRow(r: {
   gender: string;
   fullName: string;
   backName: string;
-  backNumber: number;
+  backNumber: string;
   size: string;
   sleeve: string;
   createdAt: Date;

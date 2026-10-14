@@ -373,7 +373,7 @@ export function AdminDashboard({ onLogout }: { onLogout: () => void }) {
                         {r.backName}
                       </td>
                       <td className="px-4 py-3 font-bold tabular-nums text-app-fg">
-                        {String(r.backNumber).padStart(2, "0")}
+                        {r.backNumber}
                       </td>
                       <td className="px-4 py-3 text-app-fg-soft">
                         {SIZE_LABEL[r.size]}
@@ -572,7 +572,7 @@ function EditOrderModal({
           gender,
           fullName: fullName.trim(),
           backName: backName.trim(),
-          backNumber: parseInt(backNumber, 10),
+          backNumber,
           size,
           sleeve,
         }),
