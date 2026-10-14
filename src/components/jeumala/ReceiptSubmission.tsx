@@ -67,6 +67,7 @@ export function ReceiptSubmission({ used }: { used: UsedEntry[] }) {
           onChange={setRegistrantId}
           options={options}
           placeholder="Pilih nama pendaftar"
+          searchable
         />
         <div>
           <label htmlFor="receipt-phone" className="mb-1.5 block text-sm font-semibold text-app-fg">No. HP / WhatsApp <span className="text-app-danger">*</span></label>
