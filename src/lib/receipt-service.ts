@@ -86,6 +86,45 @@ async function uploadWebp(bytes: Uint8Array, registrantId: string) {
   return `${supabaseUrl}/storage/v1/object/public/${bucket}/${path}`;
 }
 
+export async function deleteReceiptStorageObject(imageUrl: string) {
+  const supabaseUrl = requiredEnv("SUPABASE_URL").replace(/\/$/, "");
+  const serviceKey = requiredEnv("SUPABASE_SERVICE_ROLE_KEY");
+  const bucket = requiredEnv("SUPABASE_STORAGE_BUCKET");
+  const publicPrefix = `${supabaseUrl}/storage/v1/object/public/${bucket}/`;
+
+  if (!imageUrl.startsWith(publicPrefix)) {
+    throw new ReceiptServiceError("STORAGE_ERROR", "Lokasi gambar struk tidak valid.", 502);
+  }
+
+  const path = imageUrl.slice(publicPrefix.length);
+  if (!path) {
+    throw new ReceiptServiceError("STORAGE_ERROR", "Lokasi gambar struk tidak valid.", 502);
+  }
+
+  let response: Response;
+  try {
+    response = await fetch(`${supabaseUrl}/storage/v1/object/${encodeURIComponent(bucket)}/${path}`, {
+      method: "DELETE",
+      headers: {
+        Authorization: `Bearer ${serviceKey}`,
+        apikey: serviceKey,
+      },
+      cache: "no-store",
+    });
+  } catch {
+    throw new ReceiptServiceError("STORAGE_ERROR", "Gambar struk gagal dihapus.", 502);
+  }
+
+  if (!response.ok) {
+    console.error("[receipt storage delete]", {
+      status: response.status,
+      statusText: response.statusText,
+      bucket,
+    });
+    throw new ReceiptServiceError("STORAGE_ERROR", "Gambar struk gagal dihapus.", 502);
+  }
+}
+
 export async function processReceiptSubmission({
   registrantId,
   phoneNumber,
