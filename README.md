@@ -2,7 +2,7 @@
 
 Aplikasi web pendaftaran jersey PusakaFC26. Aplikasi ini menyediakan formulir pendaftaran publik, daftar nomor punggung yang sudah digunakan, dan panel admin untuk mengelola data pendaftaran.
 
-Repository: https://github.com/alfzilham/PusakaFC26
+Repository: https://github.com/pusakajeumala26/PusakaFC26
 
 ![PusakaFC26 banner](public/assets/banner/pusakafc26-banner.jpg)
 
@@ -13,8 +13,12 @@ Repository: https://github.com/alfzilham/PusakaFC26
 - Daftar nomor punggung terpakai yang dapat dilihat publik.
 - Panel admin dengan login berbasis password, rate limiting, statistik, edit/hapus data, dan ekspor.
 - Panel admin menampilkan nomor urut berdasarkan waktu submit dan nomor punggung sebagai field terpisah.
+- Panel admin menyediakan import data JSON, pagination 20 data per halaman, dan tombol Review Struk di area aksi data.
+- Fitur Struk Submission Scanner untuk upload, pemindaian OCR/Gemini, dan review bukti transfer oleh Bendahara atau Super Admin.
+- Status bukti transfer ditampilkan melalui warna baris data tanpa menambahkan kolom status baru.
+- Sidebar publik menyediakan kontak Admin, Bendahara, Sekretaris, dan Super Admin.
 - API Next.js untuk orders dan operasi admin.
-- Prisma ORM dengan SQLite untuk pengembangan lokal.
+- Prisma ORM dengan SQLite untuk pengembangan lokal dan PostgreSQL/Supabase untuk production.
 - UI mobile-first menggunakan Tailwind CSS, Radix UI, Lucide React, dan Framer Motion.
 
 ## Teknologi
@@ -77,6 +81,10 @@ Repository: https://github.com/alfzilham/PusakaFC26
 | `bun run db:migrate` | Membuat dan menjalankan migration Prisma |
 | `bun run db:reset` | Reset database lokal |
 
+## Dokumentasi Admin
+
+Panduan fungsi panel Admin, Super Admin, import JSON, Review Struk, status bukti transfer, dan pagination tersedia di [docs/ADMIN_GUIDE.md](docs/ADMIN_GUIDE.md).
+
 ## Struktur penting
 
 ```text
@@ -94,7 +102,8 @@ examples/websocket/      Contoh server dan frontend WebSocket
 - Jangan commit `.env`, password admin, session secret, atau database lokal.
 - Ganti secret dan password bawaan sebelum deployment.
 - Endpoint admin mengandalkan cookie HTTP-only dan validasi session server-side.
-- Untuk deployment, sesuaikan `DATABASE_URL` dan konfigurasi database dengan platform yang digunakan.
+- Untuk deployment, sesuaikan `DATABASE_URL`, `OCR_SERVICE_URL`, `GEMINI_API_KEY`, `GEMINI_MODEL`, `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`, dan `SUPABASE_STORAGE_BUCKET` dengan environment production.
+- Jangan menaruh service-role key Supabase pada kode client atau environment variable yang diawali `NEXT_PUBLIC_`.
 
 ## Lisensi
 

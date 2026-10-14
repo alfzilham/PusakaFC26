@@ -3,7 +3,7 @@
 Repository project ini sekarang menggunakan nama:
 
 ```text
-https://github.com/alfzilham/PusakaFC26
+https://github.com/pusakajeumala26/PusakaFC26
 ```
 
 ## Local clone
@@ -11,7 +11,7 @@ https://github.com/alfzilham/PusakaFC26
 Perbarui remote pada clone lokal:
 
 ```powershell
-git remote set-url origin https://github.com/alfzilham/PusakaFC26.git
+git remote set-url origin https://github.com/pusakajeumala26/PusakaFC26.git
 git remote -v
 ```
 
