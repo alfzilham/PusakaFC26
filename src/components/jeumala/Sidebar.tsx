@@ -10,6 +10,7 @@ import {
   ContactRound,
   ShieldAlert,
   ReceiptText,
+  BadgeCheck,
   ChevronDown,
   type LucideIcon,
 } from "lucide-react";
@@ -18,7 +19,7 @@ import { Modal } from "./Modal";
 import { APP_NAME } from "@/lib/constants";
 import { cn } from "@/lib/utils";
 
-export type ViewKey = "form" | "numbers" | "receipts";
+export type ViewKey = "form" | "numbers" | "receipts" | "payment-status";
 export type InfoKey =
   | "about"
   | "privacy"
@@ -121,6 +122,12 @@ export function Sidebar({
             label="Submit Bukti Transfer"
             active={current === "receipts"}
             onClick={() => navigate("receipts")}
+          />
+          <NavItem
+            icon={BadgeCheck}
+            label="Status Pembayaran"
+            active={current === "payment-status"}
+            onClick={() => navigate("payment-status")}
           />
           <NavItem
             icon={Lock}

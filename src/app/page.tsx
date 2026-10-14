@@ -7,6 +7,7 @@ import { Sidebar, type ViewKey, type InfoKey } from "@/components/jeumala/Sideba
 import { RegistrationForm } from "@/components/jeumala/RegistrationForm";
 import { ReceiptSubmission } from "@/components/jeumala/ReceiptSubmission";
 import { UsedNumbersList } from "@/components/jeumala/UsedNumbersList";
+import { PaymentStatusList } from "@/components/jeumala/PaymentStatusList";
 import { FormSkeleton, NumbersSkeleton } from "@/components/jeumala/Skeleton";
 import { InformationPanel } from "@/components/jeumala/InformationPanel";
 import { ToastProvider } from "@/components/jeumala/Toast";
@@ -100,8 +101,10 @@ function AppShell() {
             <RegistrationForm used={data} onAfterSubmit={fetchUsed} />
           ) : view === "numbers" ? (
             <UsedNumbersList used={data} />
-          ) : (
+          ) : view === "receipts" ? (
             <ReceiptSubmission used={data} />
+          ) : (
+            <PaymentStatusList used={data} />
           )}
         </div>
       </main>

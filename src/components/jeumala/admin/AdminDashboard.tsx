@@ -14,13 +14,11 @@ import {
   RefreshCw,
   Inbox,
 } from "lucide-react";
-import { Logo } from "@/components/jeumala/Logo";
 import { CustomDropdown } from "@/components/jeumala/CustomDropdown";
 import { CustomCheckbox } from "@/components/jeumala/CustomCheckbox";
 import { Modal } from "@/components/jeumala/Modal";
 import { GenderBadge } from "@/components/jeumala/UsedNumbersList";
 import { useToast } from "@/components/jeumala/Toast";
-import { APP_NAME } from "@/lib/constants";
 import {
   GENDER_LABEL,
   GENDER_VALUES,
@@ -234,15 +232,15 @@ export function AdminDashboard({ onLogout }: { onLogout: () => void }) {
       <header className="sticky top-0 z-40 border-b border-app-border bg-app-surface/90 backdrop-blur-md">
         <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4 sm:px-6">
           <AdminSidebarTrigger onClick={() => setSidebarOpen(true)} />
-          <div className="flex items-center gap-2.5">
-            <Logo size={32} />
-            <div className="leading-tight">
-              <p className="text-sm font-extrabold tracking-tight text-app-fg">
-                {APP_NAME}
-              </p>
-              <p className="text-[11px] text-app-muted">Panel Admin · Read-only</p>
-            </div>
-          </div>
+          <button
+            type="button"
+            onClick={refreshAll}
+            disabled={loading}
+            className="jc-focus ml-auto inline-flex items-center gap-1.5 rounded-xl border border-app-border bg-app-surface px-3 py-2 text-sm font-semibold text-app-fg transition-colors hover:border-app-border-strong disabled:opacity-60"
+          >
+            <RefreshCw className={cn("h-4 w-4", loading && "animate-spin")} />
+            <span>Refresh</span>
+          </button>
         </div>
       </header>
 
@@ -269,7 +267,7 @@ export function AdminDashboard({ onLogout }: { onLogout: () => void }) {
           />
         </section>
 
-        {/* Export + refresh */}
+        {/* Table heading */}
         <section className="mb-6 flex flex-wrap items-center gap-3">
           <h2 className="mr-auto text-lg font-bold text-app-fg">Data Pendaftar</h2>
           <p className="basis-full text-xs text-app-muted">
@@ -278,15 +276,6 @@ export function AdminDashboard({ onLogout }: { onLogout: () => void }) {
           <p className="basis-full text-xs text-app-muted">
             No. Urut mengikuti waktu submit dan tidak dapat diedit. No. Punggung adalah nomor jersey.
           </p>
-          <button
-            type="button"
-            onClick={refreshAll}
-            disabled={loading}
-            className="jc-focus inline-flex items-center gap-1.5 rounded-xl border border-app-border bg-app-surface px-3 py-2 text-sm font-semibold text-app-fg transition-colors hover:border-app-border-strong"
-          >
-            <RefreshCw className={cn("h-4 w-4", loading && "animate-spin")} />
-            <span className="hidden sm:inline">Refresh</span>
-          </button>
           <input
             ref={importInputRef}
             type="file"
