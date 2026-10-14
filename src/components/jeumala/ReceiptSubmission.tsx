@@ -20,6 +20,11 @@ export function ReceiptSubmission({ used }: { used: UsedEntry[] }) {
     .sort((a, b) => a.fullName.localeCompare(b.fullName, "id"))
     .map((entry) => ({ value: entry.id, label: `${entry.fullName} · No. ${entry.backNumber}` }));
 
+  function handlePhoneChange(value: string) {
+    const digits = value.replace(/\D/g, "");
+    setPhoneNumber(digits.startsWith("62") ? digits.slice(2) : digits.startsWith("0") ? digits.slice(1) : digits);
+  }
+
   async function handleSubmit(event: FormEvent) {
     event.preventDefault();
     if (!registrantId || !phoneNumber.trim() || !file || submitting) return;
@@ -28,7 +33,7 @@ export function ReceiptSubmission({ used }: { used: UsedEntry[] }) {
     setDone(false);
     const form = new FormData();
     form.append("registrantId", registrantId);
-    form.append("phoneNumber", phoneNumber.trim());
+    form.append("phoneNumber", `62${phoneNumber.trim()}`);
     form.append("receiptImage", file);
     try {
       const response = await fetch("/api/receipts/submit", { method: "POST", body: form });
@@ -65,11 +70,12 @@ export function ReceiptSubmission({ used }: { used: UsedEntry[] }) {
         />
         <div>
           <label htmlFor="receipt-phone" className="mb-1.5 block text-sm font-semibold text-app-fg">No. HP / WhatsApp <span className="text-app-danger">*</span></label>
-          <div className="relative">
+          <div className="relative flex items-center rounded-xl border border-app-border bg-app-surface transition-colors focus-within:border-app-accent focus-within:ring-2 focus-within:ring-app-accent/20">
             <MessageCircle className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-app-muted" />
-            <input id="receipt-phone" value={phoneNumber} onChange={(e) => setPhoneNumber(e.target.value)} placeholder="Contoh: 081234567890" inputMode="tel" className="jc-focus w-full rounded-xl border border-app-border bg-app-surface py-3 pl-10 pr-3.5 text-sm text-app-fg placeholder:text-app-muted" />
+            <span className="ml-10 border-r border-app-border pr-2.5 text-sm font-semibold text-app-fg-soft">+62</span>
+            <input id="receipt-phone" value={phoneNumber} onChange={(e) => handlePhoneChange(e.target.value)} placeholder="85213896460" inputMode="tel" className="w-full rounded-r-xl bg-transparent py-3 pl-2.5 pr-3.5 text-sm text-app-fg outline-none placeholder:text-app-muted" />
           </div>
-          <p className="mt-1.5 text-xs text-app-muted">Nomor akan divalidasi ke WhatsApp saat dikirim.</p>
+          <p className="mt-1.5 text-xs text-app-muted">Masukkan nomor setelah +62, contoh: 85213896460.</p>
         </div>
         <div>
           <label htmlFor="receipt-image" className="mb-1.5 block text-sm font-semibold text-app-fg">Foto Struk <span className="text-app-danger">*</span></label>
