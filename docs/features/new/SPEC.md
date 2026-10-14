@@ -42,7 +42,7 @@ enum PaymentStatus {
 }
 ```
 
-**Important**: Auto-rejected submissions (failed scan, or duplicate detected) never reach this table — they are rejected in the API route before any `PaymentReceipt` row is created or updated.
+**Important**: Submissions that fail the automated scan never reach this table. Visually identical receipts are allowed through and remain pending for Bendahara review.
 
 ## 2. Service Architecture Overview
 
@@ -71,8 +71,7 @@ Processing steps:
 1. Normalize the national/international Indonesian phone number.
 2. Forward `receiptImage` to FastAPI OCR service `POST /scan` (see section 4).
 3. If OCR service returns `status: "failed"` → return `422`, do not create/update any `PaymentReceipt` row.
-4. If the pHash matches an existing receipt within the similarity threshold → return `409`, do not create/update any row.
-5. Otherwise: convert image to `.webp`, upload to Supabase, upsert `PaymentReceipt` for `registrantId` with `status: PENDING_VERIFICATION`.
+4. Convert the image to `.webp`, upload to Supabase, then upsert `PaymentReceipt` for `registrantId` with `status: PENDING_VERIFICATION`.
 
 Response:
 ```json
@@ -94,7 +93,7 @@ Deletes the pending `PaymentReceipt` row and its Supabase Storage image, then re
 
 ### `POST /api/receipts/:id/replace` (Super Admin only)
 
-Accepts a new `receiptImage` for an existing `registrantId`. Re-runs the same scan + pHash pipeline as `/submit`, overwrites `imageUrl` and `receiptHash`, resets `status: PENDING_VERIFICATION`. Bendahara performs final approval/rejection as normal afterward.
+Accepts a new `receiptImage` for an existing `registrantId`. Re-runs the same scan pipeline as `/submit`, overwrites `imageUrl` and `receiptHash`, resets `status: PENDING_VERIFICATION`. Bendahara performs final approval/rejection as normal afterward.
 
 ## 4. FastAPI OCR Service Contract
 
@@ -124,14 +123,12 @@ Response:
 - `status: "success"` — either OCR or Gemini confirmed a valid receipt structure.
 - `status: "failed"` — neither OCR nor Gemini could read the image. Caller (Next.js) treats this as an auto-reject; the record is never saved.
 
-Duplicate detection is **not** performed inside this endpoint — the OCR service only returns the hash. Comparison against stored hashes happens in the Next.js API route (section 3), since that is where the database is accessible.
+The OCR service may return a perceptual hash for traceability. The Next.js application stores it with the receipt but does not compare it against previous submissions.
 
-## 5. Duplicate Detection Logic (pHash)
+## 5. Receipt Review Policy
 
-- Algorithm: perceptual hash (pHash), not exact hash (MD5/SHA256) — chosen because exact hashes fail to detect visually-identical images that have been re-compressed (e.g., by WhatsApp's automatic compression on forward/resend).
-- Comparison metric: Hamming distance between the new image's hash and every stored `receiptHash`.
-- Suggested starting threshold: Hamming distance ≤ 10 (to be tuned; false positives are expected to be rare at this scale of ~250 users).
-- On replace (`/api/receipts/:id/replace`), the new hash overwrites the old one, so the record does not later flag as a duplicate of itself.
+- No submission is automatically rejected because it appears duplicated.
+- Bendahara makes the final decision during review and can reject a duplicate or fraudulent receipt.
 
 ## 6. WhatsApp rejection flow
 
@@ -153,14 +150,14 @@ Receipt uploaded → OCR/Gemini scan completes → convert to .webp → upload t
 
 ```
 (no record)
-  → [submit, scan success, no duplicate] → PENDING_VERIFICATION
-  → [submit, scan fails OR duplicate]    → (no record created — auto-reject)
+  → [submit, scan success]               → PENDING_VERIFICATION
+  → [submit, scan fails]                 → (no record created — auto-reject)
 
 PENDING_VERIFICATION
   → [Bendahara approves] → VERIFIED
-  → [Bendahara rejects]  → REJECTED (+ WA notification sent)
+  → [Bendahara rejects]  → REJECTED (+ optional manual WhatsApp link)
 
 REJECTED
-  → [user resubmits, scan success, no duplicate] → PENDING_VERIFICATION (same row, overwritten)
+  → [user resubmits, scan success]              → PENDING_VERIFICATION (same row, overwritten)
   → [Super Admin replaces receipt] → PENDING_VERIFICATION (same row, overwritten)
 ```

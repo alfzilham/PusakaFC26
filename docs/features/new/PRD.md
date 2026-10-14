@@ -46,9 +46,8 @@ New sidebar menu item, alongside "Form Pendaftaran Jersey" and "Nomor Punggung T
 2. OCR checks whether the image's **structure** matches a standard digital bank transfer receipt (it does not read amount, account, or other field values).
 3. If OCR fails to confirm the structure (including manual handwritten receipts issued by the treasurer for cash payments), the image is sent to Gemini AI as a fallback, which is more flexible in reading non-standard formats.
 4. If **both** OCR and Gemini fail to produce a successful read → the submission is **auto-rejected by the system**. It is not saved to the database. The user is shown a message asking them to re-upload a clearer photo.
-5. In parallel, the image's perceptual hash (pHash) is computed and compared against all previously stored receipt hashes.
-   - If a near-duplicate is found (Hamming distance below threshold) → auto-rejected, not saved to the database. The user is directed to contact an Admin/Super Admin directly (outside the app) to resolve it.
-6. If the scan succeeds and no duplicate is found → the registrant's row status becomes **Pending Verification** (yellow) and a record is saved to the database.
+5. If the scan succeeds → the registrant's row status becomes **Pending Verification** (yellow) and a record is saved to the database, even if the image appears visually identical to another receipt.
+6. Possible duplicate receipts are reviewed by Bendahara; OCR/Gemini never auto-rejects based on duplicate appearance.
 
 ### 4.3 Verification Status (row color, not a separate column)
 
@@ -80,15 +79,15 @@ Actions: **Approve** or **Reject**.
 
 ### 4.6 Duplicate / Fraud Handling
 
-- Detected automatically via perceptual hash (pHash) comparison against all stored receipts, at submission time (before the record is saved).
-- A detected duplicate is auto-rejected and never saved to the database.
-- The user is instructed to contact an Admin/Super Admin outside the app.
-- Super Admin can open the Bendahara review interface and **replace** a stored receipt (for a specific registrant) with a new image. The replacement is re-scanned and re-hashed through the same pipeline. Final approval/rejection remains the Bendahara's responsibility even after a Super Admin replacement.
+- The scanner may return a perceptual hash for traceability, but the application does not compare it against previous submissions.
+- Visually identical receipts are allowed through and remain pending for Bendahara review.
+- Bendahara is responsible for deciding whether a receipt is valid, duplicated, or fraudulent.
+- Super Admin can open the Bendahara review interface and **replace** a stored receipt (for a specific registrant) with a new image. The replacement is re-scanned through the same validity pipeline. Final approval/rejection remains the Bendahara's responsibility.
 
 ### 4.7 Data Model (behavioral requirements, not schema — see SPEC.md)
 
 - **One record per registrant** — not history-based. Resubmission overwrites the existing record.
-- A submission that is auto-rejected by the system (failed scan or duplicate) **never creates or updates a database record**.
+- A submission that fails the automated scan **never creates or updates a database record**.
 - A submission rejected by the Bendahara **does** create/keep a database record (it had already passed the automated scan), and that same record is later overwritten on resubmission.
 
 ## 5. Non-Functional Requirements
@@ -108,4 +107,4 @@ Actions: **Approve** or **Reject**.
 ## 7. Resolved implementation notes
 
 - The existing **Admin** role is excluded from receipt review; only Bendahara and Super Admin have review control.
-- The pHash comparison is performed in the Next.js service before persistence.
+- The scanner hash is stored for traceability; no duplicate comparison is performed before persistence.

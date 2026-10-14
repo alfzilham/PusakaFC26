@@ -67,15 +67,11 @@ sequenceDiagram
         alt scan failed (OCR + Gemini both failed)
             N-->>U: 422 — ask for clearer photo (no DB write)
         else scan succeeded
-            N->>D: compare receiptHash vs stored hashes (pHash, Hamming distance)
-            alt duplicate detected
-                N-->>U: 409 — contact Admin/Super Admin (no DB write)
-            else no duplicate
-                N->>N: convert image to .webp
-                N->>S: upload .webp
-                N->>D: upsert PaymentReceipt (status=PENDING_VERIFICATION)
-                N-->>U: success — row turns yellow
-            end
+            Note over N,D: receiptHash is stored for traceability; duplicate comparison is disabled
+            N->>N: convert image to .webp
+            N->>S: upload .webp
+            N->>D: upsert PaymentReceipt (status=PENDING_VERIFICATION)
+            N-->>U: success — row turns yellow
         end
     end
 ```

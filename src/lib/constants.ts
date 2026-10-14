@@ -45,7 +45,6 @@ export const ADMIN_SESSION_MAX_AGE = 60 * 60 * 8; // 8 hours
 export const SUPER_ADMIN_SESSION_MAX_AGE = 60 * 60; // 1 hour
 export const SUPER_ADMIN_LOCK_MAX_AGE = 60 * 5; // 5 minutes
 
-export const RECEIPT_PHASH_THRESHOLD = 10;
 export const RECEIPT_STATUS = {
   PENDING_VERIFICATION: "PENDING_VERIFICATION",
   VERIFIED: "VERIFIED",
