@@ -102,7 +102,10 @@ export async function processReceiptSubmission({
   if (!file || !ALLOWED_TYPES.has(file.type) || file.size > MAX_RECEIPT_BYTES) {
     throw new ReceiptServiceError("INVALID_IMAGE", "Unggah gambar JPG, PNG, atau WEBP maksimal 10 MB.", 422);
   }
-  const registrant = await db.jerseyOrder.findUnique({ where: { id: registrantId }, select: { id: true } });
+  const registrant = await db.jerseyOrder.findUnique({
+    where: { id: registrantId },
+    select: { id: true, paymentReceipt: { select: { imageUrl: true } } },
+  });
   if (!registrant) throw new ReceiptServiceError("REGISTRANT_NOT_FOUND", "Data pendaftar tidak ditemukan.", 404);
 
   const normalizedPhone = validatePhoneNumber(phoneNumber);
@@ -110,24 +113,41 @@ export async function processReceiptSubmission({
   const imageUrl = await uploadWebp(bytes, registrantId);
   const receiptHash = createReceiptFingerprint(bytes);
 
-  await db.paymentReceipt.upsert({
-    where: { registrantId },
-    create: {
-      registrantId,
-      phoneNumber: normalizedPhone,
-      phoneVerified: true,
-      imageUrl,
-      receiptHash,
-      status: "PENDING_VERIFICATION",
-    },
-    update: {
-      phoneNumber: normalizedPhone,
-      phoneVerified: true,
-      imageUrl,
-      receiptHash,
-      status: "PENDING_VERIFICATION",
-      reviewedBy: null,
-      reviewedAt: null,
-    },
-  });
+  try {
+    await db.paymentReceipt.upsert({
+      where: { registrantId },
+      create: {
+        registrantId,
+        phoneNumber: normalizedPhone,
+        phoneVerified: true,
+        imageUrl,
+        receiptHash,
+        status: "PENDING_VERIFICATION",
+      },
+      update: {
+        phoneNumber: normalizedPhone,
+        phoneVerified: true,
+        imageUrl,
+        receiptHash,
+        status: "PENDING_VERIFICATION",
+        reviewedBy: null,
+        reviewedAt: null,
+      },
+    });
+  } catch (error) {
+    try {
+      await deleteReceiptStorageObject(imageUrl);
+    } catch (cleanupError) {
+      console.error("[receipt submit] failed to clean up new image", cleanupError);
+    }
+    throw error;
+  }
+
+  if (registrant.paymentReceipt?.imageUrl && registrant.paymentReceipt.imageUrl !== imageUrl) {
+    try {
+      await deleteReceiptStorageObject(registrant.paymentReceipt.imageUrl);
+    } catch (cleanupError) {
+      console.error("[receipt replace] failed to clean up previous image", cleanupError);
+    }
+  }
 }
