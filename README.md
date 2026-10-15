@@ -13,10 +13,11 @@ Repository: https://github.com/pusakajeumala26/PusakaFC26
 - Daftar nomor punggung terpakai yang dapat dilihat publik.
 - Panel admin dengan login berbasis password, rate limiting, statistik, edit/hapus data, dan ekspor.
 - Panel admin menampilkan nomor urut berdasarkan waktu submit dan nomor punggung sebagai field terpisah.
-- Panel admin menyediakan import data JSON, pagination 20 data per halaman, dan tombol Review Struk di area aksi data.
-- Fitur Struk Submission Scanner untuk upload langsung dan review bukti transfer oleh Bendahara atau Super Admin.
-- Generator Struk Bendahara untuk membuat gambar bukti pembayaran, menyimpan riwayat, mengunduh, dan membagikannya melalui WhatsApp.
-- Status bukti transfer ditampilkan melalui warna baris data tanpa menambahkan kolom status baru.
+- Panel admin menyediakan import data JSON, pagination 20 data per halaman, Review Struk, dan Struk Generator melalui sidebar.
+- Fitur Submit Bukti Transfer untuk menyimpan bukti pembayaran dan review manual oleh Bendahara atau Super Admin.
+- Struk Generator Bendahara untuk pembayaran cash/manual, menyimpan riwayat, mengunduh, dan membagikan bukti melalui WhatsApp.
+- Status pembayaran publik mengikuti urutan dan nomor urut yang sama persis dengan tabel Admin.
+- Penghapusan pendaftar ikut membersihkan receipt database dan file receipt di Supabase Storage.
 - Sidebar publik menyediakan kontak Admin, Bendahara, Sekretaris, dan Super Admin.
 - API Next.js untuk orders dan operasi admin.
 - Prisma ORM dengan SQLite untuk pengembangan lokal dan PostgreSQL/Supabase untuk production.
@@ -104,7 +105,7 @@ examples/websocket/      Contoh server dan frontend WebSocket
 - Ganti secret dan password bawaan sebelum deployment.
 - Endpoint admin mengandalkan cookie HTTP-only dan validasi session server-side.
 - Untuk deployment, sesuaikan `DATABASE_URL`, `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`, dan `SUPABASE_STORAGE_BUCKET` dengan environment production.
-- Setelah merge, jalankan migration `20261014000000_add_treasurer_receipts` pada database production.
+- Setelah merge, jalankan migration receipt pada database production dan pastikan database berstatus up to date. Migration receipt utama saat ini adalah `20261014000000_add_treasurer_receipts`, `20261015010000_link_treasurer_receipts_to_registrants`, dan `20261015020000_cascade_treasurer_receipts_on_order_delete`.
 - Jangan menaruh service-role key Supabase pada kode client atau environment variable yang diawali `NEXT_PUBLIC_`.
 
 ## Lisensi

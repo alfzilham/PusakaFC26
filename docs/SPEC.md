@@ -1,6 +1,6 @@
 # SPEC.md — PusakaFC26 Jersey Order System
 
-> **Status implementasi (14 Oktober 2026):** Dokumen ini memuat spesifikasi dasar pendaftaran jersey. Fitur Struk Scanner, perubahan kontak, penghapusan WAHA, import JSON, dan perilaku pagination terbaru dijelaskan pada `ADMIN_GUIDE.md` serta `features/BENDAHARA_REJECTION_FLOW_CHANGE.md`.
+> **Status implementasi (15 Oktober 2026):** Dokumen ini memuat spesifikasi dasar pendaftaran jersey. Alur receipt manual, status pembayaran, cleanup receipt, perubahan kontak, penghapusan WAHA, import JSON, dan pagination terbaru dijelaskan pada `ADMIN_GUIDE.md` serta `ARCHITECTURE.md`.
 
 ## 1. Overview
 
@@ -45,6 +45,13 @@ Sistem input pemesanan nama/nomor punggung jersey untuk event "PusakaFC26". Tida
 - Setiap item disertai badge/label gender (Pria/Wanita).
 - Read-only, tidak ada aksi interaktif untuk user publik.
 
+### 3.3 — Status Pembayaran
+
+- Menampilkan semua pendaftar dalam urutan yang sama persis dengan tabel Admin.
+- Nomor urut menunjukkan posisi submit asli, bukan posisi setelah filter.
+- Baris hijau: `VERIFIED`; kuning: `PENDING_VERIFICATION`; merah: `REJECTED`; putih: belum ada receipt.
+- Filter status tidak mengubah urutan canonical.
+
 ## 4. Navigasi
 
 ### 4.1 Top Bar
@@ -82,7 +89,9 @@ Sistem input pemesanan nama/nomor punggung jersey untuk event "PusakaFC26". Tida
   - Search bar (nama lengkap / nama belakang / nomor).
   - Filter gender (custom checkbox atau dropdown).
   - Pagination: 20 entri/halaman.
-  - Tombol Review Struk berada di sebelah Import JSON.
+  - Review Struk, Struk Generator, Export, dan Import tersedia melalui sidebar Admin; Refresh tetap di top bar.
+- Struk Generator berada di sidebar Admin dan memerlukan verifikasi Super Admin.
+- Receipt cash/manual dari Bendahara langsung disimpan sebagai `VERIFIED`.
 - **Row actions**:
   - Edit — inline atau modal, langsung tersimpan tanpa konfirmasi tambahan.
   - Hapus — wajib modal konfirmasi sebelum eksekusi.
@@ -114,4 +123,4 @@ Sistem input pemesanan nama/nomor punggung jersey untuk event "PusakaFC26". Tida
 - Login/akun untuk user publik.
 - Edit/cancel self-service untuk user publik.
 - Notifikasi otomatis (email/WA blast) ke user.
-- Pengiriman WhatsApp otomatis melalui WAHA; penolakan menggunakan click-to-chat manual.
+- Tidak ada pengiriman WhatsApp otomatis; penolakan menggunakan click-to-chat manual.
