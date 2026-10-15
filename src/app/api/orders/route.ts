@@ -13,12 +13,19 @@ import { isPublicSuperAdminAuthenticated } from "@/lib/auth";
 export async function GET() {
   try {
     const rows = await db.jerseyOrder.findMany({
-      orderBy: [{ backNumber: "asc" }],
+      orderBy: [{ createdAt: "desc" }, { id: "desc" }],
       include: { paymentReceipt: { select: { status: true } } },
     });
 
+    const sequenceRows = await db.jerseyOrder.findMany({
+      orderBy: [{ createdAt: "asc" }, { id: "asc" }],
+      select: { id: true },
+    });
+    const sequenceById = new Map(sequenceRows.map((row, index) => [row.id, index + 1]));
+
     const data = rows.map((r) => ({
       ...r,
+      sequenceNumber: sequenceById.get(r.id),
       gender: isGender(r.gender) ? r.gender : "PRIA",
       paymentStatus: r.paymentReceipt?.status,
     }));

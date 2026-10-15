@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { isAdminAuthenticated, isSuperAdminAuthenticated } from "@/lib/auth";
+import { deleteReceiptStorageObject } from "@/lib/receipt-service";
 import {
   updateOrderSchema,
   isGender,
@@ -96,7 +97,7 @@ export async function GET(req: Request) {
     db.jerseyOrder.count({ where }),
     db.jerseyOrder.findMany({
       where,
-      orderBy: [{ createdAt: "desc" }],
+      orderBy: [{ createdAt: "desc" }, { id: "desc" }],
       skip: (page - 1) * pageSize,
       take: pageSize,
       include: { paymentReceipt: { select: { status: true } } },
@@ -228,8 +229,29 @@ export async function DELETE(req: Request) {
   }
 
   try {
+    const order = await db.jerseyOrder.findUnique({
+      where: { id },
+      select: {
+        paymentReceipt: { select: { imageUrl: true } },
+        treasurerReceipts: { select: { imageUrl: true } },
+      },
+    });
+    if (!order) return NextResponse.json({ error: "Data tidak ditemukan." }, { status: 404 });
+
     await db.jerseyOrder.delete({ where: { id } });
-    return NextResponse.json({ ok: true });
+
+    const imageUrls = [
+      order.paymentReceipt?.imageUrl,
+      ...order.treasurerReceipts.map((receipt) => receipt.imageUrl),
+    ].filter((url): url is string => Boolean(url));
+    const cleanup = await Promise.allSettled(
+      [...new Set(imageUrls)].map((imageUrl) => deleteReceiptStorageObject(imageUrl))
+    );
+    const cleanupFailed = cleanup.some((result) => result.status === "rejected");
+    if (cleanupFailed) {
+      console.error("[admin orders DELETE] some receipt files could not be removed", cleanup);
+    }
+    return NextResponse.json({ ok: true, storageCleanup: cleanupFailed ? "partial" : "complete" });
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err);
     if (message.includes("does not exist") || message.includes("P2025")) {
