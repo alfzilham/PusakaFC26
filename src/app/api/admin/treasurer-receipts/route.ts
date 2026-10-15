@@ -3,7 +3,6 @@ import crypto from "crypto";
 import sharp from "sharp";
 import { db } from "@/lib/db";
 import { isAdminAuthenticated } from "@/lib/auth";
-import { normalizePhone } from "@/lib/validations";
 
 export const runtime = "nodejs";
 
@@ -25,13 +24,12 @@ export async function POST(request: Request) {
     const form = await request.formData();
     const registrantId = String(form.get("registrantId") || "").trim();
     const fullName = String(form.get("fullName") || "").trim();
-    const phoneNumber = normalizePhone(String(form.get("phoneNumber") || ""));
     const amount = Number(String(form.get("amount") || ""));
     const noteValue = String(form.get("note") || "").trim();
     const image = form.get("image");
 
-    if (!registrantId || !fullName || phoneNumber.length < 10 || phoneNumber.length > 15 || !Number.isSafeInteger(amount) || amount <= 0) {
-      return NextResponse.json({ error: "Lengkapi nama, nomor WhatsApp, dan nominal dengan benar." }, { status: 422 });
+    if (!registrantId || !fullName || !Number.isSafeInteger(amount) || amount <= 0) {
+      return NextResponse.json({ error: "Lengkapi nama dan nominal dengan benar." }, { status: 422 });
     }
     if (!(image instanceof File) || !ALLOWED_TYPES.has(image.type) || image.size > MAX_IMAGE_BYTES) {
       return NextResponse.json({ error: "Gambar struk maksimal 10 MB dengan format JPG, PNG, atau WEBP." }, { status: 422 });
@@ -51,6 +49,9 @@ export async function POST(request: Request) {
     if (!upload.ok) throw new Error("Gagal menyimpan gambar struk.");
 
     const imageUrl = `${supabaseUrl}/storage/v1/object/public/${bucket}/${path}`;
+    // Manual cash receipts do not require a WhatsApp number. The legacy
+    // schema keeps this field required, so use an explicit non-contact marker.
+    const phoneNumber = "MANUAL_CASH";
     const row = await db.$transaction(async (tx) => {
       const registrant = await tx.jerseyOrder.findUnique({ where: { id: registrantId }, select: { id: true } });
       if (!registrant) throw new Error("Pendaftar tidak ditemukan.");
