@@ -24,7 +24,7 @@ export function PaymentStatusList({ used }: { used: UsedEntry[] }) {
   const rows = useMemo(
     () => [...used]
       .filter((row) => filter === "ALL" || (filter === "UNPAID" ? !row.paymentStatus : row.paymentStatus === filter))
-      .sort((a, b) => Number(a.backNumber) - Number(b.backNumber)),
+      .sort((a, b) => (a.sequenceNumber ?? Number.MAX_SAFE_INTEGER) - (b.sequenceNumber ?? Number.MAX_SAFE_INTEGER)),
     [filter, used]
   );
   const filters = [
@@ -61,9 +61,9 @@ export function PaymentStatusList({ used }: { used: UsedEntry[] }) {
               </tr>
             </thead>
             <tbody>
-              {rows.map((row, index) => (
+              {rows.map((row) => (
                 <tr key={row.id} className={cn("border-b border-app-border/70 last:border-0", rowTone(row.paymentStatus))}>
-                  <td className="px-4 py-3 font-bold tabular-nums text-app-fg">{index + 1}</td>
+                  <td className="px-4 py-3 font-bold tabular-nums text-app-fg">{row.sequenceNumber ?? "—"}</td>
                   <td className="px-4 py-3 font-semibold text-app-fg">{GENDER_LABEL[row.gender]}</td>
                   <td className="px-4 py-3 font-medium text-app-fg">{row.fullName}</td>
                   <td className="px-4 py-3 font-medium text-app-fg-soft">{row.backName}</td>

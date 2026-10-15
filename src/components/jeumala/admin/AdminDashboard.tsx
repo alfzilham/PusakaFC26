@@ -58,6 +58,8 @@ export function AdminDashboard({ onLogout }: { onLogout: () => void }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [view, setView] = useState<AdminView>("dashboard");
   const pendingSuperAdminAction = useRef<(() => void | Promise<void>) | null>(null);
+  const tableRequestRef = useRef(0);
+  const tableAbortRef = useRef<AbortController | null>(null);
 
   // Derived gender filter for API
   const genderParam = (() => {
@@ -67,6 +69,10 @@ export function AdminDashboard({ onLogout }: { onLogout: () => void }) {
   })();
 
   const fetchTable = useCallback(async () => {
+    const requestId = ++tableRequestRef.current;
+    tableAbortRef.current?.abort();
+    const controller = new AbortController();
+    tableAbortRef.current = controller;
     setLoading(true);
     try {
       const params = new URLSearchParams();
@@ -75,16 +81,20 @@ export function AdminDashboard({ onLogout }: { onLogout: () => void }) {
       params.set("page", String(page));
       const res = await fetch(`/api/admin/orders?${params.toString()}`, {
         cache: "no-store",
+        signal: controller.signal,
       });
       if (!res.ok) throw new Error();
       const json = await res.json();
+      if (requestId !== tableRequestRef.current) return;
       setRows(json.data);
       setTotal(json.total);
       setTotalPages(json.totalPages);
-    } catch {
+    } catch (error) {
+      if (error instanceof DOMException && error.name === "AbortError") return;
+      if (requestId !== tableRequestRef.current) return;
       show({ variant: "error", title: "Gagal memuat data." });
     } finally {
-      setLoading(false);
+      if (requestId === tableRequestRef.current) setLoading(false);
     }
   }, [query, genderParam, page, show]);
 

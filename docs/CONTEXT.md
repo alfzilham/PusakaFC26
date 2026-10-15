@@ -34,6 +34,9 @@ Project ini sudah berjalan sebagai aplikasi Next.js + Prisma. Dokumen ini adalah
 | 14 | Export data | `.xlsx` (2 sheet: Pria & Wanita) dan `.json` |
 | 15 | Database | PostgreSQL via Prisma di Supabase production; SQLite dapat dipakai lokal |
 | 16 | Tombol submit | Disabled saat invalid/loading, mencegah double-submit |
+| 17 | Urutan status publik | Sama persis dengan tabel Admin: `createdAt DESC, id DESC`; nomor urut mengikuti waktu submit paling awal |
+| 18 | Pembayaran cash | Struk yang dibuat Bendahara tersimpan sebagai histori dan langsung berstatus `VERIFIED` |
+| 19 | Penghapusan data | Pendaftar, receipt database, dan file receipt terkait dibersihkan bersama melalui alur cleanup |
 
 ## 4. Kriteria Teknis Wajib
 
@@ -51,6 +54,7 @@ Project ini sudah berjalan sebagai aplikasi Next.js + Prisma. Dokumen ini adalah
 - Tidak ada notifikasi email/WA otomatis ke user setelah submit.
 - Penolakan struk menggunakan tautan click-to-chat WhatsApp yang dibuka dan dikirim manual; WAHA sudah dihapus dari project.
 - Struk yang ditolak dihapus dari `PaymentReceipt` dan Supabase Storage, sedangkan approval tidak mengirim notifikasi.
+- Receipt cash/manual Bendahara disimpan di `TreasurerReceipt` dan status canonical-nya berada di `PaymentReceipt` sebagai `VERIFIED`.
 
 ## 6. Dokumen Terkait
 

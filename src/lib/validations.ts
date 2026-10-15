@@ -135,6 +135,7 @@ export type OrderRow = {
 
 export type UsedEntry = {
   id: string;
+  sequenceNumber?: number;
   gender: Gender;
   fullName: string;
   backName: string;

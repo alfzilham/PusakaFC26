@@ -70,7 +70,7 @@ model TreasurerReceipt {
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 
-  registrant JerseyOrder? @relation(fields: [registrantId], references: [id], onDelete: SetNull)
+  registrant JerseyOrder? @relation(fields: [registrantId], references: [id], onDelete: Cascade)
 
   @@index([createdAt])
   @@index([phoneNumber])
