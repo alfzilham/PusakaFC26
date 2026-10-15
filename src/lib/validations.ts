@@ -142,3 +142,7 @@ export type UsedEntry = {
   backNumber: string;
   paymentStatus?: "PENDING_VERIFICATION" | "VERIFIED" | "REJECTED";
 };
+
+export function isAvailableForReceipt(entry: Pick<UsedEntry, "paymentStatus">) {
+  return !entry.paymentStatus || entry.paymentStatus === "REJECTED";
+}

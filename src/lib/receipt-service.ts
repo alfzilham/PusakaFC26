@@ -92,7 +92,7 @@ export async function processReceiptSubmission({
   registrantId,
   phoneNumber,
   file,
-  replace: _replace = false,
+  replace = false,
 }: {
   registrantId: string;
   phoneNumber: string;
@@ -104,9 +104,12 @@ export async function processReceiptSubmission({
   }
   const registrant = await db.jerseyOrder.findUnique({
     where: { id: registrantId },
-    select: { id: true, paymentReceipt: { select: { imageUrl: true } } },
+    select: { id: true, paymentReceipt: { select: { imageUrl: true, status: true } } },
   });
   if (!registrant) throw new ReceiptServiceError("REGISTRANT_NOT_FOUND", "Data pendaftar tidak ditemukan.", 404);
+  if (!replace && registrant.paymentReceipt && registrant.paymentReceipt.status !== "REJECTED") {
+    throw new ReceiptServiceError("RECEIPT_EXISTS", "Pendaftar ini sudah memiliki bukti transfer aktif.", 409);
+  }
 
   const normalizedPhone = validatePhoneNumber(phoneNumber);
   const bytes = new Uint8Array(await file.arrayBuffer());

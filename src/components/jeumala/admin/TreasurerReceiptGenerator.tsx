@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState, type FormEvent } from "react";
 import { Download, ImagePlus, MessageCircle, Send } from "lucide-react";
-import type { UsedEntry } from "@/lib/validations";
+import { isAvailableForReceipt, type UsedEntry } from "@/lib/validations";
 import { CustomDropdown } from "@/components/jeumala/CustomDropdown";
 import { useToast } from "@/components/jeumala/Toast";
 
@@ -34,7 +34,7 @@ export function TreasurerReceiptGenerator() {
       .finally(() => setLoadingRegistrants(false));
   }, [show]);
 
-  const options = [...registrants].sort((a, b) => a.fullName.localeCompare(b.fullName, "id")).map((entry) => ({ value: entry.id, label: `${entry.fullName} · No. ${entry.backNumber}` }));
+  const options = registrants.filter(isAvailableForReceipt).sort((a, b) => a.fullName.localeCompare(b.fullName, "id")).map((entry) => ({ value: entry.id, label: `${entry.fullName} · No. ${entry.backNumber}` }));
   const selected = registrants.find((entry) => entry.id === registrantId);
 
   function handlePhoneChange(value: string) {
@@ -74,7 +74,9 @@ export function TreasurerReceiptGenerator() {
       const response = await fetch("/api/admin/treasurer-receipts", { method: "POST", body: form });
       const body = await response.json().catch(() => ({}));
       if (!response.ok) throw new Error(body.error || "Gagal menyimpan struk.");
+      setRegistrants((current) => current.map((entry) => entry.id === selected.id ? { ...entry, paymentStatus: "VERIFIED" } : entry));
       setImageFile(file); setImageUrl(URL.createObjectURL(blob));
+      setRegistrantId("");
       show({ variant: "success", title: "Struk berhasil dibuat dan disimpan." });
     } catch (error) {
       show({ variant: "error", title: error instanceof Error ? error.message : "Gagal membuat struk." });

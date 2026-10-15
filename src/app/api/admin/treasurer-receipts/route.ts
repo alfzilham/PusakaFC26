@@ -54,6 +54,12 @@ export async function POST(request: Request) {
     const row = await db.$transaction(async (tx) => {
       const registrant = await tx.jerseyOrder.findUnique({ where: { id: registrantId }, select: { id: true } });
       if (!registrant) throw new Error("Pendaftar tidak ditemukan.");
+      const existingReceipt = await tx.paymentReceipt.findUnique({ where: { registrantId }, select: { status: true } });
+      if (existingReceipt && existingReceipt.status !== "REJECTED") {
+        const error = new Error("Pendaftar ini sudah memiliki bukti transfer aktif.");
+        error.name = "ACTIVE_RECEIPT_EXISTS";
+        throw error;
+      }
 
       const created = await tx.treasurerReceipt.create({
         data: { registrantId, fullName, phoneNumber, amount, note: noteValue || null, imageUrl, createdBy: "Bendahara" },
@@ -71,6 +77,9 @@ export async function POST(request: Request) {
     return NextResponse.json({ data: row }, { status: 201 });
   } catch (error) {
     console.error("[treasurer receipt]", error);
+    if (error instanceof Error && error.name === "ACTIVE_RECEIPT_EXISTS") {
+      return NextResponse.json({ error: error.message, code: "RECEIPT_EXISTS" }, { status: 409 });
+    }
     return NextResponse.json({ error: "Gagal menyimpan struk. Pastikan migration database sudah dijalankan." }, { status: 500 });
   }
 }

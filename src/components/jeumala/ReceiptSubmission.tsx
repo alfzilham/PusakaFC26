@@ -2,7 +2,7 @@
 
 import { useState, type FormEvent } from "react";
 import { CheckCircle2, FileImage, MessageCircle, Send, UploadCloud } from "lucide-react";
-import type { UsedEntry } from "@/lib/validations";
+import { isAvailableForReceipt, type UsedEntry } from "@/lib/validations";
 import { CustomDropdown } from "./CustomDropdown";
 import { useToast } from "./Toast";
 import { cn } from "@/lib/utils";
@@ -15,8 +15,9 @@ export function ReceiptSubmission({ used }: { used: UsedEntry[] }) {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [done, setDone] = useState(false);
+  const [submittedIds, setSubmittedIds] = useState<Set<string>>(() => new Set());
 
-  const options = [...used]
+  const options = used.filter((entry) => !submittedIds.has(entry.id) && isAvailableForReceipt(entry))
     .sort((a, b) => a.fullName.localeCompare(b.fullName, "id"))
     .map((entry) => ({ value: entry.id, label: `${entry.fullName} · No. ${entry.backNumber}` }));
 
@@ -39,6 +40,8 @@ export function ReceiptSubmission({ used }: { used: UsedEntry[] }) {
       const response = await fetch("/api/receipts/submit", { method: "POST", body: form });
       const body = await response.json().catch(() => ({}));
       if (!response.ok) throw new Error(body.error || "Bukti transfer gagal diproses.");
+      setSubmittedIds((current) => new Set(current).add(registrantId));
+      setRegistrantId("");
       setDone(true);
       setFile(null);
       setPhoneNumber("");
